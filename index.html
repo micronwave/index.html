@@ -2,25 +2,27 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=960">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Aaron Altergott — Operations Specialist transitioning to cloud computing and DevSecOps. Portfolio, resume, and projects.">
 <title>Aaron Altergott - Operations Specialist &amp; Cloud Enthusiast</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
     font-family: Verdana, Tahoma, Geneva, sans-serif;
-    font-size: 12px;
+    font-size: 13px;
     color: #222222;
     background-color: #2B3A4A;
     background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23384d61' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 5v-1zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
     cursor: crosshair;
-    line-height: 1.5;
+    line-height: 1.55;
 }
 a { color: #0033CC; text-decoration: underline; }
 a:visited { color: #660099; }
 a:hover { color: #FF6600; }
 
-/* Marquee - pauses on hover */
+/* ============================== */
+/* Marquee */
+/* ============================== */
 .marquee-bar {
     background: #003366; color: #FFCC00; font-size: 11px;
     font-family: 'Courier New', Courier, monospace; padding: 3px 0;
@@ -30,11 +32,18 @@ a:hover { color: #FF6600; }
 .marquee-bar:hover .scroll-text { animation-play-state: paused; }
 @keyframes marqueeScroll { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
 
+/* ============================== */
+/* Page wrapper */
+/* ============================== */
 .page-wrapper {
-    width: 1300px; margin: 0 auto; background: #D6DFE8;
+    width: 100%; max-width: 1300px; margin: 0 auto; background: #D6DFE8;
     border-left: 2px solid #FFFFFF; border-top: 2px solid #FFFFFF;
     border-right: 2px solid #888888; border-bottom: 2px solid #888888;
 }
+
+/* ============================== */
+/* Header */
+/* ============================== */
 .site-header {
     background: linear-gradient(to right, #003366, #005580, #003366);
     color: #FFFFFF; padding: 15px 20px; border-bottom: 3px solid #CC8800;
@@ -57,9 +66,17 @@ a:hover { color: #FF6600; }
 }
 @keyframes globeRotate { 0% { box-shadow: -2px 0 4px rgba(0,0,0,0.3) inset; } 50% { box-shadow: 2px 0 4px rgba(0,0,0,0.3) inset; } 100% { box-shadow: -2px 0 4px rgba(0,0,0,0.3) inset; } }
 @keyframes continentDrift { 0% { transform: translateX(-5px); } 100% { transform: translateX(5px); } }
+
+/* ============================== */
+/* Layout: sidebar + content (desktop) */
+/* ============================== */
 .layout-table { display: table; width: 100%; border-collapse: collapse; }
 .sidebar-cell { display: table-cell; width: 220px; vertical-align: top; background: #003355; border-right: 2px solid #001a33; }
 .content-cell { display: table-cell; vertical-align: top; padding: 0; background: #D6DFE8; }
+
+/* ============================== */
+/* Sidebar nav */
+/* ============================== */
 .sidebar-nav { padding: 0; }
 .sidebar-label { background: linear-gradient(to bottom, #004477, #003366); color: #FFCC00; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; padding: 8px 10px; border-bottom: 1px solid #002244; text-align: center; }
 .nav-btn { display: block; width: 100%; padding: 8px 12px; color: #CCDDEE; text-decoration: none; font-size: 11px; font-weight: bold; font-family: Verdana, sans-serif; background: linear-gradient(to bottom, #003d66, #002d4d); border: none; border-bottom: 1px solid #001a33; border-top: 1px solid #004d80; cursor: pointer; text-align: left; transition: background 0.1s; }
@@ -73,12 +90,13 @@ a:hover { color: #FF6600; }
 .sidebar-links a::before { content: '\00BB\0020'; color: #CC8800; }
 .sidebar-mini-globe { text-align: center; padding: 12px 0; border-top: 1px solid #004d80; }
 .mini-globe { width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #4FC3F7, #0277BD 60%, #002244); display: inline-block; animation: globeRotate 4s linear infinite; border: 1px solid #00ACC1; }
+
+/* ============================== */
+/* Content area */
+/* ============================== */
 .content-inner { padding: 20px 28px; }
-
-/* Section headings */
-.section-heading { font-family: Verdana, Tahoma, sans-serif; font-size: 16px; font-weight: bold; color: #003366; padding-bottom: 5px; border-bottom: 2px solid #CC8800; margin-bottom: 14px; margin-top: 24px; display: flex; align-items: center; gap: 8px; }
+.section-heading { font-family: Verdana, Tahoma, sans-serif; font-size: 17px; font-weight: bold; color: #003366; padding-bottom: 5px; border-bottom: 2px solid #CC8800; margin-bottom: 14px; margin-top: 24px; display: flex; align-items: center; gap: 8px; }
 .section-heading:first-child { margin-top: 0; }
-
 .sec-icon { display: inline-block; flex-shrink: 0; image-rendering: pixelated; }
 .icon-home { width: 18px; height: 18px; position: relative; }
 .icon-home::before { content: ''; position: absolute; top: 2px; left: 1px; width: 0; height: 0; border-left: 9px solid transparent; border-right: 9px solid transparent; border-bottom: 7px solid #B87700; }
@@ -98,16 +116,18 @@ a:hover { color: #FF6600; }
 
 hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right, #D6DFE8, #999999, #D6DFE8); margin: 20px 0; }
 
+/* ============================== */
 /* Expandable panels */
-.expand-header { background: linear-gradient(to bottom, #E8EEF4, #D0D9E3); border: 2px outset #CCCCCC; padding: 9px 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; margin-bottom: 2px; user-select: none; }
+/* ============================== */
+.expand-header { background: linear-gradient(to bottom, #E8EEF4, #D0D9E3); border: 2px outset #CCCCCC; padding: 9px 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; margin-bottom: 2px; user-select: none; flex-wrap: wrap; }
 .expand-header:hover { background: linear-gradient(to bottom, #EEF3F8, #D8E1EB); }
-.expand-header .toggle-icon { font-family: 'Courier New', monospace; font-size: 11px; font-weight: bold; color: #003366; width: 14px; flex-shrink: 0; }
-.expand-header .panel-title { font-family: Verdana, sans-serif; font-size: 12px; font-weight: bold; color: #003366; }
+.expand-header .toggle-icon { font-family: 'Courier New', monospace; font-size: 12px; font-weight: bold; color: #003366; width: 14px; flex-shrink: 0; }
+.expand-header .panel-title { font-family: Verdana, sans-serif; font-size: 13px; font-weight: bold; color: #003366; }
 .expand-header .status-badge { font-size: 10px; font-family: 'Courier New', monospace; padding: 1px 6px; margin-left: auto; border: 1px solid; flex-shrink: 0; }
 .badge-complete { background: #C8E6C9; color: #1B5E20; border-color: #81C784; }
 .badge-progress { background: #FFF9C4; color: #E65100; border-color: #FDD835; }
 .expand-header .one-liner { font-size: 11px; color: #555555; font-weight: normal; margin-left: 6px; }
-.expand-body { display: none; background: #EDF1F5; border: 1px solid #BBBBBB; border-top: none; padding: 16px 18px; margin-bottom: 8px; font-size: 12px; line-height: 1.65; }
+.expand-body { display: none; background: #EDF1F5; border: 1px solid #BBBBBB; border-top: none; padding: 16px 18px; margin-bottom: 8px; font-size: 13px; line-height: 1.65; }
 .expand-body.open { display: block; }
 .expand-body p { margin-bottom: 10px; }
 .expand-body p:last-child { margin-bottom: 0; }
@@ -115,24 +135,28 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
 .blink-new { color: #FF0000; font-weight: bold; font-size: 10px; font-family: 'Courier New', monospace; animation: blinkAnim 1s step-end infinite; margin-left: 6px; flex-shrink: 0; }
 @keyframes blinkAnim { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
 
+/* ============================== */
 /* Resume */
+/* ============================== */
 .resume-category { margin-bottom: 4px; }
 .resume-job { padding: 10px 14px; border-bottom: 1px dotted #BBBBBB; }
 .resume-job:last-child { border-bottom: none; }
-.job-title-line { font-weight: bold; font-size: 12px; color: #003355; }
-.job-date { font-family: 'Courier New', monospace; font-size: 10px; color: #777777; margin-top: 1px; }
+.job-title-line { font-weight: bold; font-size: 13px; color: #003355; }
+.job-date { font-family: 'Courier New', monospace; font-size: 11px; color: #777777; margin-top: 1px; }
 .job-bullets { margin-top: 6px; padding-left: 18px; list-style: square; color: #333333; }
-.job-bullets li { margin-bottom: 5px; font-size: 11px; line-height: 1.55; }
+.job-bullets li { margin-bottom: 5px; font-size: 12px; line-height: 1.55; }
 .skill-group { margin-bottom: 8px; }
-.skill-group strong { color: #003355; font-size: 11px; }
-.skill-group span { font-size: 11px; color: #333333; }
-.download-btn { display: inline-block; background: #E0E0E0; color: #003366; font-family: Verdana, sans-serif; font-size: 11px; font-weight: bold; padding: 6px 18px; border: 2px outset #CCCCCC; cursor: pointer; text-decoration: none; margin-top: 12px; }
+.skill-group strong { color: #003355; font-size: 12px; }
+.skill-group span { font-size: 12px; color: #333333; }
+.download-btn { display: inline-block; background: #E0E0E0; color: #003366; font-family: Verdana, sans-serif; font-size: 12px; font-weight: bold; padding: 6px 18px; border: 2px outset #CCCCCC; cursor: pointer; text-decoration: none; margin-top: 12px; }
 .download-btn:hover { border-style: inset; background: #D0D0D0; }
 .download-btn:visited { color: #003366; }
 
+/* ============================== */
 /* Chatroom */
+/* ============================== */
 .chatroom-wrapper { border: 1px solid #888888; }
-.chatroom-header { background: linear-gradient(to bottom, #004477, #003366); color: #FFFFFF; font-family: Verdana, sans-serif; font-size: 13px; font-weight: bold; padding: 8px 14px; border-bottom: 1px solid #002244; display: flex; align-items: center; gap: 8px; }
+.chatroom-header { background: linear-gradient(to bottom, #004477, #003366); color: #FFFFFF; font-family: Verdana, sans-serif; font-size: 14px; font-weight: bold; padding: 8px 14px; border-bottom: 1px solid #002244; display: flex; align-items: center; gap: 8px; }
 .chatroom-header .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #4CAF50; display: inline-block; animation: dotPulse 2s ease-in-out infinite; }
 @keyframes dotPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 .chatroom-info-bar { background: #B0BEC5; font-size: 10px; font-family: 'Courier New', monospace; color: #333333; padding: 4px 14px; border-bottom: 1px solid #999999; display: flex; justify-content: space-between; }
@@ -149,179 +173,123 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
 .dot-green { background: #4CAF50; }
 .dot-gray { background: #AAAAAA; }
 .reply-section { background: #E8ECF0; border-top: 1px solid #999999; padding: 14px; }
-.reply-section h3 { font-family: Verdana, sans-serif; font-size: 12px; font-weight: bold; color: #003366; margin-bottom: 10px; }
+.reply-section h3 { font-family: Verdana, sans-serif; font-size: 13px; font-weight: bold; color: #003366; margin-bottom: 10px; }
 .form-row { margin-bottom: 8px; }
-.form-row label { display: inline-block; width: 70px; font-size: 11px; font-weight: bold; color: #333333; vertical-align: top; padding-top: 2px; }
-.form-row input[type="text"], .form-row textarea { font-family: Verdana, sans-serif; font-size: 11px; padding: 4px 6px; border: 2px inset #BBBBBB; background: #F5F5F5; width: 420px; }
+.form-row label { display: inline-block; width: 70px; font-size: 12px; font-weight: bold; color: #333333; vertical-align: top; padding-top: 2px; }
+.form-row input[type="text"], .form-row textarea { font-family: Verdana, sans-serif; font-size: 12px; padding: 4px 6px; border: 2px inset #BBBBBB; background: #F5F5F5; width: 420px; max-width: calc(100% - 80px); }
 .form-row textarea { height: 80px; resize: vertical; }
-.submit-btn { background: #E0E0E0; color: #003366; font-family: Verdana, sans-serif; font-size: 11px; font-weight: bold; padding: 5px 22px; border: 2px outset #CCCCCC; cursor: pointer; margin-left: 70px; }
+.submit-btn { background: #E0E0E0; color: #003366; font-family: Verdana, sans-serif; font-size: 12px; font-weight: bold; padding: 5px 22px; border: 2px outset #CCCCCC; cursor: pointer; margin-left: 70px; }
 .submit-btn:hover { border-style: inset; background: #D0D0D0; }
-.form-note { font-size: 10px; color: #666666; font-style: italic; margin-top: 6px; margin-left: 70px; }
+.form-note { font-size: 11px; color: #666666; font-style: italic; margin-top: 6px; margin-left: 70px; }
 
+/* ============================== */
 /* Footer */
+/* ============================== */
 .site-footer { background: linear-gradient(to bottom, #003d66, #002d4d); border-top: 3px solid #CC8800; padding: 12px 20px; text-align: center; color: #88AACC; font-size: 10px; }
 .webring-bar { font-family: 'Courier New', monospace; font-size: 10px; color: #CCDDEE; margin-bottom: 8px; padding: 4px 0; border: 1px solid #004d80; background: #002d4d; }
 .webring-bar a { color: #88CCFF; text-decoration: underline; }
-.webring-bar a:hover { color: #FFCC00; text-decoration: underline; }
+.webring-bar a:hover { color: #FFCC00; }
 .visitor-counter { display: inline-flex; align-items: center; gap: 6px; margin: 8px 0; font-size: 9px; color: #88AACC; }
 .counter-digits { display: inline-flex; background: #111111; border: 1px inset #333333; padding: 2px; gap: 1px; }
 .counter-digit { background: #0a0a0a; color: #33FF33; font-family: 'Courier New', monospace; font-size: 11px; font-weight: bold; width: 12px; text-align: center; border: 1px solid #222222; }
 .footer-copy { margin-top: 6px; font-size: 9px; color: #667788; }
 .footer-badge { font-size: 9px; color: #556677; margin-top: 4px; font-family: 'Courier New', monospace; }
 .footer-globe { display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #4FC3F7, #0277BD 60%, #002244); animation: globeRotate 4s linear infinite; vertical-align: middle; margin-left: 4px; }
-.intro-text { font-size: 12px; line-height: 1.7; color: #333333; }
-.intro-text p { margin-bottom: 10px; }
-.about-text p { font-size: 12px; line-height: 1.7; color: #333333; margin-bottom: 10px; }
-.about-text p:last-child { margin-bottom: 0; }
-.section-spacer { height: 8px; }
-/* Helper text under Projects/Resume - contrast fixed */
-.helper-text { font-size: 11px; color: #555555; margin-bottom: 12px; }
 
 /* ============================== */
-/* System Status Widget - 50% LARGER, CENTERED IN LEFT MARGIN */
+/* Text blocks */
+/* ============================== */
+.intro-text { font-size: 13px; line-height: 1.7; color: #333333; }
+.intro-text p { margin-bottom: 10px; }
+.about-text p { font-size: 13px; line-height: 1.7; color: #333333; margin-bottom: 10px; }
+.about-text p:last-child { margin-bottom: 0; }
+.section-spacer { height: 8px; }
+.helper-text { font-size: 12px; color: #555555; margin-bottom: 12px; }
+
+/* ============================== */
+/* System Status Widget */
 /* ============================== */
 .system-status-widget {
     position: fixed;
     top: 30px;
-    left: calc((100vw - 1300px) / 4 - 173px);
-    width: 345px;
+    left: calc((100vw - 1300px) / 4 - 150px);
+    width: 300px;
     z-index: 100;
     font-family: 'Courier New', Courier, monospace;
-    font-size: 14px;
+    font-size: 13px;
 }
 .sys-status-titlebar {
     background: linear-gradient(to right, #003366, #005580);
-    color: #FFFFFF;
-    font-size: 14px;
-    font-weight: bold;
-    padding: 6px 12px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border: 1px solid #001a33;
-    border-bottom: none;
+    color: #FFFFFF; font-size: 13px; font-weight: bold;
+    padding: 5px 10px; display: flex; align-items: center;
+    justify-content: space-between; border: 1px solid #001a33; border-bottom: none;
 }
 .sys-status-titlebar .sys-dot {
-    width: 10px; height: 10px; border-radius: 50%; background: #33FF33;
-    display: inline-block; margin-right: 6px; animation: dotPulse 2s ease-in-out infinite;
+    width: 9px; height: 9px; border-radius: 50%; background: #33FF33;
+    display: inline-block; margin-right: 5px; animation: dotPulse 2s ease-in-out infinite;
 }
 .sys-status-body {
-    background: #0a0f14;
-    color: #33FF33;
-    padding: 14px 14px;
-    border: 1px solid #001a33;
-    line-height: 2;
-    font-size: 14px;
+    background: #0a0f14; color: #33FF33;
+    padding: 12px 12px; border: 1px solid #001a33;
+    line-height: 1.9; font-size: 13px;
 }
-.sys-status-body .sys-label {
-    color: #88AACC;
-    display: inline-block;
-    width: 135px;
-}
-.sys-status-body .sys-val-online {
-    color: #33FF33;
-}
-.sys-status-body .sys-val {
-    color: #FFCC00;
-}
-.sys-progress-bar {
-    display: inline;
-    color: #33FF33;
-    letter-spacing: -1px;
-}
-.sys-progress-bar .bar-empty {
-    color: #334444;
-}
+.sys-status-body .sys-label { color: #88AACC; display: inline-block; width: 115px; }
+.sys-status-body .sys-val-online { color: #33FF33; }
+.sys-status-body .sys-val { color: #FFCC00; }
+.sys-progress-bar { display: inline; color: #33FF33; letter-spacing: -1px; }
+.sys-progress-bar .bar-empty { color: #334444; }
 
 /* ============================== */
-/* Satellite Animation - 50% LARGER, CENTERED IN LEFT MARGIN */
+/* Satellite Widget — matched to system status width */
 /* ============================== */
 .satellite-widget {
     position: fixed;
-    top: 250px;
-    left: calc((100vw - 1300px) / 4 - 173px);
-    width: 345px;
+    top: 230px;
+    left: calc((100vw - 1300px) / 4 - 150px);
+    width: 300px;
     z-index: 100;
 }
 .sat-titlebar {
     background: linear-gradient(to right, #003366, #005580);
-    color: #FFFFFF;
-    font-family: 'Courier New', monospace;
-    font-size: 14px;
-    font-weight: bold;
-    padding: 6px 12px;
-    border: 1px solid #001a33;
-    border-bottom: none;
-    text-align: center;
+    color: #FFFFFF; font-family: 'Courier New', monospace;
+    font-size: 13px; font-weight: bold; padding: 5px 10px;
+    border: 1px solid #001a33; border-bottom: none; text-align: center;
 }
 .sat-body {
-    background: #070d14;
-    border: 1px solid #001a33;
-    height: 285px;
-    position: relative;
-    overflow: hidden;
+    background: #070d14; border: 1px solid #001a33;
+    height: 200px; position: relative; overflow: hidden;
 }
 .sat-earth {
-    position: absolute;
-    bottom: -50px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 142px;
-    height: 142px;
-    border-radius: 50%;
+    position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%);
+    width: 110px; height: 110px; border-radius: 50%;
     background: radial-gradient(circle at 40% 35%, #4FC3F7, #0277BD 50%, #01579B 75%, #002244);
-    border: 1px solid #00586e;
-    box-shadow: 0 0 20px rgba(0, 100, 180, 0.3);
+    border: 1px solid #00586e; box-shadow: 0 0 16px rgba(0, 100, 180, 0.3);
 }
 .sat-earth::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    border-radius: 50%;
-    background:
-        linear-gradient(90deg, transparent 20%, rgba(76,175,80,0.4) 22%, rgba(76,175,80,0.4) 28%, transparent 30%),
+    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%;
+    background: linear-gradient(90deg, transparent 20%, rgba(76,175,80,0.4) 22%, rgba(76,175,80,0.4) 28%, transparent 30%),
         linear-gradient(90deg, transparent 55%, rgba(76,175,80,0.35) 57%, rgba(76,175,80,0.35) 70%, transparent 72%);
 }
 .sat-orbit {
-    position: absolute;
-    bottom: 18px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 300px;
-    height: 180px;
-    border: 1px dashed rgba(100, 180, 255, 0.15);
-    border-radius: 50%;
-    pointer-events: none;
+    position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+    width: 260px; height: 140px; border: 1px dashed rgba(100, 180, 255, 0.15);
+    border-radius: 50%; pointer-events: none;
 }
 .sat-dot-wrap {
-    position: absolute;
-    bottom: 18px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 300px;
-    height: 180px;
+    position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+    width: 260px; height: 140px;
 }
 .sat-dot {
-    position: absolute;
-    width: 7px;
-    height: 7px;
-    background: #FFCC00;
-    border: 1px solid #CC8800;
-    animation: orbitSat 6s linear infinite;
-    box-shadow: 0 0 6px rgba(255, 204, 0, 0.6);
+    position: absolute; width: 6px; height: 6px; background: #FFCC00;
+    border: 1px solid #CC8800; animation: orbitSat 6s linear infinite;
+    box-shadow: 0 0 5px rgba(255, 204, 0, 0.6);
 }
 .sat-dot::before, .sat-dot::after {
-    content: '';
-    position: absolute;
-    top: 1px;
-    width: 6px;
-    height: 4px;
-    background: #5588BB;
-    border: 1px solid #3366AA;
+    content: ''; position: absolute; top: 1px; width: 5px; height: 3px;
+    background: #5588BB; border: 1px solid #3366AA;
 }
-.sat-dot::before { left: -7px; }
-.sat-dot::after { right: -7px; }
-
+.sat-dot::before { left: -6px; }
+.sat-dot::after { right: -6px; }
 @keyframes orbitSat {
     0%   { top: 0%;  left: 50%;  opacity: 1; }
     25%  { top: 50%; left: 100%; opacity: 0.7; }
@@ -329,39 +297,91 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
     75%  { top: 50%; left: 0%;   opacity: 0.7; }
     100% { top: 0%;  left: 50%;  opacity: 1; }
 }
-.sat-star {
-    position: absolute;
-    width: 2px; height: 2px;
-    background: #FFFFFF;
-    border-radius: 50%;
-}
+.sat-star { position: absolute; width: 1px; height: 1px; background: #FFFFFF; border-radius: 50%; }
 .sat-star.blink { animation: starBlink 3s ease-in-out infinite; }
 @keyframes starBlink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 .sat-signal {
-    position: absolute;
-    bottom: 4px;
-    left: 0;
-    right: 0;
-    text-align: center;
-    font-family: 'Courier New', monospace;
-    font-size: 11px;
-    color: #445566;
-    letter-spacing: 1px;
+    position: absolute; bottom: 3px; left: 0; right: 0; text-align: center;
+    font-family: 'Courier New', monospace; font-size: 10px; color: #445566; letter-spacing: 1px;
 }
 
-/* Hide margin widgets when viewport can't fit them */
-@media (max-width: 1700px) {
+/* ============================== */
+/* Widget visibility — hide when they'd overlap */
+/* ============================== */
+@media (max-width: 1650px) {
     .system-status-widget, .satellite-widget { display: none; }
+}
+
+/* ============================== */
+/* MOBILE / TABLET RESPONSIVE (< 900px) */
+/* ============================== */
+@media (max-width: 900px) {
+    .system-status-widget, .satellite-widget { display: none; }
+
+    .page-wrapper { width: 100%; border: none; }
+
+    /* Sidebar becomes horizontal nav */
+    .layout-table { display: block; }
+    .sidebar-cell {
+        display: block; width: 100%; border-right: none;
+        border-bottom: 2px solid #001a33;
+    }
+    .sidebar-nav { display: flex; flex-wrap: wrap; align-items: center; }
+    .sidebar-label { flex: 0 0 100%; padding: 6px 10px; }
+    .sidebar-label:nth-of-type(2) { display: none; } /* hide second "Links" label */
+    .nav-btn {
+        flex: 1 1 auto; text-align: center; border-top: none;
+        border-right: 1px solid #001a33; padding: 10px 8px; font-size: 11px;
+        min-width: 0;
+    }
+    .nav-btn .expand-hint { display: none; }
+    .nav-btn .arrow { display: none; }
+    .sidebar-links { display: flex; gap: 12px; justify-content: center; padding: 8px 10px; border-top: 1px solid #004d80; }
+    .sidebar-links a { display: inline; padding: 0; font-size: 11px; }
+    .sidebar-links a::before { content: ''; }
+    .sidebar-mini-globe { display: none; }
+
+    .content-cell { display: block; width: 100%; }
+    .content-inner { padding: 16px 14px; }
+    .section-heading { font-size: 16px; }
+
+    /* Chatroom responsive */
+    .chatroom-body { flex-direction: column; }
+    .chatroom-users { width: 100%; max-height: none; min-height: auto; border-left: none; border-top: 1px solid #BBBBBB; display: flex; gap: 12px; padding: 6px 14px; }
+    .chatroom-users .users-title { margin-bottom: 0; padding-bottom: 0; border-bottom: none; margin-right: 8px; }
+    .chatroom-users .user-entry { padding: 0; }
+
+    /* Form responsive */
+    .form-row label { display: block; width: auto; margin-bottom: 3px; }
+    .form-row input[type="text"], .form-row textarea { width: 100%; max-width: 100%; }
+    .submit-btn { margin-left: 0; }
+    .form-note { margin-left: 0; }
+
+    /* Expand headers wrap better */
+    .expand-header .one-liner { display: none; }
+
+    .site-header h1 { font-size: 17px; }
+}
+
+/* Very small phones */
+@media (max-width: 480px) {
+    .site-header { flex-direction: column; align-items: flex-start; gap: 6px; padding: 12px 14px; }
+    .site-header h1 { font-size: 16px; }
+    .nav-btn { font-size: 10px; padding: 8px 5px; }
+    .content-inner { padding: 12px 10px; }
+    .section-heading { font-size: 15px; }
+    .expand-header { padding: 8px 10px; gap: 6px; }
+    .expand-header .panel-title { font-size: 12px; }
 }
 </style>
 </head>
 <body>
 
-<!-- System Status Widget (left margin, centered, 50% larger) -->
+<!-- System Status Widget -->
 <div class="system-status-widget">
     <div class="sys-status-titlebar">
         <span><span class="sys-dot"></span> SYSTEM STATUS</span>
-        <span style="font-size:11px; color:#88AACC;">[&times;]</span>
+        <span style="font-size:10px; color:#88AACC;">[&times;]</span>
     </div>
     <div class="sys-status-body">
         <span class="sys-label">AWS Study:</span> <span class="sys-progress-bar">&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;<span class="bar-empty">&#9608;&#9608;&#9608;&#9608;</span></span> <span class="sys-val">60%</span><br>
@@ -371,26 +391,22 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
     </div>
 </div>
 
-<!-- Satellite Animation (left margin, centered, 50% larger) -->
+<!-- Satellite Widget (matched width to system status) -->
 <div class="satellite-widget">
     <div class="sat-titlebar">&#9670; SATELLITE UPLINK &#9670;</div>
     <div class="sat-body">
-        <div class="sat-star" style="top:14px;left:22px;"></div>
-        <div class="sat-star blink" style="top:38px;left:278px;"></div>
-        <div class="sat-star" style="top:68px;left:105px;"></div>
-        <div class="sat-star blink" style="top:27px;left:165px;"></div>
-        <div class="sat-star" style="top:90px;left:248px;"></div>
-        <div class="sat-star blink" style="top:57px;left:52px;"></div>
-        <div class="sat-star" style="top:18px;left:82px;"></div>
-        <div class="sat-star" style="top:78px;left:195px;"></div>
-        <div class="sat-star blink" style="top:102px;left:33px;"></div>
-        <div class="sat-star" style="top:12px;left:300px;"></div>
-        <div class="sat-star blink" style="top:50px;left:135px;"></div>
-        <div class="sat-star" style="top:84px;left:300px;"></div>
-        <div class="sat-star" style="top:63px;left:12px;"></div>
-        <div class="sat-star blink" style="top:22px;left:218px;"></div>
-        <div class="sat-star" style="top:45px;left:320px;"></div>
-        <div class="sat-star blink" style="top:95px;left:270px;"></div>
+        <div class="sat-star" style="top:10px;left:18px;"></div>
+        <div class="sat-star blink" style="top:28px;left:240px;"></div>
+        <div class="sat-star" style="top:50px;left:80px;"></div>
+        <div class="sat-star blink" style="top:20px;left:140px;"></div>
+        <div class="sat-star" style="top:65px;left:210px;"></div>
+        <div class="sat-star blink" style="top:42px;left:40px;"></div>
+        <div class="sat-star" style="top:14px;left:60px;"></div>
+        <div class="sat-star" style="top:55px;left:170px;"></div>
+        <div class="sat-star blink" style="top:72px;left:28px;"></div>
+        <div class="sat-star" style="top:8px;left:260px;"></div>
+        <div class="sat-star blink" style="top:36px;left:110px;"></div>
+        <div class="sat-star" style="top:60px;left:260px;"></div>
         <div class="sat-orbit"></div>
         <div class="sat-dot-wrap"><div class="sat-dot"></div></div>
         <div class="sat-earth"></div>
@@ -398,8 +414,9 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
     </div>
 </div>
 
-<!-- Marquee banner -->
+<!-- Marquee -->
 <div class="marquee-bar"><span class="scroll-text">&#9733; Welcome to Aaron Altergott's Homepage &#9733; Last updated: March 2026 &#9733; Currently studying for AWS Cloud Practitioner &#9733; New project coming soon &#9733; Building an AWS Docs RAG search tool &#9733; DevSecOps is the goal &#9733; Redlands, CA &#9733; Cal State Long Beach &rsquo;23 &#9733; Check out the Projects section for updates &#9733; "Make it work, make it right, make it fast" &#9733; Next up: AWS Solutions Architect &#9733;</span></div>
+
 <div class="page-wrapper">
 <div class="site-header">
     <div class="globe-spin"></div>
@@ -617,7 +634,7 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
 </div></div></div>
 
 <div class="site-footer">
-    <div class="webring-bar">[ <a href="#">&#8592; Prev</a> | &#9729; Cloud Ops Webring | <a href="#">Next &#8594;</a> ]</div>
+    <div class="webring-bar">[ <a href="javascript:void(0)">&#8592; Prev</a> | &#9729; Cloud Ops Webring | <a href="javascript:void(0)">Next &#8594;</a> ]</div>
     <div class="visitor-counter">
         Visitors:
         <div class="counter-digits">
@@ -631,7 +648,6 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
 </div>
 
 <script>
-// Satellite date stamp
 (function() {
     var d = new Date();
     var months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
