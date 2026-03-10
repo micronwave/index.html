@@ -745,15 +745,42 @@ function scrollToSection(id) {
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+function closePanel(id) {
+    var body = document.getElementById(id);
+    var icon = document.getElementById(id + '-icon');
+    if (body && body.classList.contains('open')) {
+        body.classList.remove('open');
+        if (icon) icon.textContent = '[+]';
+    }
+}
+
+function allPanelsOpen(panelIds) {
+    return panelIds.every(function(id) {
+        var body = document.getElementById(id);
+        return body && body.classList.contains('open');
+    });
+}
+
 function navigateTo(sectionId) {
     var sectionPanels = {
         'projects': ['proj-docauto', 'proj1', 'proj2'],
         'resume': ['res-exp', 'res-edu', 'res-cert', 'res-skills']
     };
+    var allPanels = ['proj-docauto', 'proj1', 'proj2', 'res-exp', 'res-edu', 'res-cert', 'res-skills'];
+
+    if (sectionId === 'home') {
+        allPanels.forEach(function(id) { closePanel(id); });
+        scrollToSection('home');
+        return;
+    }
+
     if (sectionPanels[sectionId]) {
-        sectionPanels[sectionId].forEach(function(panelId) {
-            openPanel(panelId);
-        });
+        var panels = sectionPanels[sectionId];
+        if (allPanelsOpen(panels)) {
+            panels.forEach(function(id) { closePanel(id); });
+        } else {
+            panels.forEach(function(id) { openPanel(id); });
+        }
     }
     scrollToSection(sectionId);
 }
