@@ -765,4 +765,9 @@ function submitGuestbook() {
     if (!name || !message) { alert('Please fill in at least your name and a message.'); return; }
     var subjectLine = subject ? subject : 'Chat Message from ' + name;
     var body = 'From: ' + name + '\n\n' + message;
-    var mailto = 'mailto:adaltergott@gmai
+    var mailto = 'mailto:adaltergott@gmail.com?subject=' + encodeURIComponent(subjectLine) + '&body=' + encodeURIComponent(body);
+    window.location.href = mailto;
+}
+</script>
+</body>
+</html>
