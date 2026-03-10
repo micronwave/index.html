@@ -223,7 +223,6 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
 .system-status-widget {
     position: fixed;
     top: 30px;
-    left: calc((100vw - 1300px) / 4 - 150px);
     width: 300px;
     z-index: 100;
     font-family: 'Courier New', Courier, monospace;
@@ -256,7 +255,6 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
 .satellite-widget {
     position: fixed;
     top: 230px;
-    left: calc((100vw - 1300px) / 4 - 150px);
     width: 300px;
     z-index: 100;
 }
@@ -317,9 +315,24 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
 }
 
 /* ============================== */
-/* Widget visibility */
+/* Widget visibility & positioning */
+/* The widgets live in the gap to the LEFT of the 1300px page wrapper.
+   Gap width = (100vw - 1300px) / 2
+   We need gap > ~320px (widget 300px + 10px each side) to show them.
+   That means 100vw > 1300 + 640 = 1940px for both widgets.
+   We use a safe threshold of 1700px so there's always breathing room.
+   Position: right edge of widget = left edge of page wrapper - 10px
+             left edge of widget  = that point minus 300px (widget width)
+   In CSS: left = calc(50vw - 650px - 310px) = calc(50vw - 960px)
+   This keeps the widget flush against the wrapper with a 10px gap
+   regardless of monitor width. */
 /* ============================== */
-@media (max-width: 1650px) {
+.system-status-widget,
+.satellite-widget {
+    left: calc(50vw - 960px);
+}
+
+@media (max-width: 1700px) {
     .system-status-widget, .satellite-widget { display: none; }
 }
 
@@ -485,7 +498,7 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
         <div class="sidebar-links">
             <a href="https://github.com/lobotomy100" target="_blank" rel="noopener">GitHub</a>
             <a href="https://www.linkedin.com/in/aaronaltergott/" target="_blank" rel="noopener">LinkedIn</a>
-            <a href="mailto:adaltergott@gmail.com">Email Me</a>
+            <a href="/cdn-cgi/l/email-protection#5b3a3f3a372f3e293c342f2f1b3c363a323775383436">Email Me</a>
         </div>
         <div class="sidebar-mini-globe"><div class="mini-globe"></div></div>
     </nav>
@@ -697,7 +710,7 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
 </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 (function() {
     var d = new Date();
     var months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
@@ -752,9 +765,4 @@ function submitGuestbook() {
     if (!name || !message) { alert('Please fill in at least your name and a message.'); return; }
     var subjectLine = subject ? subject : 'Chat Message from ' + name;
     var body = 'From: ' + name + '\n\n' + message;
-    var mailto = 'mailto:adaltergott@gmail.com?subject=' + encodeURIComponent(subjectLine) + '&body=' + encodeURIComponent(body);
-    window.location.href = mailto;
-}
-</script>
-</body>
-</html>
+    var mailto = 'mailto:adaltergott@gmai
