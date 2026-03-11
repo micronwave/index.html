@@ -147,6 +147,19 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
 @keyframes blinkAnim { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
 
 /* ============================== */
+/* Project detail styles */
+/* ============================== */
+.proj-detail-heading { font-family: Verdana, sans-serif; font-size: 13px; font-weight: bold; color: #003355; margin-top: 12px; margin-bottom: 6px; }
+.proj-detail-heading:first-child { margin-top: 0; }
+.proj-links { margin-bottom: 12px; }
+.proj-links a { font-size: 12px; margin-right: 12px; }
+.proj-arch-diagram { background: #0a0f14; color: #33FF33; font-family: 'Courier New', monospace; font-size: 11px; padding: 12px 14px; border: 1px solid #333333; margin: 10px 0; overflow-x: auto; white-space: pre; line-height: 1.5; }
+.proj-tech-table { border-collapse: collapse; margin: 8px 0 12px 0; font-size: 12px; }
+.proj-tech-table td { padding: 3px 12px 3px 0; vertical-align: top; }
+.proj-tech-table td:first-child { font-weight: bold; color: #003355; white-space: nowrap; }
+.proj-tech-table td:last-child { color: #333333; }
+
+/* ============================== */
 /* Resume */
 /* ============================== */
 .resume-category { margin-bottom: 4px; }
@@ -316,16 +329,6 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
 
 /* ============================== */
 /* Widget visibility & positioning */
-/* The widgets live in the gap to the LEFT of the 1300px page wrapper.
-   Gap width = (100vw - 1300px) / 2
-   We need gap > ~320px (widget 300px + 10px each side) to show them.
-   That means 100vw > 1300 + 640 = 1940px for both widgets.
-   We use a safe threshold of 1700px so there's always breathing room.
-   Position: right edge of widget = left edge of page wrapper - 10px
-             left edge of widget  = that point minus 300px (widget width)
-   In CSS: left = calc(50vw - 650px - 310px) = calc(50vw - 960px)
-   This keeps the widget flush against the wrapper with a 10px gap
-   regardless of monitor width. */
 /* ============================== */
 .system-status-widget,
 .satellite-widget {
@@ -373,16 +376,13 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
     /* FIX: Consistent expand-header cards on mobile */
     /* ============================== */
     .expand-header {
-        /* Switch to column layout so title is always on its own line */
         flex-direction: column;
         align-items: flex-start;
         gap: 6px;
         position: relative;
-        /* Extra right padding to keep content away from the toggle icon */
         padding-right: 38px;
     }
 
-    /* Pin the [+]/[-] toggle icon to the top-right corner */
     .expand-header .toggle-icon {
         position: absolute;
         top: 10px;
@@ -390,13 +390,11 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
         width: auto;
     }
 
-    /* Title always takes full width */
     .expand-header .panel-title {
         width: 100%;
         margin-right: 0;
     }
 
-    /* Badges row: all badges/labels sit together on the same line below the title */
     .expand-header .status-badge {
         margin-left: 0;
         align-self: flex-start;
@@ -408,7 +406,6 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
         margin-left: 0;
     }
 
-    /* Hide the one-liner subtitle on mobile (keeps things clean) */
     .expand-header .one-liner { display: none; }
 
     /* Chatroom responsive */
@@ -424,6 +421,9 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
     .form-note { margin-left: 0; }
 
     .site-header h1 { font-size: 17px; }
+
+    /* Project detail responsive */
+    .proj-arch-diagram { font-size: 9px; padding: 8px 10px; }
 }
 
 /* Very small phones */
@@ -478,7 +478,7 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
 </div>
 
 <!-- Marquee -->
-<div class="marquee-bar"><span class="scroll-text">&#9733; Welcome to Aaron Altergott's Homepage &#9733; Last updated: March 2026 &#9733; Currently studying for AWS Cloud Practitioner &#9733; New project coming soon &#9733; Building an AWS Docs RAG search tool &#9733; DevSecOps is the goal &#9733; Redlands, CA &#9733; Cal State Long Beach &rsquo;23 &#9733; Check out the Projects section for updates &#9733; "Make it work, make it right, make it fast" &#9733; Next up: AWS Solutions Architect &#9733;</span></div>
+<div class="marquee-bar"><span class="scroll-text">&#9733; Welcome to Aaron Altergott's Homepage &#9733; Last updated: March 2026 &#9733; Currently studying for AWS Cloud Practitioner &#9733; AWS Docs RAG system is LIVE &#9733; DevSecOps is the goal &#9733; Redlands, CA &#9733; Cal State Long Beach &rsquo;23 &#9733; Check out the Projects section for updates &#9733; "Make it work, make it right, make it fast" &#9733; Next up: AWS Solutions Architect &#9733;</span></div>
 
 <div class="page-wrapper">
 <div class="site-header">
@@ -496,7 +496,7 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
         <a href="#contact" class="nav-btn" onclick="navigateTo('contact'); return false;"><span class="arrow">&#9658;</span> Contact</a>
         <div class="sidebar-label">&#9632; Links</div>
         <div class="sidebar-links">
-            <a href="https://github.com/lobotomy100" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://github.com/micronwave" target="_blank" rel="noopener">GitHub</a>
             <a href="https://www.linkedin.com/in/aaronaltergott/" target="_blank" rel="noopener">LinkedIn</a>
             <a href="/cdn-cgi/l/email-protection#5b3a3f3a372f3e293c342f2f1b3c363a323775383436">Email Me</a>
         </div>
@@ -529,6 +529,73 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
     <h2 class="section-heading"><div class="sec-icon icon-folder"></div> Projects</h2>
     <p class="helper-text">Click a project to expand it and read more.</p>
 
+    <!-- ============ PROJECT 1: AWS RAG ============ -->
+    <div class="expand-header" onclick="togglePanel('proj-rag')">
+        <span class="toggle-icon" id="proj-rag-icon">[+]</span>
+        <span class="panel-title">AWS Docs RAG &mdash; AI Documentation Search</span>
+        <span class="status-badge badge-complete">&#10004; Complete</span>
+        <span class="blink-new">NEW!</span>
+    </div>
+    <div class="expand-body" id="proj-rag">
+        <p class="proj-links">
+            <a href="https://d3d0zch3u8ca61.cloudfront.net" target="_blank">&#9658; Live Demo</a>
+            <a href="https://github.com/micronwave/aws-rag-project" target="_blank">&#9658; Source Code</a>
+        </p>
+
+        <p>I built a full-stack Retrieval Augmented Generation (RAG) system that answers questions about AWS services using real AWS documentation as its knowledge base. Users ask a question through a web-based chat interface, and the system searches through indexed documentation, retrieves the most relevant sections, and generates a grounded answer using Claude &mdash; complete with source links back to the original AWS docs.</p>
+
+        <p class="proj-detail-heading">The Problem</p>
+        <p>Large language models are powerful, but they hallucinate &mdash; they can confidently generate answers that sound right but aren&rsquo;t. For something like AWS documentation, where accuracy matters, you need a way to ground the model&rsquo;s responses in real source material. RAG solves this by retrieving actual documentation at query time and feeding it into the prompt so the model answers based on facts.</p>
+
+        <p class="proj-detail-heading">How I Built It</p>
+        <p><strong>Data Pipeline:</strong> I wrote a Python scraper that crawls AWS user guides for S3, EC2, Lambda, DynamoDB, and VPC, strips the HTML down to clean text, and uploads it to S3. The documents are split into overlapping chunks (~1000 characters each) using LangChain&rsquo;s text splitter, and each chunk is converted into a 1024-dimensional vector using Amazon Titan Embeddings v2 via Bedrock. The vectors are stored in Pinecone&rsquo;s free-tier vector database for fast semantic search.</p>
+        <p><strong>Query Pipeline:</strong> When a user asks a question, an AWS Lambda function embeds the question using the same Titan model, queries Pinecone for the 5 most semantically similar document chunks, constructs a prompt with anti-hallucination instructions, sends it to Claude via Amazon Bedrock, and returns the answer with source citations. API Gateway exposes this as a REST endpoint.</p>
+        <p><strong>Frontend:</strong> A static HTML/JS chat interface hosted on S3 and served through CloudFront with HTTPS. No frameworks &mdash; single-file HTML that calls the API and renders responses.</p>
+        <p><strong>Security:</strong> The Lambda execution role runs with a scoped IAM policy limited to Bedrock model invocation and CloudWatch logging. No broad admin permissions in production.</p>
+
+        <p class="proj-detail-heading">Architecture</p>
+        <div class="proj-arch-diagram">User &rarr; CloudFront &rarr; API Gateway &rarr; Lambda
+                                    &boxvr;&horbar;&horbar; Embed question (Titan v2 via Bedrock)
+                                    &boxvr;&horbar;&horbar; Search Pinecone (top 5 chunks)
+                                    &boxvr;&horbar;&horbar; Build prompt with context
+                                    &boxvr;&horbar;&horbar; Generate answer (Claude via Bedrock)
+                                    &boxur;&horbar;&horbar; Return response + sources</div>
+
+        <p class="proj-detail-heading">Tech Stack</p>
+        <table class="proj-tech-table">
+            <tr><td>LLM</td><td>Claude Sonnet 3.5 via Amazon Bedrock</td></tr>
+            <tr><td>Embeddings</td><td>Amazon Titan Embeddings v2</td></tr>
+            <tr><td>Vector DB</td><td>Pinecone (free tier)</td></tr>
+            <tr><td>Compute</td><td>AWS Lambda + API Gateway</td></tr>
+            <tr><td>Frontend</td><td>S3 + CloudFront</td></tr>
+            <tr><td>Monitoring</td><td>CloudWatch</td></tr>
+            <tr><td>Language</td><td>Python 3.11</td></tr>
+        </table>
+
+        <p class="proj-detail-heading">Key Decisions</p>
+        <p><strong>Pinecone over OpenSearch Serverless:</strong> OpenSearch Serverless has a minimum cost of ~$700/month even at zero traffic. Pinecone&rsquo;s free tier handles up to 100K vectors at no cost &mdash; identical search quality at a fraction of the price.</p>
+        <p><strong>Serverless architecture:</strong> Lambda + API Gateway means zero cost at idle and automatic scaling under load. The entire system runs for approximately $3&ndash;11/month.</p>
+        <p><strong>CLI-first deployment:</strong> Every component &mdash; from IAM roles to CloudFront distributions &mdash; is deployed through Python scripts using boto3 and the AWS CLI.</p>
+
+        <p class="proj-detail-heading">What I Learned</p>
+        <p>This project connected several concepts I&rsquo;d studied independently &mdash; vector embeddings, serverless compute, API design, IAM security &mdash; into a single working system. Debugging Lambda deployments from a Windows machine taught me about cross-platform packaging (Linux binaries for Lambda, PowerShell). Scoping IAM policies after deployment reinforced why least-privilege matters.</p>
+    </div>
+    <div class="section-spacer"></div>
+
+    <!-- ============ PROJECT 2: This Website ============ -->
+    <div class="expand-header" onclick="togglePanel('proj-site')">
+        <span class="toggle-icon" id="proj-site-icon">[+]</span>
+        <span class="panel-title">This Website &mdash; Personal Portfolio</span>
+        <span class="status-badge badge-complete">&#10004; Complete</span>
+        <span class="one-liner">Static portfolio site hosted on GitHub Pages</span>
+    </div>
+    <div class="expand-body" id="proj-site">
+        <p>This is the site you're looking at right now. I built it as a single static HTML page and deployed it on GitHub Pages. If you want to see the source, there's a link to my GitHub in the sidebar.</p>
+        <p>The early-2000s design was a deliberate choice because I think it looks cool and reminds me of the good old web 1.0 days. Every section on this page actually works &mdash; the nav scrolls to the right spot, the panels expand and collapse, the contact form opens the outlook email client, and the resume has a download link.</p>
+    </div>
+    <div class="section-spacer"></div>
+
+    <!-- ============ PROJECT 3: Auction Mail ============ -->
     <div class="expand-header" onclick="togglePanel('proj-docauto')">
         <span class="toggle-icon" id="proj-docauto-icon">[+]</span>
         <span class="panel-title">Auction Mail Verification &mdash; Document Automation Workflow</span>
@@ -538,32 +605,6 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
     <div class="expand-body" id="proj-docauto">
         <p>Designed a document automation workflow to streamline PLN/NOL Certificate of Mailing verification for storage unit auction files. The previous process required manually referencing mailing certifications against tenant records one at a time, which was slow and error prone.</p>
         <p>Reduced manual lookup time by integrating AI-assisted document parsing with a documented process. The workflow standardizes how verification data is matched and extracted, cutting down what used to take hours into a matter of minutes. Built the process to be reproducible so that anyone on the team can follow it and maintain auction compliance.</p>
-    </div>
-    <div class="section-spacer"></div>
-
-    <div class="expand-header" onclick="togglePanel('proj1')">
-        <span class="toggle-icon" id="proj1-icon">[+]</span>
-        <span class="panel-title">This Website &mdash; Personal Portfolio</span>
-        <span class="status-badge badge-complete">&#10004; Complete</span>
-        <span class="one-liner">Static portfolio site hosted on GitHub Pages</span>
-    </div>
-    <div class="expand-body" id="proj1">
-        <p>This is the site you're looking at right now. I built it as a single static HTML page and deployed it on GitHub Pages. If you want to see the source, there's a link to my GitHub in the sidebar.</p>
-        <p>The early-2000s design was a deliberate choice because I think it looks cool and reminds me of the good old web 1.0 days. Every section on this page actually works &mdash; the nav scrolls to the right spot, the panels expand and collapse, the contact form opens the outlook email client, and the resume has a download link.</p>
-    </div>
-    <div class="section-spacer"></div>
-
-    <div class="expand-header" onclick="togglePanel('proj2')">
-        <span class="toggle-icon" id="proj2-icon">[+]</span>
-        <span class="panel-title">AWS Docs RAG &mdash; AI Documentation Search</span>
-        <span class="status-badge badge-progress">&#9881; In Progress</span>
-        <span class="blink-new">NEW!</span>
-        <span class="under-construction">UNDER CONSTRUCTION</span>
-    </div>
-    <div class="expand-body" id="proj2">
-        <p>If you've ever tried to find a specific answer in the AWS documentation, you know it can be rough. There are thousands of pages spread across dozens of services, and sometimes you just need a straight answer to a straightforward question. That's what this project is about.</p>
-        <p>I'm building an AI-powered search tool that uses Retrieval Augmented Generation (RAG) to pull answers directly from official AWS documentation. The idea is that instead of getting a generic AI response that might be wrong or outdated, you get an answer that's actually backed by the updated docs, with references you can check. I started this because I kept running into the same frustration while studying for the Cloud Practitioner exam.</p>
-        <p>The plan is to use Python for the backend, probably LangChain for the RAG pipeline, and a database like Chroma to store the document embeddings. The docs will be pulled from official AWS docs. This is still in the early stages, so nothing is deployed yet. I'll update this section as it comes together. It's a learning project as much as anything else, but it solves a real problem I've ran into.</p>
     </div>
 </div>
 <hr class="classic-hr">
@@ -643,7 +684,7 @@ hr.classic-hr { border: none; height: 2px; background: linear-gradient(to right,
             <span class="panel-title">&#9632; Skills</span>
         </div>
         <div class="expand-body" id="res-skills">
-            <div class="skill-group"><strong>Software:</strong> <span>Excel (PivotTables, XLOOKUP, Data Analysis), Sitelink ERP, IBM SPSS, Google Workspace, Microsoft 365, AnyDesk, Linux Ubuntu, VirtualBox/VMware</span></div>
+            <div class="skill-group"><strong>Software:</strong> <span>Excel (PivotTables, XLOOKUP, Data Analysis), Sitelink ERP, IBM SPSS, Google Workspace, Microsoft 365, AnyDesk, Linux Ubuntu, VirtualBox/VMware, AWS console/CLI, Powershell</span></div>
             <div class="skill-group"><strong>Operations:</strong> <span>XPS ticket tracking and resolution, User troubleshooting, Password resets and account access, Website and mobile app troubleshooting, Office device support, Wi-Fi and connectivity troubleshooting</span></div>
         </div>
     </div>
@@ -763,10 +804,10 @@ function allPanelsOpen(panelIds) {
 
 function navigateTo(sectionId) {
     var sectionPanels = {
-        'projects': ['proj-docauto', 'proj1', 'proj2'],
+        'projects': ['proj-rag', 'proj-site', 'proj-docauto'],
         'resume': ['res-exp', 'res-edu', 'res-cert', 'res-skills']
     };
-    var allPanels = ['proj-docauto', 'proj1', 'proj2', 'res-exp', 'res-edu', 'res-cert', 'res-skills'];
+    var allPanels = ['proj-rag', 'proj-site', 'proj-docauto', 'res-exp', 'res-edu', 'res-cert', 'res-skills'];
 
     if (sectionId === 'home') {
         allPanels.forEach(function(id) { closePanel(id); });
