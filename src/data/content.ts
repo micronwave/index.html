@@ -134,7 +134,7 @@ export const projects: Project[] = [
     ],
     stack: ['Python', 'Claude Code', 'Slash Commands', 'Python Hooks'],
     githubUrl: 'https://github.com/micronwave/claude-chaperone',
-    status: 'active',
+    status: 'complete',
   },
   {
     name: 'Narrative Intelligence Engine',
