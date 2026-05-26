@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
-import type { CSSProperties } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import type {
   Person,
   About,
   ExperienceEntry,
-  Project,
   SkillGroup,
   EducationEntry,
   Certification,
@@ -44,9 +43,15 @@ const NAV_LINKS = [
 function SiteNav({ name }: { name: string }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 40);
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollProgress(docHeight > 0 ? y / docHeight : 0);
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -92,6 +97,11 @@ function SiteNav({ name }: { name: string }) {
           <span />
           <span />
         </button>
+        <div
+          className="scroll-progress-bar"
+          aria-hidden="true"
+          style={{ '--scroll-progress': scrollProgress } as CSSProperties}
+        />
       </nav>
 
       {/* Mobile menu drawer */}
@@ -123,6 +133,14 @@ function HeroSection({ person }: { person: Person }) {
   const firstName = person.name.split(' ')[0];
   const lastName = person.name.split(' ').slice(1).join(' ');
   const [showEmail, setShowEmail] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const copyEmail = () => {
+    navigator.clipboard.writeText(person.email).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    });
+  };
 
   return (
     <section className="hero page-wrapper" aria-label="Introduction">
@@ -132,8 +150,8 @@ function HeroSection({ person }: { person: Person }) {
         <em>{lastName}</em>
       </h1>
       <p className="hero-sub">
-        Operations engineer who automates what others accept as manual.
-        Cloud, security, and AI — three layers that depend on each other.
+        Operations engineer building in cloud, security, and AI.<br />
+        I find what's inefficient and fix it.
       </p>
       <div className="hero-links">
         <a className="hero-link" href={person.github} target="_blank" rel="noopener noreferrer">
@@ -155,6 +173,24 @@ function HeroSection({ person }: { person: Person }) {
           <span id="hero-email-address" className="hero-email-address" aria-hidden={!showEmail}>
             {person.email}
           </span>
+          <button
+            className={`hero-copy-btn${copied ? ' copied' : ''}`}
+            type="button"
+            aria-label={copied ? 'Copied!' : 'Copy email address'}
+            tabIndex={showEmail ? 0 : -1}
+            onClick={copyEmail}
+          >
+            {copied ? (
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polyline points="2,7 5,10 11,3" />
+              </svg>
+            ) : (
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="4.5" y="4.5" width="7.5" height="7.5" rx="1.2" />
+                <path d="M8 4.5V2.5a1 1 0 00-1-1H2.5a1 1 0 00-1 1V7a1 1 0 001 1H4.5" />
+              </svg>
+            )}
+          </button>
         </span>
       </div>
     </section>
@@ -258,10 +294,38 @@ function SkillsSection({ skills }: { skills: SkillGroup[] }) {
   const nodes = skills.map((group, index) => {
     const angle = -90 + (360 / Math.max(skills.length, 1)) * index;
     const rad = (angle * Math.PI) / 180;
-    const radius = 36;
-    const x = 50 + Math.cos(rad) * radius;
-    const y = 50 + Math.sin(rad) * radius;
-    return { group, angle, x, y };
+
+    // Position each node so the visual gap from card edge → circle edge is equal
+    // in every direction, regardless of card orientation or label wrapping.
+    // Calibrated for: orbit ≈ 710px square, circle ≈ 190px dia, card width = 230px.
+    const TARGET_GAP = 74;    // px — desired gap from card edge to circle edge
+    const CIRCLE_R   = 95;    // px — circle radius at max clamp
+    const ORBIT_HALF = 355;   // px — half the orbit container
+    const CARD_W     = 230;   // px — card width at max clamp
+
+    // Estimate collapsed and expanded card heights for this group.
+    // Labels > 12 chars wrap to 2 lines (adds ~23px).
+    const isMultiLine  = group.label.length > 12;
+    const focusCardH   = isMultiLine ? 81 : 58;
+    const atlasCardH   = focusCardH + 21 + group.items.length * 17;
+
+    // Which face of the card points toward the center?
+    const cosA = Math.abs(Math.cos(rad));
+    const sinA = Math.abs(Math.sin(rad));
+    const isHorizontal = cosA > sinA;
+
+    const focusHalf = isHorizontal ? CARD_W / 2 : focusCardH / 2;
+    const atlasHalf = isHorizontal ? CARD_W / 2 : atlasCardH / 2;
+
+    const focusR = ((TARGET_GAP + CIRCLE_R + focusHalf) / ORBIT_HALF) * 50;
+    const atlasR = ((TARGET_GAP + CIRCLE_R + atlasHalf) / ORBIT_HALF) * 50;
+
+    const x      = 50 + Math.cos(rad) * focusR;
+    const y      = 50 + Math.sin(rad) * focusR;
+    const xAtlas = 50 + Math.cos(rad) * atlasR;
+    const yAtlas = 50 + Math.sin(rad) * atlasR;
+
+    return { group, angle, x, y, xAtlas, yAtlas };
   });
 
   return (
@@ -272,8 +336,8 @@ function SkillsSection({ skills }: { skills: SkillGroup[] }) {
       >
         <div className="skills-orbit" aria-label="Skill categories">
           <svg className="skills-orbit-lines" viewBox="0 0 100 100" aria-hidden="true">
-            <circle cx="50" cy="50" r="41" className="skills-ring outer" />
-            <circle cx="50" cy="50" r="27" className="skills-ring inner" />
+            <ellipse cx="50" cy="50" rx="44" ry="31" className="skills-ring outer" />
+            <ellipse cx="50" cy="50" rx="29" ry="20" className="skills-ring inner" />
             {nodes.map(({ group, x, y }, index) => (
               <line
                 key={group.label}
@@ -303,11 +367,13 @@ function SkillsSection({ skills }: { skills: SkillGroup[] }) {
             <small>{viewMode === 'all' ? 'skills visible' : 'working skills'}</small>
           </button>
 
-          {nodes.map(({ group, angle, x, y }, index) => {
+          {nodes.map(({ group, angle, x, y, xAtlas, yAtlas }, index) => {
             const active = group.label === activeGroup?.label;
             const nodeStyle = {
               '--skill-x': `${x}%`,
               '--skill-y': `${y}%`,
+              '--skill-x-atlas': `${xAtlas}%`,
+              '--skill-y-atlas': `${yAtlas}%`,
               '--skill-angle': `${angle}deg`,
               '--skill-delay': `${index * 55}ms`,
             } as CSSProperties;
@@ -326,8 +392,10 @@ function SkillsSection({ skills }: { skills: SkillGroup[] }) {
                   setViewMode('focus');
                 }}
               >
-                <span className="skill-node-count">/</span>
-                <span className="skill-node-label">{group.label}</span>
+                <span className="skill-node-top">
+                  <span className="skill-node-count">/</span>
+                  <span className="skill-node-label">{group.label}</span>
+                </span>
                 <span className="skill-node-map" aria-hidden={viewMode !== 'all'}>
                   {group.items.map((item) => (
                     <span key={item}>{item}</span>
@@ -363,12 +431,53 @@ function SkillsSection({ skills }: { skills: SkillGroup[] }) {
 
 // ── Experience ────────────────────────────────────────────────────────────
 
+const MONTHS: Record<string, number> = {
+  Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11,
+};
+
+function UptimeChip({ dates, startHour = 0 }: { dates: string; startHour?: number }) {
+  const startTime = useMemo(() => {
+    const match = dates.match(/^([A-Za-z]+)\s+(\d{4})/);
+    if (!match) return null;
+    const month = MONTHS[match[1]!];
+    if (month === undefined) return null;
+    return new Date(parseInt(match[2]!), month, 1, startHour, 0, 0).getTime();
+  }, [dates, startHour]);
+
+  const [label, setLabel] = useState('');
+
+  useEffect(() => {
+    if (!startTime) return;
+    const compute = () => {
+      const diff = Date.now() - startTime;
+      const days = Math.floor(diff / 86400000);
+      const rem = diff % 86400000;
+      const h = Math.floor(rem / 3600000);
+      const m = Math.floor((rem % 3600000) / 60000);
+      const s = Math.floor((rem % 60000) / 1000);
+      const p = (n: number) => String(n).padStart(2, '0');
+      setLabel(`${days}d ${p(h)}:${p(m)}:${p(s)}`);
+    };
+    compute();
+    const id = setInterval(compute, 1000);
+    return () => clearInterval(id);
+  }, [startTime]);
+
+  if (!startTime || !label) return null;
+  return (
+    <span className="uptime-chip" aria-label={`Active for ${label}`}>
+      {label}
+    </span>
+  );
+}
+
 function ExperienceItem({ entry }: { entry: ExperienceEntry }) {
   const ref = useReveal();
   return (
     <div className="exp-item reveal" ref={ref as React.RefObject<HTMLDivElement>}>
       <div className="exp-meta">
         <span className="exp-dates">{entry.dates}</span>
+        {entry.dates.includes('Present') && <UptimeChip dates={entry.dates} startHour={entry.startHour ?? 0} />}
         <span className="exp-company">{entry.company}</span>
         <span className="exp-location">{entry.location}</span>
       </div>
@@ -402,59 +511,6 @@ function ExperienceSection({ experience }: { experience: ExperienceEntry[] }) {
   );
 }
 
-// ── Projects ──────────────────────────────────────────────────────────────
-
-function ProjectItem({ project }: { project: Project }) {
-  const ref = useReveal();
-  return (
-    <div className="project-item reveal" ref={ref as React.RefObject<HTMLDivElement>}>
-      <div className="project-top">
-        <span className="project-name">{project.name}</span>
-        <span className={`project-status ${project.status}`}>{project.status}</span>
-      </div>
-      <p className="project-tagline">{project.tagline}</p>
-      <ul className="project-bullets">
-        {project.bullets.slice(0, 3).map((b, i) => (
-          <li key={i}>{b}</li>
-        ))}
-      </ul>
-      <div className="project-footer">
-        <div className="project-stack">
-          {project.stack.map((s) => (
-            <span className="stack-chip" key={s}>{s}</span>
-          ))}
-        </div>
-        {(project.githubUrl || project.liveUrl) && (
-          <div className="project-links">
-            {project.githubUrl && (
-              <a className="project-link" href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                Source <span className="arrow">→</span>
-              </a>
-            )}
-            {project.liveUrl && (
-              <a className="project-link" href={project.liveUrl} target="_blank" rel="noopener noreferrer">
-                Live <span className="arrow">→</span>
-              </a>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function ProjectsSection({ projects }: { projects: Project[] }) {
-  return (
-    <section id="projects" className="section page-wrapper">
-      <SectionHead title="Projects" />
-      <div className="projects-list">
-        {projects.map((project) => (
-          <ProjectItem key={project.name} project={project} />
-        ))}
-      </div>
-    </section>
-  );
-}
 
 // ── Contact ───────────────────────────────────────────────────────────────
 
@@ -509,20 +565,20 @@ interface Props {
   person: Person;
   about: About;
   experience: ExperienceEntry[];
-  projects: Project[];
   skills: SkillGroup[];
   education: EducationEntry[];
   certifications: Certification[];
+  children?: ReactNode;
 }
 
 export default function PortfolioInterface({
   person,
   about,
   experience,
-  projects,
   skills,
   education,
   certifications,
+  children,
 }: Props) {
   return (
     <main>
@@ -536,7 +592,7 @@ export default function PortfolioInterface({
       />
       <SkillsSection skills={skills} />
       <ExperienceSection experience={experience} />
-      <ProjectsSection projects={projects} />
+      {children}
       <ContactSection person={person} />
       <SiteFooter name={person.name} />
     </main>

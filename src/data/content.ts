@@ -23,6 +23,19 @@ export interface ExperienceEntry {
   dates: string;
   bullets: string[];
   tags: string[];
+  startHour?: number;
+}
+
+export interface ProjectStat {
+  value: string;
+  label: string;
+}
+
+export interface ProjectDetail {
+  stats: ProjectStat[];
+  overview: string;
+  mechanism: string;
+  notes: string[];
 }
 
 export interface Project {
@@ -34,6 +47,7 @@ export interface Project {
   githubUrl?: string;
   liveUrl?: string;
   status: 'active' | 'complete' | 'prototype' | 'archived';
+  detail?: ProjectDetail;
 }
 
 export interface EducationEntry {
@@ -72,9 +86,9 @@ export const person: Person = {
 export const about: About = {
   summary: [
     "I've worked across customer ops, marketing, finance, and engineering. It's not the typical path, but that mix means I tend to see problems differently than someone who came up through one track.",
-    
+
     "Currently, I'm an Operations Specialist at Southwest Self Storage where I automated our auction mailing certification workflow, fixed a recurring autopay failure that was costing us time and money every month, and set up automatic notifications for overdue accounts.",
-    
+
     "That's also why I'm moving into tech. The part of the job I like most is figuring out why something isn't working and then making it work — or making something that kind of works, work more efficiently. Cloud, security, and AI are where I want to do that. They're not really separate fields; they're three layers that depend on each other, and I think you need to understand all three to build anything solid.",
   ],
 };
@@ -85,6 +99,7 @@ export const experience: ExperienceEntry[] = [
     role: 'Operations Specialist (CSR)',
     location: 'Redlands, CA',
     dates: 'Nov 2024 – Present',
+    startHour: 8,
     bullets: [
       'Eliminated 60+ monthly AMEX and Discover autopay failures by tracing them to an AVS misconfiguration in billing.',
       'Cut auction mail certification processing time by 90% with an automated workflow using file conversion and AI-assisted parsing; authored the companywide process document.',
@@ -100,6 +115,7 @@ export const experience: ExperienceEntry[] = [
     role: 'Operations Volunteer',
     location: 'Remote',
     dates: 'May 2026 – Present',
+    startHour: 18,
     bullets: [
       'Run sponsor outreach for a cybersecurity research group, targeting hardware, crypto, cyber, and consulting firms.',
       'Designed the Null404 sponsorship package PDF; assist in development of CTF challenges and game structure.',
@@ -135,6 +151,22 @@ export const projects: Project[] = [
     stack: ['Python', 'Claude Code', 'Slash Commands', 'Python Hooks'],
     githubUrl: 'https://github.com/micronwave/claude-chaperone',
     status: 'complete',
+    detail: {
+      stats: [
+        { value: '12', label: 'slash commands' },
+        { value: '4', label: 'hooks' },
+        { value: '58', label: 'tests' },
+        { value: '3', label: 'max audit loops' },
+      ],
+      overview:
+        "A structured Claude Code build workflow for any project. It's built around one core problem: Claude drifts in long sessions. It starts carrying assumptions from earlier work, makes judgment calls it should not be making, and cuts corners. Mandatory /clear calls between every stage fix that as each phase runs in a fresh context and automatic handoff files from the previous step.",
+      mechanism:
+        '/chaperone is the single entry point. Give it your idea and it kicks off the sequence; run it with no arguments and it reads the current state and tells you exactly what to run next. Twelve slash commands carry the session stages of planning, phasing, building, auditing. The four Python hooks handle enforcement without any pip install. They watch for scope drift, prompt before any git push, remind you when code changes have outrun the build log, and inject current state after /clear so Claude picks up where it left off.',
+      notes: [
+        'Idempotent installer. Merges settings.json without clobbering existing hooks, then runs the 58-test suite to verify the install is clean. Pass --force to overwrite divergent files when upgrading.',
+        'Dormant until you activate it. Dropping the folder into a repo changes nothing until you start a workflow.',
+      ],
+    },
   },
   {
     name: 'Narrative Intelligence Engine',
@@ -161,7 +193,23 @@ export const projects: Project[] = [
       'TypeScript',
     ],
     githubUrl: 'https://github.com/micronwave/market-narrative-engine',
-    status: 'active',
+    status: 'complete',
+    detail: {
+      stats: [
+        { value: '11', label: 'pipeline stages' },
+        { value: '4h', label: 'schedule' },
+        { value: '66', label: 'API routes' },
+        { value: '5', label: 'data sources' },
+      ],
+      overview:
+        'Pulls from RSS feeds, SEC filings, Reddit, news APIs every four hours. Incoming documents get clustered into narratives and tracked as they grow, shift, and decay. Each narrative gets mapped to S&P 500 tickers by comparing its embedding against a library built from 10-K summaries. It watches the stories that move markets, not the markets themselves.',
+      mechanism:
+        'Documents come in and get deduplicated with LSH MinHash. Anything above 0.85 Jaccard similarity gets dropped before clustering. Survivors get embedded into 768-dimensional vectors and grouped with HDBSCAN. The pipeline tracks centroid drift over time. When a narrative shifts from "Fed rate decision" toward "regional bank stress," that shows up in the centroid movement as mutation. On the LLM side, Haiku handles routine topic labeling and Sonnet only gets called for mutation analysis, with a daily token budget cap to keep costs predictable. The coordination detector flags five or more sources hitting the same narrative inside 300 seconds as a suspicious burst.',
+      notes: [
+        'Narratives move through five lifecycle stages (Emerging, Growing, Mature, Declining, Dormant) based on velocity and entropy metrics. A dormant narrative whose velocity spikes past 0.10 automatically reverts to Growing.',
+        'FastAPI backend with 66 routes. Next.js frontend with views for signal radar, constellation graph, coordination detection, and velocity-price correlation explorer.',
+      ],
+    },
   },
   {
     name: 'AWS Docs RAG',
@@ -188,6 +236,22 @@ export const projects: Project[] = [
     githubUrl: 'https://github.com/micronwave/aws-docs-rag',
     liveUrl: 'https://d3d0zch3u8ca61.cloudfront.net',
     status: 'complete',
+    detail: {
+      stats: [
+        { value: '~120', label: 'pages indexed' },
+        { value: '5', label: 'services covered' },
+        { value: 'top 5', label: 'chunks retrieved' },
+        { value: '$3-11', label: 'per month' },
+      ],
+      overview:
+        'Ingestion scrapes the docs, breaks them into overlapping chunks, embeds with Titan v2, loads into Pinecone. After that, the query path handles everything. A question comes in, gets embedded with the same model, and the top 5 closest chunks come back from Pinecone. Those get packaged into a grounded prompt with anti-hallucination instructions baked in and sent to Claude via Bedrock. The answer comes back with source URLs.',
+      mechanism:
+        'Ingestion covers about 120 pages across S3, EC2, Lambda, DynamoDB, and VPC. Chunks are 1000 characters with 200 character overlap. Each ingestion script writes a manifest and checks that the previous stage completed before running. If the embedding step did not finish cleanly, the Pinecone upload will not start. Lambda runs with a scoped IAM policy that holds Bedrock invoke and CloudWatch log permissions only. The API Gateway sits in front handling CORS, rate limiting, and quota enforcement. The frontend is a single static HTML file on CloudFront.',
+      notes: [
+        'Costs $3-11/month depending on query volume. Pinecone free tier, Lambda free tier, CloudFront around $0.50. That is compared to about $700/month with OpenSearch Serverless as the vector database.',
+        'Adding more services is straightforward. Add the URLs to the first ingestion script and rerun the pipeline. The architecture does not change.',
+      ],
+    },
   },
 ];
 

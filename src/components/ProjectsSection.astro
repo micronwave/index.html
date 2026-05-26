@@ -1,0 +1,65 @@
+---
+import type { Project } from '../data/content';
+import ProjectCard from './ProjectCard.astro';
+
+interface Props {
+  projects: Project[];
+}
+const { projects } = Astro.props;
+---
+
+<section id="projects" class="section page-wrapper">
+  <div class="section-header reveal">
+    <h2 class="section-title">Projects</h2>
+  </div>
+  <div class="projects-list">
+    {projects.map(project => <ProjectCard project={project} />)}
+  </div>
+</section>
+
+<script>
+  // One open at a time
+  document.querySelectorAll<HTMLButtonElement>('.project-detail-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const detailId = btn.getAttribute('aria-controls');
+      if (!detailId) return;
+      const panel = document.getElementById(detailId);
+      if (!panel) return;
+      const willOpen = !btn.classList.contains('open');
+
+      // Close any currently open panel
+      document.querySelectorAll<HTMLButtonElement>('.project-detail-toggle.open').forEach(other => {
+        if (other === btn) return;
+        const otherId = other.getAttribute('aria-controls');
+        if (otherId) {
+          const otherPanel = document.getElementById(otherId);
+          otherPanel?.classList.remove('open');
+          otherPanel?.setAttribute('aria-hidden', 'true');
+        }
+        other.classList.remove('open');
+        other.setAttribute('aria-expanded', 'false');
+        const otherLabel = other.querySelector('span');
+        if (otherLabel) otherLabel.textContent = 'details';
+      });
+
+      btn.classList.toggle('open', willOpen);
+      btn.setAttribute('aria-expanded', String(willOpen));
+      panel.classList.toggle('open', willOpen);
+      panel.setAttribute('aria-hidden', String(!willOpen));
+      const label = btn.querySelector('span');
+      if (label) label.textContent = willOpen ? 'close' : 'details';
+    });
+  });
+
+  // Scroll reveal
+  const obs = new IntersectionObserver(
+    entries => entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        obs.unobserve(e.target);
+      }
+    }),
+    { threshold: 0.12 }
+  );
+  document.querySelectorAll('#projects .reveal').forEach(el => obs.observe(el));
+</script>

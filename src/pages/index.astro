@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import { person, about, experience, projects, skills, education, certifications } from '../data/content';
 import PortfolioInterface from '../components/PortfolioInterface';
+import ProjectsSection from '../components/ProjectsSection.astro';
 ---
 
 <Layout>
@@ -10,9 +11,10 @@ import PortfolioInterface from '../components/PortfolioInterface';
     person={person}
     about={about}
     experience={experience}
-    projects={projects}
     skills={skills}
     education={education}
     certifications={certifications}
-  />
+  >
+    <ProjectsSection projects={projects} />
+  </PortfolioInterface>
 </Layout>
