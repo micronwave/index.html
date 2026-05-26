@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Positive terminal nub -->
+  <rect x="11" y="1" width="10" height="3.5" rx="1.5" fill="#FFB060"/>
+  <!-- Battery body -->
+  <rect x="5" y="4.5" width="22" height="27" rx="2.5" fill="#1a1208" stroke="#E8923A" stroke-width="1.2"/>
+  <!-- Top terminal band (bright gold) -->
+  <rect x="6.5" y="6" width="19" height="5.5" rx="1" fill="#FFB060"/>
+  <!-- Bottom terminal band (dark metallic) -->
+  <rect x="6.5" y="24" width="19" height="5.5" rx="1" fill="#484848"/>
+  <!-- Left edge sheen for depth -->
+  <rect x="6" y="5.5" width="2.5" height="25" rx="0" fill="rgba(255,255,255,0.05)"/>
+  <!-- AA text -->
+  <text x="16" y="21" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="9" letter-spacing="0.5" fill="#f0f0f0">AA</text>
+</svg>
