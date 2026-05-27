@@ -298,7 +298,7 @@ export const skills: SkillGroup[] = [
     items: ['RAG', 'Vector DB (Pinecone, FAISS)', 'HDBSCAN Clustering', 'LSH MinHash', 'Embeddings', 'Semantic Search'],
   },
   {
-    label: 'Languages & Frameworks',
+    label: 'Languages',
     items: ['Python', 'FastAPI', 'REST APIs', 'SQLite', 'CI/CD'],
   },
   {

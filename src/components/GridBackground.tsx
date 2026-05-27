@@ -31,8 +31,8 @@ export default function GridBackground({ reducedMotion, fadeIn }: { reducedMotio
       auroraCtx.globalCompositeOperation = 'screen';
 
       const bottomGlow = auroraCtx.createRadialGradient(cx, h + h * 0.22, 0, cx, h + h * 0.22, Math.max(w, h) * 0.55);
-      bottomGlow.addColorStop(0, 'rgba(61,133,96,0.04)');
-      bottomGlow.addColorStop(1, 'rgba(61,133,96,0)');
+      bottomGlow.addColorStop(0, 'rgba(92,122,77,0.04)');
+      bottomGlow.addColorStop(1, 'rgba(92,122,77,0)');
       auroraCtx.fillStyle = bottomGlow;
       auroraCtx.fillRect(0, 0, w, h);
 
@@ -40,9 +40,9 @@ export default function GridBackground({ reducedMotion, fadeIn }: { reducedMotio
       const ay = cy + Math.cos(t * 0.00025) * 120;
       const ar = Math.max(w, h) * 0.46;
       const a = auroraCtx.createRadialGradient(ax, ay, 0, ax, ay, ar);
-      a.addColorStop(0, 'rgba(61,133,96,0.09)');
-      a.addColorStop(0.4, 'rgba(61,133,96,0)');
-      a.addColorStop(1, 'rgba(61,133,96,0)');
+      a.addColorStop(0, 'rgba(92,122,77,0.09)');
+      a.addColorStop(0.4, 'rgba(92,122,77,0)');
+      a.addColorStop(1, 'rgba(92,122,77,0)');
       auroraCtx.fillStyle = a;
       auroraCtx.fillRect(0, 0, w, h);
 
@@ -50,9 +50,9 @@ export default function GridBackground({ reducedMotion, fadeIn }: { reducedMotio
       const by = cy + Math.sin(t * 0.0004 + phase) * 100;
       const br = Math.max(w, h) * 0.42;
       const b = auroraCtx.createRadialGradient(bx, by, 0, bx, by, br);
-      b.addColorStop(0, 'rgba(30,85,55,0.12)');
-      b.addColorStop(0.35, 'rgba(30,85,55,0)');
-      b.addColorStop(1, 'rgba(30,85,55,0)');
+      b.addColorStop(0, 'rgba(92,122,77,0.12)');
+      b.addColorStop(0.35, 'rgba(92,122,77,0)');
+      b.addColorStop(1, 'rgba(92,122,77,0)');
       auroraCtx.fillStyle = b;
       auroraCtx.fillRect(0, 0, w, h);
 

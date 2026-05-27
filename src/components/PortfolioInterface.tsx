@@ -366,7 +366,7 @@ function SkillsSection({ skills }: { skills: SkillGroup[] }) {
           >
             <span>{viewMode === 'all' ? 'Expanded' : 'Systems'}</span>
             <strong>{viewMode === 'all' ? 'All' : totalSkills}</strong>
-            <small>{viewMode === 'all' ? 'skills visible' : 'working skills'}</small>
+            <small>{viewMode === 'all' ? 'skills visible' : 'skills'}</small>
           </button>
 
           {nodes.map(({ group, angle, x, y, xAtlas, yAtlas }, index) => {
@@ -547,7 +547,7 @@ function ContactSection({ person }: { person: Person }) {
       <SectionHead title="Contact" />
       <div className="contact-content">
         <p className="contact-cta">
-          Interested in working together?<br />Find me here:
+          Connect with me here:
         </p>
         <div className="contact-grid">
           <div className="contact-item">
