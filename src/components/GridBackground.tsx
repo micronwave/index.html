@@ -10,12 +10,10 @@ export default function GridBackground({ reducedMotion, fadeIn }: { reducedMotio
     const aurora = auroraRef.current!;
     const auroraCtx = aurora.getContext('2d')!;
     let auroraFrame = 0;
+    let resizeRaf = 0;
 
-    function resize() {
-      aurora.width = window.innerWidth;
-      aurora.height = window.innerHeight;
-      drawAurora(performance.now(), true);
-    }
+    const mobileQuery = window.matchMedia('(max-width: 700px)');
+    const isStaticMode = () => reducedMotion || mobileQuery.matches;
 
     function drawAurora(ts: number, force = false) {
       if (!force && auroraFrame++ % 3 !== 0) return;
@@ -25,7 +23,7 @@ export default function GridBackground({ reducedMotion, fadeIn }: { reducedMotio
       const cx = w / 2;
       const cy = h / 2;
       const phase = Math.PI / 3;
-      const t = reducedMotion ? 0 : ts;
+      const t = isStaticMode() ? 0 : ts;
 
       auroraCtx.clearRect(0, 0, w, h);
       auroraCtx.globalCompositeOperation = 'screen';
@@ -59,23 +57,50 @@ export default function GridBackground({ reducedMotion, fadeIn }: { reducedMotio
       auroraCtx.globalCompositeOperation = 'source-over';
     }
 
+    function resize() {
+      aurora.width = window.innerWidth;
+      aurora.height = window.innerHeight;
+      drawAurora(performance.now(), true);
+    }
+
+    function onResize() {
+      cancelAnimationFrame(resizeRaf);
+      resizeRaf = requestAnimationFrame(resize);
+    }
+
     function auroraLoop(ts: number) {
       drawAurora(ts);
       auroraRafRef.current = requestAnimationFrame(auroraLoop);
     }
 
-    resize();
-    window.addEventListener('resize', resize);
-
-    if (!reducedMotion) {
-      auroraRafRef.current = requestAnimationFrame(auroraLoop);
-    } else {
-      drawAurora(0, true);
+    function startAnimation() {
+      if (!isStaticMode()) {
+        auroraRafRef.current = requestAnimationFrame(auroraLoop);
+      }
     }
 
-    return () => {
-      window.removeEventListener('resize', resize);
+    function stopAnimation() {
       cancelAnimationFrame(auroraRafRef.current);
+    }
+
+    function onVisibilityChange() {
+      if (document.visibilityState === 'hidden') {
+        stopAnimation();
+      } else {
+        startAnimation();
+      }
+    }
+
+    resize();
+    window.addEventListener('resize', onResize);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    startAnimation();
+
+    return () => {
+      window.removeEventListener('resize', onResize);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      cancelAnimationFrame(auroraRafRef.current);
+      cancelAnimationFrame(resizeRaf);
     };
   }, [reducedMotion]);
 

@@ -1342,9 +1342,9 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     flex-direction: column;
     justify-content: center;
     gap: 5px;
-    width: 36px;
-    height: 36px;
-    padding: 6px;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
     background: transparent;
     border: none;
     cursor: pointer;
@@ -1525,17 +1525,18 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
       font-size: 16px;
     }
 
-    /* Suppress atlas-open expansion on mobile — too small for expanded cards */
+    /* Atlas-open on mobile: show expanded skill items inline in each card */
     .skills-system.atlas-open .skill-node {
       left: auto;
       top: auto;
-      justify-content: center;
-      align-items: center;
+      justify-content: flex-start;
+      align-items: flex-start;
       min-height: 54px;
-      padding-bottom: 11px;
+      padding-bottom: 12px;
     }
     .skills-system.atlas-open .skill-node-map {
-      display: none;
+      display: grid;
+      font-size: 11px;
     }
     .skills-system.atlas-open .skill-node-top {
       grid-template-columns: 1fr;
@@ -1599,6 +1600,22 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     .mobile-menu-backdrop { display: block; }
     .hero h1 { font-size: clamp(40px, 12vw, 64px); }
     .project-footer { flex-direction: column; align-items: flex-start; }
+
+    /* Touch targets — 44×44px minimum */
+    .nav-hamburger { width: 44px; height: 44px; }
+    .hero-link { min-height: 44px; }
+    .hero-copy-btn { min-height: 44px; min-width: 44px; padding: 10px; }
+    .project-detail-toggle { min-height: 44px; padding: 12px 0; }
+    .project-link { min-height: 44px; padding: 8px 0; }
+    .contact-item a { min-height: 44px; display: inline-flex; align-items: center; }
+    .resume-link { min-height: 44px; }
+
+    /* Mobile content typography — 15–16px floor */
+    .project-bullets li { font-size: 15px; }
+    .project-detail-bullets li { font-size: 15px; }
+    .exp-bullets li { font-size: 15px; }
+    .contact-item a,
+    .contact-item span:not(.contact-item-label) { font-size: 16px; }
   }
 
   /* Very small phones (≤430px) */
@@ -1618,7 +1635,7 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
       font-size: 14px;
     }
     .hero-sub {
-      font-size: 15px;
+      font-size: 16px;
       line-height: 1.6;
     }
     .hero-links {
