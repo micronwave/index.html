@@ -1466,45 +1466,18 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
       display: none;
     }
 
-    /* Core summary bar spans both columns — show just "24 skills" */
-    .skills-core {
-      position: relative;
-      left: auto;
-      top: auto;
-      width: 100%;
-      min-height: 72px;
-      aspect-ratio: auto;
-      grid-column: 1 / -1;
-      grid-template-columns: auto auto;
-      gap: 7px;
-      justify-content: center;
-      align-items: baseline;
-      transform: none;
-      border-radius: 6px;
-    }
-    .skills-core > span {
-      display: none;
-    }
-    .skills-core:hover,
-    .skills-core:focus-visible,
-    .skills-core.active {
-      transform: none;
-    }
-    .skills-core strong {
-      margin: 0;
-      font-size: 38px;
-    }
-    .skills-core.active strong {
-      font-size: 34px;
-    }
+    .skills-core { display: none; }
 
-    /* Skill cards in the 2-col grid */
+    /* Skill cards — always expanded on mobile */
     .skill-node {
       position: relative;
       left: auto;
       top: auto;
       width: 100%;
-      min-height: 54px;
+      min-height: 0;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding-bottom: 14px;
       transform: none;
       animation: none;
     }
@@ -1513,7 +1486,6 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     .skill-node.active {
       transform: none;
     }
-    /* Simplify node header — full-width label, no slash column */
     .skill-node-top {
       grid-template-columns: 1fr;
     }
@@ -1524,37 +1496,35 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
       grid-column: 1;
       font-size: 16px;
     }
-
-    /* Atlas-open on mobile: show expanded skill items inline in each card */
-    .skills-system.atlas-open .skill-node {
-      left: auto;
-      top: auto;
-      justify-content: flex-start;
-      align-items: flex-start;
-      min-height: 54px;
-      padding-bottom: 12px;
-    }
-    .skills-system.atlas-open .skill-node-map {
+    .skill-node-map {
       display: grid;
+      width: 100%;
+      gap: 5px;
+      margin-top: 10px;
+      padding-top: 11px;
+      border-top: 1px solid rgba(92, 122, 77, 0.2);
+      font-family: var(--font-mono);
       font-size: 11px;
+      line-height: 1.35;
+      color: var(--text-dim);
+      text-align: left;
     }
-    .skills-system.atlas-open .skill-node-top {
-      grid-template-columns: 1fr;
+    .skill-node-map span {
+      position: relative;
+      display: block;
+      min-width: 0;
+      padding-left: 12px;
+      overflow-wrap: anywhere;
+    }
+    .skill-node-map span::before {
+      content: '/';
+      position: absolute;
+      left: 0;
+      color: rgba(212, 168, 85, 0.58);
     }
 
-    /* Detail panel */
-    .skills-detail-panel {
-      padding: 24px;
-    }
-    .skills-detail-panel.returning {
-      transform: translate3d(0, -100vh, 0) scale(0.06);
-    }
-    .skills-detail-panel h3 {
-      font-size: 36px;
-    }
-    .skill-ledger {
-      margin-top: 22px;
-    }
+    /* Detail panel hidden — items live in the cards */
+    .skills-detail-panel { display: none; }
 
     /* Experience */
     .exp-item {
@@ -1591,8 +1561,8 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     }
 
     /* General */
-    .section { padding: 80px 0; }
-    .section-header { margin-bottom: 32px; }
+    .section { padding: 100px 0; }
+    .section-header { margin-bottom: 40px; }
     .site-footer { padding-top: 60px; }
     .nav-links { display: none; }
     .nav-hamburger { display: flex; }
@@ -1646,9 +1616,6 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     }
     .skills-orbit {
       gap: 6px;
-    }
-    .skills-core strong {
-      font-size: 32px;
     }
     .hero-email.visible .hero-email-address {
       max-width: 180px;
