@@ -8,6 +8,7 @@ import type {
   EducationEntry,
   Certification,
 } from '../data/content';
+import GridBackground from './GridBackground';
 
 // ── Scroll reveal ──────────────────────────────────────────────────────────
 
@@ -155,10 +156,12 @@ function HeroSection({ person }: { person: Person }) {
       </p>
       <div className="hero-links">
         <a className="hero-link" href={person.github} target="_blank" rel="noopener noreferrer">
-          GitHub <span className="arrow">→</span>
+          <span className="hero-link-text">GitHub</span>
+          <span className="hero-link-arrow" aria-hidden="true">↗</span>
         </a>
         <a className="hero-link" href={person.linkedin} target="_blank" rel="noopener noreferrer">
-          LinkedIn <span className="arrow">→</span>
+          <span className="hero-link-text">LinkedIn</span>
+          <span className="hero-link-arrow" aria-hidden="true">↗</span>
         </a>
         <span className={`hero-email${showEmail ? ' visible' : ''}`}>
           <button
@@ -168,7 +171,7 @@ function HeroSection({ person }: { person: Person }) {
             aria-controls="hero-email-address"
             onClick={() => setShowEmail((visible) => !visible)}
           >
-            Email <span className="arrow">→</span>
+            <span className="hero-link-text">Email</span>
           </button>
           <span id="hero-email-address" className="hero-email-address" aria-hidden={!showEmail}>
             {person.email}
@@ -221,11 +224,10 @@ function AboutSection({
   education: EducationEntry[];
   certifications: Certification[];
 }) {
-  const ref = useReveal();
   return (
     <section id="about" className="section page-wrapper">
       <SectionHead title="About" />
-      <div className="about-content reveal" ref={ref as React.RefObject<HTMLDivElement>}>
+      <div className="about-content">
         <div className="about-text">
           {about.summary.map((p, i) => (
             <p key={i}>{p}</p>
@@ -435,14 +437,24 @@ const MONTHS: Record<string, number> = {
   Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11,
 };
 
-function UptimeChip({ dates, startHour = 0 }: { dates: string; startHour?: number }) {
+function UptimeChip({
+  dates,
+  startHour = 0,
+  startMinute = 0,
+  startSecond = 0,
+}: {
+  dates: string;
+  startHour?: number;
+  startMinute?: number;
+  startSecond?: number;
+}) {
   const startTime = useMemo(() => {
     const match = dates.match(/^([A-Za-z]+)\s+(\d{4})/);
     if (!match) return null;
     const month = MONTHS[match[1]!];
     if (month === undefined) return null;
-    return new Date(parseInt(match[2]!), month, 1, startHour, 0, 0).getTime();
-  }, [dates, startHour]);
+    return new Date(parseInt(match[2]!), month, 1, startHour, startMinute, startSecond).getTime();
+  }, [dates, startHour, startMinute, startSecond]);
 
   const [label, setLabel] = useState('');
 
@@ -472,12 +484,18 @@ function UptimeChip({ dates, startHour = 0 }: { dates: string; startHour?: numbe
 }
 
 function ExperienceItem({ entry }: { entry: ExperienceEntry }) {
-  const ref = useReveal();
   return (
-    <div className="exp-item reveal" ref={ref as React.RefObject<HTMLDivElement>}>
+    <div className="exp-item">
       <div className="exp-meta">
         <span className="exp-dates">{entry.dates}</span>
-        {entry.dates.includes('Present') && <UptimeChip dates={entry.dates} startHour={entry.startHour ?? 0} />}
+        {entry.dates.includes('Present') && (
+          <UptimeChip
+            dates={entry.dates}
+            startHour={entry.startHour ?? 0}
+            startMinute={entry.startMinute ?? 0}
+            startSecond={entry.startSecond ?? 0}
+          />
+        )}
         <span className="exp-company">{entry.company}</span>
         <span className="exp-location">{entry.location}</span>
       </div>
@@ -515,26 +533,54 @@ function ExperienceSection({ experience }: { experience: ExperienceEntry[] }) {
 // ── Contact ───────────────────────────────────────────────────────────────
 
 function ContactSection({ person }: { person: Person }) {
-  const ref = useReveal();
+  const [copied, setCopied] = useState(false);
+
+  const copyEmail = () => {
+    navigator.clipboard.writeText(person.email).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    });
+  };
+
   return (
     <section id="contact" className="section page-wrapper">
       <SectionHead title="Contact" />
-      <div className="contact-content reveal" ref={ref as React.RefObject<HTMLDivElement>}>
+      <div className="contact-content">
         <p className="contact-cta">
           Interested in working together?<br />Find me here:
         </p>
         <div className="contact-grid">
           <div className="contact-item">
             <span className="contact-item-label">Email</span>
-            <a href={`mailto:${person.email}`}>{person.email}</a>
+            <span className="contact-email-row">
+              <a href={`mailto:${person.email}`}>{person.email}</a>
+              <button
+                className={`hero-copy-btn${copied ? ' copied' : ''}`}
+                type="button"
+                aria-label={copied ? 'Copied!' : 'Copy email address'}
+                onClick={copyEmail}
+                style={{ opacity: 1, transform: 'none' }}
+              >
+                {copied ? (
+                  <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <polyline points="2,7 5,10 11,3" />
+                  </svg>
+                ) : (
+                  <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <rect x="4.5" y="4.5" width="7.5" height="7.5" rx="1.2" />
+                    <path d="M8 4.5V2.5a1 1 0 00-1-1H2.5a1 1 0 00-1 1V7a1 1 0 001 1H4.5" />
+                  </svg>
+                )}
+              </button>
+            </span>
           </div>
           <div className="contact-item">
             <span className="contact-item-label">GitHub</span>
-            <a href={person.github} target="_blank" rel="noopener noreferrer">micronwave</a>
+            <a href={person.github} target="_blank" rel="noopener noreferrer">micronwave <span className="contact-ext-arrow" aria-hidden="true">↗</span></a>
           </div>
           <div className="contact-item">
             <span className="contact-item-label">LinkedIn</span>
-            <a href={person.linkedin} target="_blank" rel="noopener noreferrer">aaronaltergott</a>
+            <a href={person.linkedin} target="_blank" rel="noopener noreferrer">aaronaltergott <span className="contact-ext-arrow" aria-hidden="true">↗</span></a>
           </div>
           <div className="contact-item">
             <span className="contact-item-label">Location</span>
@@ -580,21 +626,38 @@ export default function PortfolioInterface({
   certifications,
   children,
 }: Props) {
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [backgroundReady, setBackgroundReady] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const syncReducedMotion = () => setReducedMotion(media.matches);
+
+    syncReducedMotion();
+    setBackgroundReady(true);
+    media.addEventListener('change', syncReducedMotion);
+
+    return () => media.removeEventListener('change', syncReducedMotion);
+  }, []);
+
   return (
-    <main>
-      <SiteNav name={person.name} />
-      <HeroSection person={person} />
-      <AboutSection
-        about={about}
-        person={person}
-        education={education}
-        certifications={certifications}
-      />
-      <SkillsSection skills={skills} />
-      <ExperienceSection experience={experience} />
-      {children}
-      <ContactSection person={person} />
-      <SiteFooter name={person.name} />
-    </main>
+    <>
+      <GridBackground reducedMotion={reducedMotion} fadeIn={backgroundReady} />
+      <main>
+        <SiteNav name={person.name} />
+        <HeroSection person={person} />
+        <AboutSection
+          about={about}
+          person={person}
+          education={education}
+          certifications={certifications}
+        />
+        <SkillsSection skills={skills} />
+        <ExperienceSection experience={experience} />
+        {children}
+        <ContactSection person={person} />
+        <SiteFooter name={person.name} />
+      </main>
+    </>
   );
 }

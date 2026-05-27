@@ -51,7 +51,7 @@ const { projects } = Astro.props;
     });
   });
 
-  // Scroll reveal
+  // Section header reveal
   const obs = new IntersectionObserver(
     entries => entries.forEach(e => {
       if (e.isIntersecting) {
@@ -61,5 +61,5 @@ const { projects } = Astro.props;
     }),
     { threshold: 0.12 }
   );
-  document.querySelectorAll('#projects .reveal').forEach(el => obs.observe(el));
+  document.querySelectorAll('#projects .section-header.reveal').forEach(el => obs.observe(el));
 </script>

@@ -24,6 +24,8 @@ export interface ExperienceEntry {
   bullets: string[];
   tags: string[];
   startHour?: number;
+  startMinute?: number;
+  startSecond?: number;
 }
 
 export interface ProjectStat {
@@ -100,6 +102,8 @@ export const experience: ExperienceEntry[] = [
     location: 'Redlands, CA',
     dates: 'Nov 2024 – Present',
     startHour: 8,
+    startMinute: 17,
+    startSecond: 43,
     bullets: [
       'Eliminated 60+ monthly AMEX and Discover autopay failures by tracing them to an AVS misconfiguration in billing.',
       'Cut auction mail certification processing time by 90% with an automated workflow using file conversion and AI-assisted parsing; authored the companywide process document.',
@@ -116,6 +120,8 @@ export const experience: ExperienceEntry[] = [
     location: 'Remote',
     dates: 'May 2026 – Present',
     startHour: 18,
+    startMinute: 42,
+    startSecond: 11,
     bullets: [
       'Run sponsor outreach for a cybersecurity research group, targeting hardware, crypto, cyber, and consulting firms.',
       'Designed the Null404 sponsorship package PDF; assist in development of CTF challenges and game structure.',
