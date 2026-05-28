@@ -180,7 +180,7 @@ function HeroSection({ person }: { person: Person }) {
         <em>{lastName}</em>
       </h1>
       <p className="hero-sub">
-        Operations engineer building with cloud, data, and AI.<br />
+        Operations engineer building with cloud, security, and AI.<br />
         I find what's inefficient and fix it.
       </p>
       <div className="hero-links-group">
