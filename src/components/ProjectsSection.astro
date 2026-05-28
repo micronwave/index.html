@@ -51,6 +51,17 @@ const { projects } = Astro.props;
     });
   });
 
+  document.querySelectorAll<HTMLElement>('.project-item').forEach(item => {
+    item.addEventListener('click', event => {
+      if (!window.matchMedia('(max-width: 700px)').matches) return;
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (target.closest('a, button, .project-detail')) return;
+
+      item.querySelector<HTMLButtonElement>('.project-detail-toggle')?.click();
+    });
+  });
+
   // Section header reveal
   const obs = new IntersectionObserver(
     entries => entries.forEach(e => {

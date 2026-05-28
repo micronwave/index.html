@@ -1,6 +1,6 @@
 ---
 import type { Project } from '../data/content';
-import ProjectStats from './ProjectStats.astro';
+import ProjectFlow from './ProjectFlow.astro';
 
 interface Props {
   project: Project;
@@ -9,6 +9,7 @@ interface Props {
 const { project } = Astro.props;
 const detailId = `project-detail-${project.name.replace(/\s+/g, '-').toLowerCase()}`;
 const extraBullets = project.bullets.slice(3);
+const flow = project.flow ?? [];
 ---
 
 <div class="project-item">
@@ -21,53 +22,72 @@ const extraBullets = project.bullets.slice(3);
     {project.bullets.slice(0, 3).map((b) => <li>{b}</li>)}
   </ul>
 
-  <button
-    class="project-detail-toggle"
-    type="button"
-    aria-expanded="false"
-    aria-controls={detailId}
-  >
-    <svg
-      class="project-detail-chevron"
-      width="11"
-      height="11"
-      viewBox="0 0 11 11"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
+  <div class="project-action-row">
+    <button
+      class="project-detail-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls={detailId}
     >
-      <polyline points="1.5,3.5 5.5,7.5 9.5,3.5" />
-    </svg>
-    <span>details</span>
-  </button>
+      <svg
+        class="project-detail-chevron"
+        width="11"
+        height="11"
+        viewBox="0 0 11 11"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <polyline points="1.5,3.5 5.5,7.5 9.5,3.5" />
+      </svg>
+      <span>details</span>
+    </button>
+
+    {(project.githubUrl || project.liveUrl) && (
+      <div class="project-links">
+        {project.githubUrl && (
+          <a class="project-link" href={project.githubUrl} target="_blank" rel="noopener noreferrer">
+            Source <span class="arrow">↗</span>
+          </a>
+        )}
+        {project.liveUrl && (
+          <a class="project-link" href={project.liveUrl} target="_blank" rel="noopener noreferrer">
+            Live <span class="arrow">↗</span>
+          </a>
+        )}
+      </div>
+    )}
+  </div>
 
   <div id={detailId} class="project-detail" aria-hidden="true">
     <div class="project-detail-inner">
       <div class="project-detail-content">
+
+        {flow.length > 0 && <ProjectFlow steps={flow} />}
+
         {project.detail ? (
-          <Fragment>
-            <ProjectStats stats={project.detail.stats} />
+          <>
             <div class="project-detail-section">
-              <span class="project-detail-label">Overview</span>
-              <p class="project-detail-desc">{project.detail.overview}</p>
+              <span class="project-detail-label">The problem</span>
+              <p class="project-detail-desc">{project.detail.problem}</p>
             </div>
             <div class="project-detail-section">
-              <span class="project-detail-label">How it works</span>
-              <p class="project-detail-desc">{project.detail.mechanism}</p>
+              <span class="project-detail-label">Decisions</span>
+              <ul class="project-detail-decisions">
+                {project.detail.decisions.map((d) => (
+                  <li>
+                    <span class="decision-num" aria-hidden="true">/</span>
+                    <span>{d}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-            {project.detail.notes.length > 0 && (
-              <div class="project-detail-section">
-                <ul class="project-detail-bullets">
-                  {project.detail.notes.map((note) => <li>{note}</li>)}
-                </ul>
-              </div>
-            )}
-          </Fragment>
+          </>
         ) : (
-          <Fragment>
+          <>
             <div class="project-detail-section">
               <span class="project-detail-label">Overview</span>
               <p class="project-detail-desc">{project.description}</p>
@@ -79,29 +99,10 @@ const extraBullets = project.bullets.slice(3);
                 </ul>
               </div>
             )}
-          </Fragment>
+          </>
         )}
-      </div>
-    </div>
-  </div>
 
-  <div class="project-footer">
-    <div class="project-stack">
-      {project.stack.map((s) => <span class="stack-chip">{s}</span>)}
-    </div>
-    {(project.githubUrl || project.liveUrl) && (
-      <div class="project-links">
-        {project.githubUrl && (
-          <a class="project-link" href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-            Source <span class="arrow">→</span>
-          </a>
-        )}
-        {project.liveUrl && (
-          <a class="project-link" href={project.liveUrl} target="_blank" rel="noopener noreferrer">
-            Live <span class="arrow">→</span>
-          </a>
-        )}
       </div>
-    )}
+    </div>
   </div>
 </div>

@@ -1,0 +1,65 @@
+---
+interface Props {
+  steps: string[];
+}
+const { steps } = Astro.props;
+---
+
+<div class="project-flow-strip">
+  {steps.map((step, i) => (
+    i < steps.length - 1 ? (
+      <span class="flow-pair">
+        <span class="flow-node">{step}</span>
+        <svg
+          class="flow-chevron"
+          width="9"
+          height="15"
+          viewBox="0 0 9 15"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <polyline points="1.5,1.5 7.5,7.5 1.5,13.5" />
+        </svg>
+      </span>
+    ) : (
+      <span class="flow-node">{step}</span>
+    )
+  ))}
+</div>
+
+<style>
+  .project-flow-strip {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0 6px;
+    row-gap: 8px;
+    padding: 10px 0 18px;
+    border-bottom: 1px solid rgba(92, 122, 77, 0.10);
+  }
+
+  .flow-pair {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .flow-node {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.09em;
+    color: var(--green);
+  }
+
+  .flow-chevron {
+    color: var(--text);
+    flex-shrink: 0;
+    display: block;
+  }
+</style>

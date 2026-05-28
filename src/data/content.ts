@@ -28,16 +28,9 @@ export interface ExperienceEntry {
   startSecond?: number;
 }
 
-export interface ProjectStat {
-  value: string;
-  label: string;
-}
-
 export interface ProjectDetail {
-  stats: ProjectStat[];
-  overview: string;
-  mechanism: string;
-  notes: string[];
+  problem: string;
+  decisions: string[];
 }
 
 export interface Project {
@@ -46,6 +39,7 @@ export interface Project {
   description: string;
   bullets: string[];
   stack: string[];
+  flow?: string[];
   githubUrl?: string;
   liveUrl?: string;
   status: 'active' | 'complete' | 'prototype' | 'archived';
@@ -87,11 +81,11 @@ export const person: Person = {
 
 export const about: About = {
   summary: [
-    "I've worked across customer ops, marketing, finance, and engineering. It's not the typical path, but that mix means I tend to see problems differently than someone who came up through one track.",
+    "I've done work across customer ops, marketing, finance, and engineering. That mix means I have a different perspective than someone who came up through one track.",
 
-    "Currently, I'm an Operations Specialist at Southwest Self Storage where I automated our auction mailing certification workflow, fixed a recurring autopay failure that was costing us time and money every month, and set up automatic notifications for overdue accounts.",
+    "Currently, I'm an Operations Specialist at Southwest Self Storage, where I've automated our auction mailing certification workflow, fixed a recurring autopay failure that was costing us time and money every month, and set up automatic SMS notifications for overdue accounts.",
 
-    "That's also why I'm moving into tech. The part of the job I like most is figuring out why something isn't working and then making it work — or making something that kind of works, work more efficiently. Cloud, security, and AI are where I want to do that. They're not really separate fields; they're three layers that depend on each other, and I think you need to understand all three to build anything solid.",
+    "That work is what pulled me into tech. What I actually enjoy is figuring out why something isn't working and making it work, or taking something that kind of works and making it faster. Cloud, security, and AI is where that instinct makes the most sense. They're three layers that depend on each other, and I think you need to understand all of them to build anything worthwhile.",
   ],
 };
 
@@ -155,22 +149,16 @@ export const projects: Project[] = [
       'A routing skill auto-triggers on phrases like "build phase" or "audit"; running /chaperone with no arguments reads current workflow state and tells you the exact next command to run.',
     ],
     stack: ['Python', 'Claude Code', 'Slash Commands', 'Python Hooks'],
+    flow: ['plan', 'build', 'audit', 'commit'],
     githubUrl: 'https://github.com/micronwave/claude-chaperone',
     status: 'complete',
     detail: {
-      stats: [
-        { value: '12', label: 'slash commands' },
-        { value: '4', label: 'hooks' },
-        { value: '58', label: 'tests' },
-        { value: '3', label: 'max audit loops' },
-      ],
-      overview:
-        "A structured Claude Code build workflow for any project. It's built around one core problem: Claude drifts in long sessions. It starts carrying assumptions from earlier work, makes judgment calls it should not be making, and cuts corners. Mandatory /clear calls between every stage fix that as each phase runs in a fresh context and automatic handoff files from the previous step.",
-      mechanism:
-        '/chaperone is the single entry point. Give it your idea and it kicks off the sequence; run it with no arguments and it reads the current state and tells you exactly what to run next. Twelve slash commands carry the session stages of planning, phasing, building, auditing. The four Python hooks handle enforcement without any pip install. They watch for scope drift, prompt before any git push, remind you when code changes have outrun the build log, and inject current state after /clear so Claude picks up where it left off.',
-      notes: [
-        'Idempotent installer. Merges settings.json without clobbering existing hooks, then runs the 58-test suite to verify the install is clean. Pass --force to overwrite divergent files when upgrading.',
-        'Dormant until you activate it. Dropping the folder into a repo changes nothing until you start a workflow.',
+      problem:
+        "Claude accumulates issues in long sessions by carrying assumptions, filling in gaps it shouldn't, and drifting from scope. Mandatory /clear between every stage fixes this as each phase runs in a fresh context. session_start.py injects previous state after /clear so the thread doesn't break.",
+      decisions: [
+        "A one-file fix or a typo doesn't need this workflow, only scoped for multi-phase work. The overhead only pays off when the task spans multiple sessions.",
+        'If codex, gemini, or aider are on PATH, they run the audit pass. If none are present, an isolated fresh subagent handles it.',
+        'Three loop cap on /re-audit keeps the workflow from turning into its own kind of scope drift. /handoff writes a self-contained state file mid workflow and the next session reads it and picks up without you re-explaining what happened.',
       ],
     },
   },
@@ -198,22 +186,17 @@ export const projects: Project[] = [
       'Next.js',
       'TypeScript',
     ],
+    flow: ['sources', 'cluster', 'score', 'map'],
     githubUrl: 'https://github.com/micronwave/market-narrative-engine',
     status: 'complete',
     detail: {
-      stats: [
-        { value: '11', label: 'pipeline stages' },
-        { value: '4h', label: 'schedule' },
-        { value: '66', label: 'API routes' },
-        { value: '5', label: 'data sources' },
-      ],
-      overview:
-        'Pulls from RSS feeds, SEC filings, Reddit, news APIs every four hours. Incoming documents get clustered into narratives and tracked as they grow, shift, and decay. Each narrative gets mapped to S&P 500 tickers by comparing its embedding against a library built from 10-K summaries. It watches the stories that move markets, not the markets themselves.',
-      mechanism:
-        'Documents come in and get deduplicated with LSH MinHash. Anything above 0.85 Jaccard similarity gets dropped before clustering. Survivors get embedded into 768-dimensional vectors and grouped with HDBSCAN. The pipeline tracks centroid drift over time. When a narrative shifts from "Fed rate decision" toward "regional bank stress," that shows up in the centroid movement as mutation. On the LLM side, Haiku handles routine topic labeling and Sonnet only gets called for mutation analysis, with a daily token budget cap to keep costs predictable. The coordination detector flags five or more sources hitting the same narrative inside 300 seconds as a suspicious burst.',
-      notes: [
-        'Narratives move through five lifecycle stages (Emerging, Growing, Mature, Declining, Dormant) based on velocity and entropy metrics. A dormant narrative whose velocity spikes past 0.10 automatically reverts to Growing.',
-        'FastAPI backend with 66 routes. Next.js frontend with views for signal radar, constellation graph, coordination detection, and velocity-price correlation explorer.',
+      problem:
+        'Financial narratives are scattered, so the same story surfaces as an RSS headline, a Reddit thread, and an SEC filing. NIE aggregates those fragments across sources every four hours, clusters them into tracked narratives, and watches how they evolve.',
+      decisions: [
+        "The number of active narratives at any moment isn't knowable in advance, HDBSCAN discovers it in the data.",
+        "When a narrative cluster's center shifts semantically, that movement is what gets flagged, not a keyword change or title match.",
+        'Emerging, Growing, Mature, Declining, Dormant lifecycle stages. A dormant narrative that spikes past 0.10 velocity reverts to Growing automatically because going quiet and then spiking is itself a signal.',
+        'The 300-second window in the coordination detector is short enough to catch a coordinated burst, long enough to filter organic spread across sources. False positive filtering is straight forward when sent to Sonnet for analysis.',
       ],
     },
   },
@@ -239,23 +222,18 @@ export const projects: Project[] = [
       'S3',
       'CloudFront',
     ],
+    flow: ['docs', 'chunks', 'embed', 'retrieve', 'answer'],
     githubUrl: 'https://github.com/micronwave/aws-docs-rag',
     liveUrl: 'https://d3d0zch3u8ca61.cloudfront.net',
     status: 'complete',
     detail: {
-      stats: [
-        { value: '~120', label: 'pages indexed' },
-        { value: '5', label: 'services covered' },
-        { value: 'top 5', label: 'chunks retrieved' },
-        { value: '$3-11', label: 'per month' },
-      ],
-      overview:
-        'Ingestion scrapes the docs, breaks them into overlapping chunks, embeds with Titan v2, loads into Pinecone. After that, the query path handles everything. A question comes in, gets embedded with the same model, and the top 5 closest chunks come back from Pinecone. Those get packaged into a grounded prompt with anti-hallucination instructions baked in and sent to Claude via Bedrock. The answer comes back with source URLs.',
-      mechanism:
-        'Ingestion covers about 120 pages across S3, EC2, Lambda, DynamoDB, and VPC. Chunks are 1000 characters with 200 character overlap. Each ingestion script writes a manifest and checks that the previous stage completed before running. If the embedding step did not finish cleanly, the Pinecone upload will not start. Lambda runs with a scoped IAM policy that holds Bedrock invoke and CloudWatch log permissions only. The API Gateway sits in front handling CORS, rate limiting, and quota enforcement. The frontend is a single static HTML file on CloudFront.',
-      notes: [
-        'Costs $3-11/month depending on query volume. Pinecone free tier, Lambda free tier, CloudFront around $0.50. That is compared to about $700/month with OpenSearch Serverless as the vector database.',
-        'Adding more services is straightforward. Add the URLs to the first ingestion script and rerun the pipeline. The architecture does not change.',
+      problem:
+        "Claude can describe AWS services confidently from training data, which is precisely the issue, training data isn't the current documentation. This RAG retrieves the relevant chunks from the actual docs at query time and builds the prompt around them. Responses come back grounded in reality with source URLs attached. I used this to study for my AWS CP exam.",
+      decisions: [
+        'S3, EC2, Lambda, DynamoDB, and VPC cover what shows up in almost every AWS architecture question, questions about one usually involve another.',
+        'A concept that starts near the end of one chunk appears at the start of the next because of the 200 character chunk overlap. Retrieval does not miss it because of an arbitrary split boundary.',
+        'Pinecone free tier over OpenSearch Serverless keeps it at ~$3/month vs ~$700. Same architecture but that price difference is what made this easily deployable.',
+        'Adding new AWS services is as easy as putting the URLs in the first ingestion script and triggering a rerun.',
       ],
     },
   },
