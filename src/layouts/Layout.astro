@@ -494,8 +494,8 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
   .skill-vector {
     stroke: rgba(92, 122, 77, 0.18);
     stroke-width: 0.24;
-    stroke-dasharray: 74;
-    stroke-dashoffset: 74;
+    stroke-dasharray: 50;
+    stroke-dashoffset: 50;
     vector-effect: non-scaling-stroke;
     transition:
       stroke 0.25s ease,
@@ -508,72 +508,115 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     stroke-dashoffset: 0;
   }
 
-  .skills-core {
+  .skills-rocker {
     position: absolute;
     left: 50%;
     top: 50%;
     z-index: 4;
-    display: grid;
-    place-items: center;
-    width: clamp(142px, 18vw, 190px);
-    aspect-ratio: 1;
-    padding: 18px;
     transform: translate(-50%, -50%);
-    color: var(--text);
-    border: 1px solid rgba(92, 122, 77, 0.34);
-    border-radius: 50%;
-    background:
-      radial-gradient(circle at 50% 22%, rgba(212, 168, 85, 0.13), transparent 34%),
-      rgba(14, 13, 10, 0.88);
-    box-shadow: inset 0 0 36px rgba(92, 122, 77, 0.12);
-    text-align: center;
+    width: 30%;
+    max-width: 220px;
+    min-width: 120px;
+    height: 10%;
+    max-height: 54px;
+    min-height: 40px;
+
+    appearance: none;
+    display: flex;
+    align-items: stretch;
+    padding: 0;
+    background: rgba(14, 13, 10, 0.96);
+    border: 1px solid rgba(92, 122, 77, 0.38);
+    clip-path: polygon(
+      8px 0%, calc(100% - 8px) 0%,
+      100% 8px, 100% calc(100% - 8px),
+      calc(100% - 8px) 100%, 8px 100%,
+      0% calc(100% - 8px), 0% 8px
+    );
     cursor: pointer;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.36);
     transition:
       border-color 0.25s ease,
-      box-shadow 0.25s ease,
-      transform 0.25s ease,
-      background 0.25s ease;
+      box-shadow 0.25s ease;
   }
-  .skills-core:hover,
-  .skills-core:focus-visible,
-  .skills-core.active {
-    border-color: rgba(212, 168, 85, 0.62);
-    background:
-      radial-gradient(circle at 50% 22%, rgba(212, 168, 85, 0.18), transparent 36%),
-      rgba(14, 13, 10, 0.94);
-    box-shadow: inset 0 0 42px rgba(92, 122, 77, 0.16);
-    transform: translate(-50%, -50%) scale(1.035);
+
+  /* Vertical divider between halves */
+  .skills-rocker::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 20%;
+    bottom: 20%;
+    width: 1px;
+    background: rgba(92, 122, 77, 0.28);
+    pointer-events: none;
+    z-index: 2;
   }
-  .skills-core.active {
-    transform: translate(-50%, -50%);
+
+  .skills-rocker:hover {
+    border-color: rgba(212, 168, 85, 0.46);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.4), 0 0 18px rgba(212, 168, 85, 0.06);
   }
-  .skills-core:active {
-    transform: translate(-50%, -50%) scale(0.965);
+
+  .skills-rocker:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+
+  .skills-rocker:active {
+    transform: translate(-50%, -50%) scale(0.97);
     transition-duration: 0.08s;
   }
-  .skills-core span,
-  .skills-core small {
+
+  .skills-rocker.active {
+    border-color: rgba(212, 168, 85, 0.48);
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.36), 0 0 28px rgba(212, 168, 85, 0.09);
+  }
+
+  .skills-rocker-label {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
     font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--green);
+    font-size: clamp(9px, 1.4vw, 11px);
+    letter-spacing: 0.1em;
+    text-transform: lowercase;
+    user-select: none;
+    pointer-events: none;
+    line-height: 1;
+    transition: color 0.22s ease;
   }
-  .skills-core strong {
-    margin: -4px 0;
-    font-family: var(--font-heading);
-    font-size: clamp(48px, 7vw, 72px);
-    font-weight: 400;
-    line-height: 0.9;
+
+  /* The > prompt glyph — always reserves its width so label text stays still */
+  .skills-rocker-label::before {
+    content: '>';
+    font-family: var(--font-mono);
+    font-size: inherit;
+    letter-spacing: 0;
+    display: inline-block;
+    width: 10px;
     color: var(--accent);
+    opacity: 0;
+    transform: translateX(-2px);
+    transition:
+      opacity 0.22s ease,
+      transform 0.22s ease;
   }
-  .skills-core small {
-    color: var(--text-faint);
-  }
-  .skills-core.active strong {
-    font-size: clamp(36px, 5vw, 54px);
-    font-style: italic;
-  }
+
+  /* Browse active — left label shows > */
+  .skills-rocker:not(.active) .skills-rocker-label.left::before  { opacity: 1; transform: translateX(0); }
+  /* Run active — right label shows > */
+  .skills-rocker.active       .skills-rocker-label.right::before { opacity: 1; transform: translateX(0); }
+
+  .skills-rocker-label.left  { color: var(--green); }
+  .skills-rocker-label.right { color: var(--text-faint); }
+
+  .skills-rocker.active .skills-rocker-label.left  { color: var(--text-faint); }
+  .skills-rocker.active .skills-rocker-label.right { color: var(--accent); }
 
   .skill-node {
     position: absolute;
@@ -685,11 +728,25 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     to   { opacity: 1; transform: translateX(0)    scale(1); }
   }
 
+  .pip-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px clamp(12px, 1.6vw, 16px);
+    border-bottom: 1px solid rgba(92, 122, 77, 0.18);
+    background: rgba(14, 13, 10, 0.35);
+    flex-shrink: 0;
+  }
+.pip-title {
+    flex: 1;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--text-faint);
+    user-select: none;
+  }
   .pip-close {
-    position: absolute;
-    top: 11px;
-    right: 11px;
-    z-index: 2;
     appearance: none;
     background: transparent;
     border: 0;
@@ -698,6 +755,7 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     color: var(--text-faint);
     line-height: 1;
     transition: color 0.18s ease;
+    flex-shrink: 0;
   }
   .pip-close:hover { color: var(--text-dim); }
   .pip-close:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
@@ -719,18 +777,28 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     white-space: pre-wrap;
     font-family: var(--font-mono);
     font-size: clamp(11px, 1.05vw, 13px);
-    line-height: 1.72;
+    line-height: 1.58;
     color: rgba(190, 183, 166, 0.86);
   }
   .pip-line {
     display: block;
     animation: terminal-line-in 180ms ease both;
   }
-  .pip-line.command { color: rgba(236, 229, 210, 0.94); }
-  .pip-line.status  { color: rgba(212, 168, 85, 0.76); }
-  .pip-line.ok,
-  .pip-line.success { color: rgba(132, 175, 112, 0.9); }
-  .pip-line.warning { color: rgba(212, 168, 85, 0.82); }
+  .pip-line.command  { color: rgba(236, 229, 210, 0.94); }
+  .pip-line.status   { color: rgba(212, 168, 85, 0.76); }
+  .pip-line.ok       { color: rgba(132, 175, 112, 0.9); }
+  .pip-line.success  { color: rgba(168, 220, 140, 1); font-weight: 500; text-shadow: 0 0 14px rgba(132, 175, 112, 0.45); }
+  .pip-line.warning  { color: rgba(210, 120, 50, 0.9); }
+  .pip-prompt-char   { color: var(--accent); }
+
+  .pip-line.help-row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: clamp(12px, 2vw, 20px);
+    align-items: baseline;
+  }
+  .help-cmd  { color: rgba(212, 168, 85, 0.9); white-space: nowrap; }
+  .help-desc { color: rgba(144, 138, 124, 0.78); }
   .pip-cursor {
     display: inline-block;
     margin-left: 2px;
@@ -788,74 +856,6 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
   .pip-send:not(:disabled):hover { color: var(--accent); transform: translateX(2px); }
   .pip-send:disabled { opacity: 0.28; cursor: default; }
   .pip-send:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
-
-  /* ── Trash can ── */
-  .pip-trash {
-    position: absolute;
-    left: 10%;
-    bottom: 11%;
-    z-index: 3;
-    opacity: 0;
-    transform: scale(0.78) translateY(6px);
-    transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.18, 0.88, 0.2, 1);
-    pointer-events: none;
-  }
-  .pip-trash.visible {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-
-  .trash-lid-group {
-    transform-origin: 11px 9px;
-  }
-
-  /* Lid swings open with anticipation + overshoot */
-  @keyframes trash-lid-open {
-    0%   { transform: rotate(0deg); }
-    10%  { transform: rotate(-5deg); }
-    42%  { transform: rotate(-60deg); }
-    62%  { transform: rotate(-38deg); }
-    80%  { transform: rotate(-52deg); }
-    100% { transform: rotate(-47deg); }
-  }
-  .pip-trash.lid-open .trash-lid-group {
-    animation: trash-lid-open 0.62s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  }
-
-  /* Lid snaps shut — quick with a crisp settle */
-  @keyframes trash-lid-close {
-    0%   { transform: rotate(-47deg); }
-    32%  { transform: rotate(-4deg); }
-    50%  { transform: rotate(5deg); }
-    68%  { transform: rotate(-1.5deg); }
-    100% { transform: rotate(0deg); }
-  }
-  .pip-trash.lid-closing .trash-lid-group {
-    animation: trash-lid-close 0.48s cubic-bezier(0.36, 0, 0.66, -0.1) forwards;
-  }
-
-  /* Can squash-and-stretch on impact */
-  @keyframes trash-can-catch {
-    0%   { transform: scale(1, 1) translateY(0); }
-    18%  { transform: scale(1.06, 0.92) translateY(3px); }
-    38%  { transform: scale(0.96, 1.06) translateY(-4px); }
-    58%  { transform: scale(1.03, 0.97) translateY(2px); }
-    76%  { transform: scale(0.99, 1.01) translateY(-1px); }
-    100% { transform: scale(1, 1) translateY(0); }
-  }
-  /* Amber flash on the SVG strokes when the plane is swallowed */
-  @keyframes trash-catch-glow {
-    0%   { filter: none; }
-    20%  { filter: drop-shadow(0 0 5px rgba(212, 168, 85, 0.55)) brightness(1.18); }
-    55%  { filter: drop-shadow(0 0 2px rgba(212, 168, 85, 0.22)); }
-    100% { filter: none; }
-  }
-  .pip-trash.catching {
-    animation: trash-can-catch 0.52s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  }
-  .pip-trash.catching svg {
-    animation: trash-catch-glow 0.58s ease forwards;
-  }
 
   .skills-detail-panel {
     position: relative;
@@ -1656,48 +1656,24 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
       display: none;
     }
 
-    .skills-core {
+    .skills-rocker {
       position: relative;
       left: auto;
       top: auto;
+      transform: none;
       grid-column: 1 / -1;
-      width: min(176px, 48vw);
+      width: min(200px, 52vw);
+      height: 44px;
+      max-height: 44px;
+      min-height: 44px;
       justify-self: center;
       margin-bottom: 14px;
-      transform: none;
     }
-    .skills-core:hover,
-    .skills-core:focus-visible,
-    .skills-core.active {
-      transform: none;
+    .skills-rocker:active {
+      transform: scale(0.97);
     }
-    .skills-core::after {
-      content: '';
-      position: absolute;
-      inset: -8px;
-      border: 1px solid rgba(212, 168, 85, 0.26);
-      border-radius: 50%;
-      box-shadow:
-        0 0 0 1px rgba(92, 122, 77, 0.08),
-        0 0 22px rgba(212, 168, 85, 0.08);
-      opacity: 0.62;
-      pointer-events: none;
-      animation: skills-core-touch-ring 8s ease-in-out infinite;
-    }
-    .skills-core:active {
-      transform: scale(0.965);
-      transition-duration: 0.08s;
-    }
-
-    @keyframes skills-core-touch-ring {
-      0%, 100% {
-        opacity: 0.42;
-        transform: scale(0.985);
-      }
-      50% {
-        opacity: 0.74;
-        transform: scale(1.035);
-      }
+    .skills-rocker-label {
+      font-size: 12px;
     }
 
     .skill-node {
@@ -1757,16 +1733,6 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     .pip-input {
       font-size: 16px;
     }
-    /* Trash can: below the pip card, centered */
-    .skills-system.pip-open {
-      padding-bottom: 54px;
-    }
-    .pip-trash {
-      left: 50%;
-      bottom: -46px;
-      translate: -50% 0;
-    }
-
     /* Experience */
     .exp-item {
       grid-template-columns: 1fr;
@@ -1916,6 +1882,9 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     .about-sidebar {
       grid-template-columns: 1fr 1fr;
     }
+    .detail-group-full {
+      grid-column: 1 / -1;
+    }
     .skills-orbit {
       gap: 6px;
     }
@@ -1948,9 +1917,6 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     .pip-card {
       animation: none;
       transition: none;
-    }
-    .skills-core::after {
-      animation: none;
     }
     .skills-ring.outer {
       animation: none;

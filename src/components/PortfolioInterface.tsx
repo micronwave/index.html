@@ -296,7 +296,7 @@ function AboutSection({
           </div>
           <div className="detail-group">
             <span className="detail-label">Focus</span>
-            <span className="detail-value">Cloud · Security · AI</span>
+            <span className="detail-value">Cloud&nbsp;·&nbsp;Security&nbsp;·&nbsp;AI</span>
           </div>
           {certifications.map((cert) => (
             <div className="detail-group" key={cert.name}>
@@ -314,10 +314,10 @@ function AboutSection({
             </div>
           ))}
           {education.map((ed) => (
-            <div className="detail-group" key={ed.institution}>
+            <div className="detail-group detail-group-full" key={ed.institution}>
               <span className="detail-label">Education</span>
               <span className="detail-value">
-                {ed.degree}, {ed.institution.split(',')[0]}
+                {ed.degree}, {ed.institution}
               </span>
             </div>
           ))}
@@ -341,11 +341,7 @@ const PIP_LINES = [
   { text: '  ✓ fastapi', tone: 'ok' },
   { text: '  ✓ powershell-hooks', tone: 'ok' },
   { text: '', tone: 'spacer' },
-  { text: 'Building wheels...', tone: 'status' },
-  { text: '  ✓ retrieval-pipeline', tone: 'ok' },
-  { text: '  ✓ serverless-deploy', tone: 'ok' },
-  { text: '  ✓ agent-guardrails', tone: 'ok' },
-  { text: '', tone: 'spacer' },
+  { text: 'Installing collected packages...', tone: 'status' },
   { text: 'Successfully installed aaron-altergott-1.0.0', tone: 'success' },
   { text: 'WARNING: Java not found. Continuing anyway.', tone: 'warning' },
 ] as const;
@@ -353,157 +349,207 @@ const PIP_LINES = [
 const PIP_STEP_MS = 235;
 const PIP_INTERACTIVE_DELAY = 680;
 
-const CORPORATE_RESPONSES = [
-  'NOTE: Your inquiry has been triaged and forwarded to our synergy team. Expected response time: Q3 2027.',
-  'LOGGED: Message received. Assigned priority P4 and archived in an unmonitored queue.',
-  'NOTICE: Input acknowledged. Per our retention policy this has been escalated to 12 stakeholders.',
-  'PROCESSED: Contribution noted, actioned, and immediately deprecated per company policy.',
-  'ALERT: Your message triggered our high-value detection system. It has been thoroughly ignored.',
-];
+// ── Pip terminal types ────────────────────────────────────────────────────
 
-// ── Flight paths: [cp1xRatio, cp1yOffset, cp2xRatio, cp2yOffset] ─────────
-const FLIGHT_PATHS: [number, number, number, number][] = [
-  [0.30, -150, 0.70,  -70],
-  [0.20, -230, 0.60, -150],
-  [0.15,   55, 0.72,  -85],
-  [0.40, -170, 0.88,  -25],
-];
-
-// ── Paper airplane ────────────────────────────────────────────────────────
-
-interface FlightSpec {
-  startX: number; startY: number;
-  endX: number;   endY: number;
-  pathIdx: number; key: number;
+type OutputTone = 'command' | 'status' | 'ok' | 'success' | 'warning' | 'spacer' | 'help-row';
+interface OutputLine { text: string; tone: OutputTone; }
+interface PipMsg {
+  id: string;
+  input: string;
+  lines: OutputLine[];
+  loading?: boolean;
 }
 
-const PLANE_DURATION = 1600;
-
-function PaperAirplane({ spec, onLand }: { spec: FlightSpec; onLand: () => void }) {
-  const planeRef  = useRef<HTMLDivElement>(null);
-  const trailRef  = useRef<SVGPathElement>(null);
-  const onLandRef = useRef(onLand);
-  onLandRef.current = onLand;
-
-  useEffect(() => {
-    const plane = planeRef.current;
-    if (!plane) return;
-    const planeEl = plane;
-
-    const { startX, startY, endX, endY, pathIdx } = spec;
-    const dx = endX - startX;
-    const dy = endY - startY;
-    const fp = FLIGHT_PATHS[pathIdx % FLIGHT_PATHS.length]!;
-    const [r1x, r1y, r2x, r2y] = fp;
-    const cp1 = { x: startX + dx * r1x, y: startY + dy * 0.5 + r1y };
-    const cp2 = { x: startX + dx * r2x, y: startY + dy * 0.5 + r2y };
-
-    const startTime = performance.now();
-    const trailPts: string[] = [];
-    let rafId: number;
-
-    function cubic(t: number, p0: number, p1: number, p2: number, p3: number) {
-      const u = 1 - t;
-      return u*u*u*p0 + 3*u*u*t*p1 + 3*u*t*t*p2 + t*t*t*p3;
-    }
-
-    function tick(now: number) {
-      const raw = Math.min((now - startTime) / PLANE_DURATION, 1);
-      const t   = raw < 0.5 ? 2*raw*raw : -1 + (4 - 2*raw)*raw;
-
-      const x = cubic(t, startX, cp1.x, cp2.x, endX);
-      const y = cubic(t, startY, cp1.y, cp2.y, endY);
-
-      const nt = Math.min(t + 0.02, 1);
-      const nx = cubic(nt, startX, cp1.x, cp2.x, endX);
-      const ny = cubic(nt, startY, cp1.y, cp2.y, endY);
-      const angle = Math.atan2(ny - y, nx - x) * 180 / Math.PI;
-
-      // Fade into the can's mouth over the final 16% of travel
-      const opacity = raw > 0.84 ? Math.max(0, 1 - (raw - 0.84) / 0.16) : 1;
-
-      planeEl.style.left    = `${x - 10}px`;
-      planeEl.style.top     = `${y - 8}px`;
-      planeEl.style.transform = `rotate(${angle}deg)`;
-      planeEl.style.opacity = String(opacity);
-
-      // Trail stops before the final approach so it doesn't reach the can
-      if (raw < 0.76) {
-        trailPts.push(`${trailPts.length ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`);
-        trailRef.current?.setAttribute('d', trailPts.join(''));
-      }
-
-      if (raw < 1) {
-        rafId = requestAnimationFrame(tick);
-      } else {
-        const tr = trailRef.current;
-        if (tr) { tr.style.transition = 'opacity 0.4s ease'; tr.style.opacity = '0'; }
-        setTimeout(() => onLandRef.current(), 200);
-      }
-    }
-
-    rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
-  // onLand intentionally excluded — stabilized via ref above
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [spec]);
-
-  return (
-    <>
-      <svg
-        aria-hidden="true"
-        style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 9998, overflow: 'visible' }}
-      >
-        <path ref={trailRef} fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth="1" strokeDasharray="3 6" />
-      </svg>
-      <div ref={planeRef} aria-hidden="true" style={{ position: 'fixed', pointerEvents: 'none', zIndex: 9999 }}>
-        <svg width="20" height="16" viewBox="0 0 20 16" fill="none" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M1 8L18 1L14 15L10 9Z" fill="rgba(255,255,255,0.16)" stroke="white" strokeWidth="1.3" />
-          <line x1="10" y1="9" x2="18" y2="1" stroke="white" strokeWidth="1.1" />
-          <line x1="10" y1="9" x2="14" y2="15" stroke="white" strokeWidth="1.1" />
-        </svg>
-      </div>
-    </>
-  );
+interface Command {
+  description: string;
+  run: (args: string) => Promise<OutputLine[]>;
 }
 
-// ── Trash can ─────────────────────────────────────────────────────────────
+// ── Easter-egg lines ─────────────────────────────────────────────────────
 
-function TrashCan({ visible, lidOpen, catching, lidClosing, canRef }: {
-  visible: boolean; lidOpen: boolean; catching: boolean; lidClosing: boolean;
-  canRef: React.RefObject<HTMLDivElement | null>;
-}) {
-  const cls = ['pip-trash', visible && 'visible', lidOpen && 'lid-open', catching && 'catching', lidClosing && 'lid-closing']
-    .filter(Boolean).join(' ');
-  return (
-    <div ref={canRef} className={cls} aria-hidden="true">
-      <svg width="22" height="27" viewBox="0 0 22 27" fill="none" strokeLinecap="round" strokeLinejoin="round">
-        <g className="trash-lid-group">
-          <line x1="1" y1="9" x2="21" y2="9" stroke="var(--text-dim)" strokeWidth="1.3" />
-          <path d="M8 6.5h6" stroke="var(--text-dim)" strokeWidth="1.3" />
-        </g>
-        <rect x="3" y="9" width="16" height="16" rx="2" stroke="var(--text-faint)" strokeWidth="1.1" />
-        <line x1="8.5" y1="13" x2="8.5" y2="21" stroke="var(--text-faint)" strokeWidth="1" />
-        <line x1="13.5" y1="13" x2="13.5" y2="21" stroke="var(--text-faint)" strokeWidth="1" />
-      </svg>
-    </div>
+const AARON_PACKAGE_LINES: OutputLine[] = PIP_LINES.map(l => ({ text: l.text, tone: l.tone as OutputTone }));
+
+// ── PyPI helper ───────────────────────────────────────────────────────────
+
+async function fetchPyPI(pkg: string): Promise<OutputLine[]> {
+  if (!pkg) return [{ text: 'usage: pip install <package-name>', tone: 'warning' }];
+
+  let res: Response;
+  try {
+    res = await fetch(`https://pypi.org/pypi/${encodeURIComponent(pkg)}/json`, {
+      headers: { Accept: 'application/json' },
+    });
+  } catch {
+    return [{ text: 'ERROR: Could not connect to PyPI. Check your connection.', tone: 'warning' }];
+  }
+
+  if (res.status === 404) return [{ text: `ERROR: No matching distribution found for ${pkg}`, tone: 'warning' }];
+  if (!res.ok) return [{ text: 'ERROR: Unexpected response from PyPI.', tone: 'warning' }];
+
+  let data: { info: Record<string, unknown>; urls: Record<string, unknown>[] };
+  try { data = await res.json(); } catch {
+    return [{ text: 'ERROR: Unexpected response from PyPI.', tone: 'warning' }];
+  }
+  if (!data?.info || !Array.isArray(data?.urls)) {
+    return [{ text: 'ERROR: Unexpected response from PyPI.', tone: 'warning' }];
+  }
+
+  const { info, urls } = data;
+  const name = String(info['name'] ?? pkg);
+  const version = String(info['version'] ?? '');
+  const summary = String(info['summary'] ?? '');
+  const author = String((info['author'] as string) || (info['maintainer'] as string) || '');
+  const requiresPython = String(info['requires_python'] ?? '');
+  const requiresDist = Array.isArray(info['requires_dist']) ? (info['requires_dist'] as string[]) : [];
+
+  const sortedUrls = [...urls].sort((a, b) =>
+    String(b['upload_time_iso_8601'] ?? '').localeCompare(String(a['upload_time_iso_8601'] ?? ''))
   );
+  const latest = sortedUrls[0] ?? {};
+  const released = String(latest['upload_time_iso_8601'] ?? '').slice(0, 10);
+  const filename = String(latest['filename'] ?? '');
+  const sizeBytes = typeof latest['size'] === 'number' ? (latest['size'] as number) : 0;
+  const sizePart = sizeBytes ? ` (${(sizeBytes / 1_048_576).toFixed(1)} MB)` : '';
+
+  const lines: OutputLine[] = [
+    { text: `Collecting ${name}`, tone: 'command' },
+    { text: `  Downloading ${filename}${sizePart}`.trimEnd(), tone: 'status' },
+    { text: '', tone: 'spacer' },
+    { text: 'Package metadata', tone: 'status' },
+    { text: `  Name:         ${name}`, tone: 'ok' },
+    { text: `  Version:      ${version}`, tone: 'ok' },
+  ];
+  if (summary) lines.push({ text: `  Summary:      ${summary}`, tone: 'ok' });
+  if (author) lines.push({ text: `  Author:       ${author}`, tone: 'ok' });
+  if (requiresPython) lines.push({ text: `  Requires:     Python ${requiresPython}`, tone: 'ok' });
+  if (released) lines.push({ text: `  Released:     ${released}`, tone: 'ok' });
+
+  if (requiresDist.length > 0) {
+    const top5 = requiresDist.slice(0, 5);
+    const extra = requiresDist.length - top5.length;
+    lines.push({ text: '', tone: 'spacer' });
+    lines.push({ text: `Dependencies (top ${Math.min(5, requiresDist.length)})`, tone: 'status' });
+    top5.forEach(dep => lines.push({ text: `  ✓ ${dep}`, tone: 'ok' }));
+    if (extra > 0) lines.push({ text: `  ... (${extra} more)`, tone: 'ok' });
+  }
+
+  lines.push({ text: '', tone: 'spacer' });
+  lines.push({ text: `Successfully installed ${name}-${version}`, tone: 'success' });
+  return lines;
+}
+
+// ── GitHub helper ─────────────────────────────────────────────────────────
+
+async function fetchGitHub(handle: string): Promise<OutputLine[]> {
+  const headers: HeadersInit = {
+    Accept: 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+  };
+
+  let userRes: Response, reposRes: Response;
+  try {
+    [userRes, reposRes] = await Promise.all([
+      fetch(`https://api.github.com/users/${handle}`, { headers }),
+      fetch(`https://api.github.com/users/${handle}/repos?sort=updated&per_page=100`, { headers }),
+    ]);
+  } catch {
+    return [{ text: 'ERROR: Could not reach GitHub API.', tone: 'warning' }];
+  }
+
+  const rateLimited = (s: number) => s === 403 || s === 429;
+  if (rateLimited(userRes.status) || rateLimited(reposRes.status)) {
+    const r = rateLimited(userRes.status) ? userRes : reposRes;
+    const resetHeader = r.headers.get('x-ratelimit-reset');
+    const lines: OutputLine[] = [{ text: 'ERROR: GitHub API rate limit exceeded.', tone: 'warning' }];
+    if (resetHeader) {
+      const resetTime = new Date(parseInt(resetHeader, 10) * 1000).toLocaleTimeString();
+      lines.push({ text: `  Rate limit resets at: ${resetTime}`, tone: 'warning' });
+    }
+    return lines;
+  }
+
+  if (userRes.status === 404) return [{ text: 'ERROR: GitHub user not found.', tone: 'warning' }];
+  if (!userRes.ok) return [{ text: 'ERROR: Could not reach GitHub API.', tone: 'warning' }];
+
+  let user: Record<string, unknown>, repos: Record<string, unknown>[];
+  try {
+    [user, repos] = await Promise.all([userRes.json(), reposRes.json()]);
+  } catch {
+    return [{ text: 'ERROR: Unexpected response from GitHub API.', tone: 'warning' }];
+  }
+  if (!user || !Array.isArray(repos)) {
+    return [{ text: 'ERROR: Unexpected response from GitHub API.', tone: 'warning' }];
+  }
+
+  const login = String(user['login'] ?? handle);
+  const name = String(user['name'] ?? login);
+  const publicRepos = (user['public_repos'] as number) ?? 0;
+  const followers = (user['followers'] as number) ?? 0;
+  const createdAt = String(user['created_at'] ?? '');
+  const memberSince = createdAt ? new Date(createdAt).getFullYear() : null;
+  const totalStars = repos.reduce((s, r) => s + (((r['stargazers_count'] as number) ?? 0)), 0);
+  const topRepos = repos.slice(0, 5).map(r => ({
+    name: String(r['name'] ?? ''),
+    stars: (r['stargazers_count'] as number) ?? 0,
+    lang: r['language'] ? String(r['language']) : null,
+  }));
+  const lastPushed = repos
+    .map(r => String(r['pushed_at'] ?? ''))
+    .filter(Boolean)
+    .sort()
+    .at(-1) ?? '';
+
+  const lines: OutputLine[] = [
+    { text: `GitHub profile — ${login}`, tone: 'status' },
+    { text: '', tone: 'spacer' },
+    { text: `  Name:         ${name}`, tone: 'ok' },
+    { text: `  Repos:        ${publicRepos} public`, tone: 'ok' },
+    { text: `  Stars:        ${totalStars} total`, tone: 'ok' },
+    { text: `  Followers:    ${followers}`, tone: 'ok' },
+  ];
+  if (memberSince) lines.push({ text: `  Member since: ${memberSince}`, tone: 'ok' });
+  if (lastPushed) lines.push({ text: `  Last push:    ${lastPushed.slice(0, 10)}`, tone: 'ok' });
+
+  if (topRepos.length > 0) {
+    lines.push({ text: '', tone: 'spacer' });
+    lines.push({ text: 'Recent repositories', tone: 'status' });
+    topRepos.forEach(({ name: rName, stars, lang }) => {
+      const langPart = lang ? `(${lang})` : '';
+      const starPart = stars > 0 ? `★ ${stars}` : '';
+      lines.push({ text: [`  ✓ ${rName}`, langPart, starPart].filter(Boolean).join('  ').trimEnd(), tone: 'ok' });
+    });
+  }
+
+  return lines;
+}
+
+// ── Pip line renderer ─────────────────────────────────────────────────────
+
+function renderPipLine(tone: string, text: string): ReactNode {
+  if (tone === 'command' && text.startsWith('> ')) {
+    return <><span className="pip-prompt-char">{'>'}</span>{text.slice(1)}</>;
+  }
+  if (tone === 'help-row') {
+    const pipeIdx = text.indexOf('|');
+    const cmd  = pipeIdx >= 0 ? text.slice(0, pipeIdx) : text;
+    const desc = pipeIdx >= 0 ? text.slice(pipeIdx + 1) : '';
+    return <><span className="help-cmd">{cmd}</span><span className="help-desc">{desc}</span></>;
+  }
+  return text || ' ';
 }
 
 // ── Pip card ──────────────────────────────────────────────────────────────
 
-interface PipMsg { text: string; response: string; }
-
 function SkillsPipCard({
   runId,
   onClose,
-  onFlight,
-  sendBtnRef,
+  person,
+  aboutSummary,
 }: {
   runId: number;
   onClose: () => void;
-  onFlight: (btnRect: DOMRect, msgCount: number) => void;
-  sendBtnRef: React.RefObject<HTMLButtonElement | null>;
+  person: { name: string; email: string; github: string };
+  aboutSummary: string[];
 }) {
   const [visibleLines, setVisibleLines] = useState(0);
   const [phase, setPhase] = useState<'running' | 'interactive'>('running');
@@ -511,6 +557,12 @@ function SkillsPipCard({
   const [inputVal, setInputVal] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef  = useRef<HTMLInputElement>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
 
   useEffect(() => {
     setVisibleLines(0);
@@ -535,38 +587,139 @@ function SkillsPipCard({
     if (phase === 'interactive') inputRef.current?.focus();
   }, [phase]);
 
-  const handleSend = useCallback(() => {
-    if (!inputVal.trim() || phase !== 'interactive') return;
-    const text = inputVal.trim();
-    const resp = CORPORATE_RESPONSES[messages.length % CORPORATE_RESPONSES.length];
-    setMessages(prev => [...prev, { text, response: resp! }]);
+  const clearMessages = useCallback(() => setMessages([]), []);
+
+  const commands = useMemo<Record<string, Command>>(() => ({
+    help: {
+      description: 'this menu',
+      run: async () => [
+        { text: 'Available commands:', tone: 'status' },
+        { text: '', tone: 'spacer' },
+        { text: 'pip install <pkg>|fetch real PyPI metadata', tone: 'help-row' },
+        { text: 'github|live stats — repos, stars, activity', tone: 'help-row' },
+        { text: 'about|who am I', tone: 'help-row' },
+        { text: 'contact|how to reach me', tone: 'help-row' },
+        { text: 'clear|clear terminal output', tone: 'help-row' },
+        { text: 'help|this menu', tone: 'help-row' },
+      ],
+    },
+    about: {
+      description: 'who am I',
+      run: async () => [
+        { text: 'Director of Strategic Ambiguity & Dynamic Synthesis for Ecosystem Optimization,', tone: 'ok' as OutputTone },
+        { text: 'specializing in heuristic community architecture and frictionless workplaces', tone: 'ok' as OutputTone },
+      ],
+    },
+    sudo: {
+      description: '',
+      run: async () => [
+        { text: 'aaron is not in the sudoers file.', tone: 'warning' as OutputTone },
+        { text: 'This incident will be reported.', tone: 'warning' as OutputTone },
+      ],
+    },
+    contact: {
+      description: 'how to reach me',
+      run: async () => [
+        { text: `email:  ${person.email}`, tone: 'ok' },
+        { text: `github: ${person.github}`, tone: 'ok' },
+      ],
+    },
+    github: {
+      description: 'live stats from GitHub (repos, stars, last push)',
+      run: () => {
+        const handle = person.github.split('/').filter(Boolean).at(-1) ?? 'micronwave';
+        return fetchGitHub(handle);
+      },
+    },
+    clear: {
+      description: 'clear the terminal output',
+      run: async () => { clearMessages(); return []; },
+    },
+    pip: {
+      description: 'fetch real PyPI metadata for any package',
+      run: async (args: string) => {
+        const [sub = '', ...pkgTokens] = args.trim().split(/\s+/);
+        if (sub.toLowerCase() !== 'install') {
+          return [{ text: `pip: unknown command '${sub || '(none)'}'`, tone: 'warning' as OutputTone }];
+        }
+        const pkg = pkgTokens.join(' ').trim();
+        if (pkg.toLowerCase() === 'aaron-altergott') return AARON_PACKAGE_LINES;
+        return fetchPyPI(pkg);
+      },
+    },
+  }), [person, aboutSummary, clearMessages]);
+
+  const hasLoading = messages.some(m => m.loading);
+
+  const handleSend = useCallback(async () => {
+    if (!inputVal.trim() || phase !== 'interactive' || hasLoading) return;
+    const raw = inputVal.trim();
+    const [cmdToken = '', ...rest] = raw.split(/\s+/);
+    const cmd = cmdToken.toLowerCase();
+    const args = rest.join(' ');
+
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const pending: PipMsg = { id, input: raw, lines: [], loading: true };
+    setMessages(prev => [...prev, pending]);
     setInputVal('');
-    if (sendBtnRef.current) onFlight(sendBtnRef.current.getBoundingClientRect(), messages.length);
-  }, [inputVal, phase, messages, onFlight, sendBtnRef]);
+
+    const command = commands[cmd];
+    if (!command) {
+      setMessages(prev => prev.map(m => m.id === id
+        ? { ...m, lines: [{ text: `command not found: ${raw}. Type 'help' to see available commands.`, tone: 'warning' as OutputTone }], loading: false }
+        : m
+      ));
+      return;
+    }
+
+    try {
+      const lines = await command.run(args);
+      if (!mountedRef.current) return;
+      setMessages(prev => prev.map(m => m.id === id ? { ...m, lines, loading: false } : m));
+    } catch {
+      if (!mountedRef.current) return;
+      setMessages(prev =>
+        prev.map(m => m.id === id
+          ? { ...m, lines: [{ text: 'ERROR: command failed.', tone: 'warning' as OutputTone }], loading: false }
+          : m
+        )
+      );
+    }
+  }, [inputVal, phase, commands, hasLoading]);
 
   return (
     <div className="pip-card" role="region" aria-label="pip install terminal">
-      <button className="pip-close" type="button" onClick={onClose} aria-label="Close terminal">
-        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
-          <line x1="1" y1="1" x2="9" y2="9" /><line x1="9" y1="1" x2="1" y2="9" />
-        </svg>
-      </button>
+      <div className="pip-titlebar">
+<span className="pip-title" aria-hidden="true">pip ~ aaron-altergott</span>
+        <button className="pip-close" type="button" onClick={onClose} aria-label="Close terminal">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+            <line x1="1" y1="1" x2="9" y2="9" /><line x1="9" y1="1" x2="1" y2="9" />
+          </svg>
+        </button>
+      </div>
 
       <div className="pip-scroll" ref={scrollRef}>
         <pre className="pip-pre" aria-live="polite" aria-atomic="false">
           {PIP_LINES.slice(0, visibleLines).map((line, i) => (
             <span key={`${runId}-${i}`} className={`pip-line ${line.tone}`}>
-              {line.text || ' '}
+              {renderPipLine(line.tone, line.text)}
             </span>
           ))}
           {phase === 'running' && visibleLines > 0 && (
             <span className="pip-cursor" aria-hidden="true">_</span>
           )}
-          {messages.map((msg, i) => (
-            <span key={`msg-${i}`}>
-              <span className="pip-line spacer">{' '}</span>
-              <span className="pip-line command">&gt; {msg.text}</span>
-              <span className="pip-line warning">{msg.response}</span>
+          {messages.map((msg) => (
+            <span key={msg.id}>
+              <span className="pip-line spacer">{' '}</span>
+              <span className="pip-line command"><span className="pip-prompt-char">{'>'}</span>{' '}{msg.input}</span>
+              {msg.loading
+                ? <span className="pip-line status">loading<span className="pip-cursor">_</span></span>
+                : msg.lines.map((l, j) => (
+                    <span key={j} className={`pip-line ${l.tone}`}>
+                      {renderPipLine(l.tone, l.text)}
+                    </span>
+                  ))
+              }
             </span>
           ))}
         </pre>
@@ -580,17 +733,16 @@ function SkillsPipCard({
           type="text"
           value={inputVal}
           onChange={e => setInputVal(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && handleSend()}
-          placeholder="type something..."
-          disabled={phase !== 'interactive'}
+          onKeyDown={e => { if (e.key === 'Enter') handleSend(); }}
+          placeholder="try: help, pip install <pkg>, github"
+          disabled={phase !== 'interactive' || hasLoading}
           aria-label="Terminal input"
         />
         <button
-          ref={sendBtnRef}
           className="pip-send"
           type="button"
-          onClick={handleSend}
-          disabled={phase !== 'interactive' || !inputVal.trim()}
+          onClick={() => { handleSend(); }}
+          disabled={phase !== 'interactive' || !inputVal.trim() || hasLoading}
           aria-label="Send"
         >
           <svg width="14" height="13" viewBox="0 0 14 13" fill="none" strokeLinecap="round" strokeLinejoin="round">
@@ -605,18 +757,11 @@ function SkillsPipCard({
 
 // ── Skills ────────────────────────────────────────────────────────────────
 
-function SkillsSection({ skills }: { skills: SkillGroup[] }) {
+function SkillsSection({ skills, person, about }: { skills: SkillGroup[]; person: Person; about: About }) {
   const [selected, setSelected] = useState(skills[0]?.label ?? '');
   const [pipOpen, setPipOpen] = useState(false);
   const [pipRunId, setPipRunId] = useState(0);
-  const [flight, setFlight] = useState<FlightSpec | null>(null);
-  const [trashVisible, setTrashVisible] = useState(false);
-  const [trashLidOpen, setTrashLidOpen] = useState(false);
-  const [trashCatching, setTrashCatching] = useState(false);
-  const [trashLidClosing, setTrashLidClosing] = useState(false);
-  const systemRef   = useRef<HTMLDivElement>(null);
-  const sendBtnRef  = useRef<HTMLButtonElement>(null);
-  const trashCanRef = useRef<HTMLDivElement>(null);
+  const systemRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!skills.some((g) => g.label === selected)) setSelected(skills[0]?.label ?? '');
@@ -629,57 +774,9 @@ function SkillsSection({ skills }: { skills: SkillGroup[] }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [pipOpen]);
 
-  const handleFlight = useCallback((btnRect: DOMRect, msgCount: number) => {
-    const canEl = trashCanRef.current;
-    if (!canEl) return;
-
-    // Aim at the SVG's lid line — y=9 in the 27px-tall can SVG
-    const cr   = canEl.getBoundingClientRect();
-    const endX = cr.left + cr.width  / 2;
-    const endY = cr.top  + 9;
-
-    setTrashLidOpen(false);
-    setTrashLidClosing(false);
-    setTrashCatching(false);
-
-    setFlight({
-      startX: btnRect.left + btnRect.width  / 2,
-      startY: btnRect.top  + btnRect.height / 2,
-      endX, endY,
-      pathIdx: msgCount % FLIGHT_PATHS.length,
-      key: Date.now(),
-    });
-    setTrashVisible(true);
-
-    // Lid swings open as plane approaches
-    setTimeout(() => setTrashLidOpen(true), PLANE_DURATION - 500);
-
-    // Plane is invisible at PLANE_DURATION → catching squash + glow
-    setTimeout(() => {
-      setTrashCatching(true);
-      setTimeout(() => setTrashCatching(false), 520);
-    }, PLANE_DURATION);
-
-    // Lid snaps shut quickly after the plane enters
-    setTimeout(() => {
-      setTrashLidOpen(false);
-      setTrashLidClosing(true);
-    }, PLANE_DURATION + 180);
-
-    // Plane element can be removed once trail has faded (~450ms)
-    setTimeout(() => setFlight(null), PLANE_DURATION + 480);
-
-    // Trash disappears after lid close animation (550ms)
-    setTimeout(() => {
-      setTrashLidClosing(false);
-      setTrashVisible(false);
-    }, PLANE_DURATION + 180 + 580);
-  }, []);
-
   const closePip = useCallback(() => setPipOpen(false), []);
 
   const activeGroup = skills.find((g) => g.label === selected) ?? skills[0];
-  const totalSkills = skills.reduce((t, g) => t + g.items.length, 0);
 
   const nodes = skills.map((group, index) => {
     const angle = -90 + (360 / Math.max(skills.length, 1)) * index;
@@ -708,27 +805,34 @@ function SkillsSection({ skills }: { skills: SkillGroup[] }) {
           <svg className="skills-orbit-lines" viewBox="0 0 100 100" aria-hidden="true">
             <ellipse cx="50" cy="50" rx="44" ry="31" className="skills-ring outer" />
             <ellipse cx="50" cy="50" rx="29" ry="20" className="skills-ring inner" />
-            {nodes.map(({ group, x, y }, index) => (
-              <line
-                key={group.label}
-                x1={x} y1={y} x2="50" y2="50"
-                style={{ '--skill-vector-delay': `${index * 35}ms` } as CSSProperties}
-                className={group.label === activeGroup?.label ? 'skill-vector active' : 'skill-vector'}
-              />
-            ))}
+            {nodes.map(({ group, x, y }, index) => {
+              const dx = x - 50;
+              const x2 = Math.abs(dx) > 1 ? (dx < 0 ? 35 : 65) : 50;
+              const y2 = Math.abs(dx) > 1 ? 50 : (y < 50 ? 45 : 55);
+              return (
+                <line
+                  key={group.label}
+                  x1={x} y1={y} x2={x2} y2={y2}
+                  style={{ '--skill-vector-delay': `${index * 35}ms` } as CSSProperties}
+                  className={group.label === activeGroup?.label ? 'skill-vector active' : 'skill-vector'}
+                />
+              );
+            })}
           </svg>
 
           <button
-            className={pipOpen ? 'skills-core active' : 'skills-core'}
+            className={`skills-rocker${pipOpen ? ' active' : ''}`}
             type="button"
-            aria-pressed={pipOpen}
-            aria-label={pipOpen ? 'Close pip terminal' : 'Run pip install'}
+            role="switch"
+            aria-checked={pipOpen}
+            aria-label={pipOpen ? 'Switch to browse mode' : 'Switch to run mode'}
             onClick={() => {
               if (pipOpen) { setPipOpen(false); }
               else { setPipRunId(r => r + 1); setPipOpen(true); }
             }}
           >
-            <strong>{pipOpen ? 'pip' : totalSkills}</strong>
+            <span className="skills-rocker-label left" aria-hidden="true">browse</span>
+            <span className="skills-rocker-label right" aria-hidden="true">run</span>
           </button>
 
           {nodes.map(({ group, angle, x, y }, index) => {
@@ -757,14 +861,12 @@ function SkillsSection({ skills }: { skills: SkillGroup[] }) {
           })}
         </div>
 
-        <TrashCan visible={trashVisible} lidOpen={trashLidOpen} catching={trashCatching} lidClosing={trashLidClosing} canRef={trashCanRef} />
-
         {pipOpen ? (
           <SkillsPipCard
             runId={pipRunId}
             onClose={closePip}
-            onFlight={handleFlight}
-            sendBtnRef={sendBtnRef}
+            person={{ name: person.name, email: person.email, github: person.github }}
+            aboutSummary={about.summary}
           />
         ) : (
           <aside className="skills-detail-panel" aria-live="polite">
@@ -780,9 +882,6 @@ function SkillsSection({ skills }: { skills: SkillGroup[] }) {
           </aside>
         )}
 
-        {flight && (
-          <PaperAirplane key={flight.key} spec={flight} onLand={() => {}} />
-        )}
       </div>
     </section>
   );
@@ -1005,7 +1104,7 @@ export default function PortfolioInterface({
           education={education}
           certifications={certifications}
         />
-        <SkillsSection skills={skills} />
+        <SkillsSection skills={skills} person={person} about={about} />
         <ExperienceSection experience={experience} />
         {children}
         <ContactSection person={person} />
