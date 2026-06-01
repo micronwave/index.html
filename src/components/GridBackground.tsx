@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 
-const GRAIN_URL = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='512' height='512' filter='url(%23n)'/%3E%3C/svg%3E")`;
+const GRAIN_URL = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)'/%3E%3C/svg%3E")`;
+const AURORA_FRAME_MS = 50;
 
 export default function GridBackground({ reducedMotion, fadeIn }: { reducedMotion: boolean; fadeIn: boolean }) {
   const auroraRef = useRef<HTMLCanvasElement>(null);
@@ -9,14 +10,18 @@ export default function GridBackground({ reducedMotion, fadeIn }: { reducedMotio
   useEffect(() => {
     const aurora = auroraRef.current!;
     const auroraCtx = aurora.getContext('2d')!;
-    let auroraFrame = 0;
+    let bottomGlow: CanvasGradient | null = null;
+    let lastAuroraDraw = 0;
     let resizeRaf = 0;
+    let auroraTimeout: ReturnType<typeof setTimeout> | null = null;
+    let isAnimating = false;
 
     const mobileQuery = window.matchMedia('(max-width: 700px)');
     const isStaticMode = () => reducedMotion || mobileQuery.matches;
 
     function drawAurora(ts: number, force = false) {
-      if (!force && auroraFrame++ % 3 !== 0) return;
+      if (!force && ts - lastAuroraDraw < AURORA_FRAME_MS) return;
+      lastAuroraDraw = ts;
 
       const w = aurora.width;
       const h = aurora.height;
@@ -28,9 +33,7 @@ export default function GridBackground({ reducedMotion, fadeIn }: { reducedMotio
       auroraCtx.clearRect(0, 0, w, h);
       auroraCtx.globalCompositeOperation = 'screen';
 
-      const bottomGlow = auroraCtx.createRadialGradient(cx, h + h * 0.22, 0, cx, h + h * 0.22, Math.max(w, h) * 0.55);
-      bottomGlow.addColorStop(0, 'rgba(92,122,77,0.04)');
-      bottomGlow.addColorStop(1, 'rgba(92,122,77,0)');
+      if (!bottomGlow) return;
       auroraCtx.fillStyle = bottomGlow;
       auroraCtx.fillRect(0, 0, w, h);
 
@@ -60,6 +63,12 @@ export default function GridBackground({ reducedMotion, fadeIn }: { reducedMotio
     function resize() {
       aurora.width = window.innerWidth;
       aurora.height = window.innerHeight;
+      const w = aurora.width;
+      const h = aurora.height;
+      const cx = w / 2;
+      bottomGlow = auroraCtx.createRadialGradient(cx, h + h * 0.22, 0, cx, h + h * 0.22, Math.max(w, h) * 0.55);
+      bottomGlow.addColorStop(0, 'rgba(92,122,77,0.04)');
+      bottomGlow.addColorStop(1, 'rgba(92,122,77,0)');
       drawAurora(performance.now(), true);
     }
 
@@ -68,19 +77,32 @@ export default function GridBackground({ reducedMotion, fadeIn }: { reducedMotio
       resizeRaf = requestAnimationFrame(resize);
     }
 
+    function scheduleAuroraFrame() {
+      auroraTimeout = setTimeout(() => {
+        auroraRafRef.current = requestAnimationFrame(auroraLoop);
+      }, AURORA_FRAME_MS);
+    }
+
     function auroraLoop(ts: number) {
+      if (!isAnimating) return;
       drawAurora(ts);
-      auroraRafRef.current = requestAnimationFrame(auroraLoop);
+      scheduleAuroraFrame();
     }
 
     function startAnimation() {
-      if (!isStaticMode()) {
+      if (!isStaticMode() && !isAnimating) {
+        isAnimating = true;
         auroraRafRef.current = requestAnimationFrame(auroraLoop);
       }
     }
 
     function stopAnimation() {
+      isAnimating = false;
       cancelAnimationFrame(auroraRafRef.current);
+      if (auroraTimeout) {
+        clearTimeout(auroraTimeout);
+        auroraTimeout = null;
+      }
     }
 
     function onVisibilityChange() {
@@ -100,6 +122,7 @@ export default function GridBackground({ reducedMotion, fadeIn }: { reducedMotio
       window.removeEventListener('resize', onResize);
       document.removeEventListener('visibilitychange', onVisibilityChange);
       cancelAnimationFrame(auroraRafRef.current);
+      if (auroraTimeout) clearTimeout(auroraTimeout);
       cancelAnimationFrame(resizeRaf);
     };
   }, [reducedMotion]);
@@ -117,6 +140,8 @@ export default function GridBackground({ reducedMotion, fadeIn }: { reducedMotio
           opacity: fadeIn ? 1 : 0,
           transition: 'opacity 900ms ease',
           mixBlendMode: 'screen',
+          transform: 'translateZ(0)',
+          willChange: 'transform, opacity',
         }}
       />
       <div
@@ -131,6 +156,8 @@ export default function GridBackground({ reducedMotion, fadeIn }: { reducedMotio
           backgroundImage: GRAIN_URL,
           backgroundRepeat: 'repeat',
           backgroundSize: '256px 256px',
+          transform: 'translateZ(0)',
+          willChange: 'transform, opacity',
         }}
       />
     </>

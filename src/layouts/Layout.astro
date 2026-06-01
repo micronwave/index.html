@@ -117,13 +117,13 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     display: flex;
     justify-content: space-between;
     align-items: center;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
     background: rgba(14, 13, 10, 0.85);
     border-bottom: 1px solid transparent;
     transition: border-color 0.3s ease;
   }
   .site-nav.scrolled {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-bottom-color: var(--border);
   }
 
@@ -812,13 +812,6 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     gap: 8px;
     padding: 9px clamp(18px, 2.2vw, 28px);
     border-top: 1px solid rgba(92, 122, 77, 0.15);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.28s ease;
-  }
-  .pip-input-row.active {
-    opacity: 1;
-    pointer-events: auto;
   }
   .pip-prompt {
     font-family: var(--font-mono);
@@ -875,11 +868,10 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     visibility: visible;
     transition:
       clip-path 460ms cubic-bezier(0.2, 0.78, 0.2, 1),
-      filter 460ms cubic-bezier(0.2, 0.78, 0.2, 1),
       opacity 360ms ease,
       transform 480ms cubic-bezier(0.18, 0.88, 0.2, 1),
       visibility 0ms linear 0ms;
-    will-change: clip-path, filter, opacity, transform;
+    will-change: clip-path, opacity, transform;
     clip-path: inset(0 round 8px);
     z-index: 1;
   }
@@ -1520,6 +1512,9 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     opacity: 0;
     transform: translateY(18px);
     transition: opacity 0.65s ease, transform 0.65s ease;
+  }
+  .section-header.reveal {
+    will-change: opacity, transform;
   }
   .reveal.visible {
     opacity: 1;

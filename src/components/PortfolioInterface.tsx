@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import type {
   Person,
@@ -68,18 +68,19 @@ const NAV_LINKS = [
   { href: '#contact', label: 'contact' },
 ];
 
-function SiteNav({ name }: { name: string }) {
+const SiteNav = memo(function SiteNav({ name }: { name: string }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const progressRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
       setScrolled(y > 40);
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      setScrollProgress(docHeight > 0 ? y / docHeight : 0);
+      progressRef.current?.style.setProperty('--scroll-progress', String(docHeight > 0 ? y / docHeight : 0));
     };
+    onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -126,9 +127,9 @@ function SiteNav({ name }: { name: string }) {
           <span />
         </button>
         <div
+          ref={progressRef}
           className="scroll-progress-bar"
           aria-hidden="true"
-          style={{ '--scroll-progress': scrollProgress } as CSSProperties}
         />
       </nav>
 
@@ -153,11 +154,11 @@ function SiteNav({ name }: { name: string }) {
       )}
     </>
   );
-}
+});
 
 // ── Hero ──────────────────────────────────────────────────────────────────
 
-function HeroSection({ person }: { person: Person }) {
+const HeroSection = memo(function HeroSection({ person }: { person: Person }) {
   const firstName = person.name.split(' ')[0];
   const lastName = person.name.split(' ').slice(1).join(' ');
   const [showEmail, setShowEmail] = useState(false);
@@ -254,22 +255,22 @@ function HeroSection({ person }: { person: Person }) {
       </div>
     </section>
   );
-}
+});
 
 // ── Section header ────────────────────────────────────────────────────────
 
-function SectionHead({ title }: { title: string }) {
+const SectionHead = memo(function SectionHead({ title }: { title: string }) {
   const ref = useReveal();
   return (
     <div className="section-header reveal" ref={ref as React.RefObject<HTMLDivElement>}>
       <h2 className="section-title">{title}</h2>
     </div>
   );
-}
+});
 
 // ── About ─────────────────────────────────────────────────────────────────
 
-function AboutSection({
+const AboutSection = memo(function AboutSection({
   about,
   person,
   education,
@@ -325,7 +326,7 @@ function AboutSection({
       </div>
     </section>
   );
-}
+});
 
 // ── Pip terminal data ─────────────────────────────────────────────────────
 
@@ -343,7 +344,6 @@ const PIP_LINES = [
   { text: '', tone: 'spacer' },
   { text: 'Installing collected packages...', tone: 'status' },
   { text: 'Successfully installed aaron-altergott-1.0.0', tone: 'success' },
-  { text: 'WARNING: Java not found. Continuing anyway.', tone: 'warning' },
 ] as const;
 
 const PIP_STEP_MS = 235;
@@ -555,6 +555,8 @@ function SkillsPipCard({
   const [phase, setPhase] = useState<'running' | 'interactive'>('running');
   const [messages, setMessages] = useState<PipMsg[]>([]);
   const [inputVal, setInputVal] = useState('');
+  const [history, setHistory] = useState<string[]>([]);
+  const [historyIdx, setHistoryIdx] = useState(-1);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef  = useRef<HTMLInputElement>(null);
   const mountedRef = useRef(true);
@@ -569,6 +571,8 @@ function SkillsPipCard({
     setPhase('running');
     setMessages([]);
     setInputVal('');
+    setHistory([]);
+    setHistoryIdx(-1);
 
     const timers: ReturnType<typeof setTimeout>[] = [];
     PIP_LINES.forEach((_, i) => {
@@ -662,6 +666,8 @@ function SkillsPipCard({
     const pending: PipMsg = { id, input: raw, lines: [], loading: true };
     setMessages(prev => [...prev, pending]);
     setInputVal('');
+    setHistory(prev => [raw, ...prev]);
+    setHistoryIdx(-1);
 
     const command = commands[cmd];
     if (!command) {
@@ -687,6 +693,25 @@ function SkillsPipCard({
     }
   }, [inputVal, phase, commands, hasLoading]);
 
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') { handleSend(); return; }
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (history.length === 0) return;
+      const next = Math.min(historyIdx + 1, history.length - 1);
+      setHistoryIdx(next);
+      setInputVal(history[next] ?? '');
+      return;
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (historyIdx <= 0) { setHistoryIdx(-1); setInputVal(''); return; }
+      const next = historyIdx - 1;
+      setHistoryIdx(next);
+      setInputVal(history[next] ?? '');
+    }
+  }, [handleSend, history, historyIdx]);
+
   return (
     <div className="pip-card" role="region" aria-label="pip install terminal">
       <div className="pip-titlebar">
@@ -703,11 +728,11 @@ function SkillsPipCard({
           {PIP_LINES.slice(0, visibleLines).map((line, i) => (
             <span key={`${runId}-${i}`} className={`pip-line ${line.tone}`}>
               {renderPipLine(line.tone, line.text)}
+              {i === visibleLines - 1 && phase === 'running' && (
+                <span className="pip-cursor" aria-hidden="true">_</span>
+              )}
             </span>
           ))}
-          {phase === 'running' && visibleLines > 0 && (
-            <span className="pip-cursor" aria-hidden="true">_</span>
-          )}
           {messages.map((msg) => (
             <span key={msg.id}>
               <span className="pip-line spacer">{' '}</span>
@@ -725,15 +750,15 @@ function SkillsPipCard({
         </pre>
       </div>
 
-      <div className={`pip-input-row${phase === 'interactive' ? ' active' : ''}`}>
+      <div className="pip-input-row">
         <span className="pip-prompt" aria-hidden="true">&gt;</span>
         <input
           ref={inputRef}
           className="pip-input"
           type="text"
           value={inputVal}
-          onChange={e => setInputVal(e.target.value)}
-          onKeyDown={e => { if (e.key === 'Enter') handleSend(); }}
+          onChange={e => { setInputVal(e.target.value); setHistoryIdx(-1); }}
+          onKeyDown={handleKeyDown}
           placeholder="try: help, pip install <pkg>, github"
           disabled={phase !== 'interactive' || hasLoading}
           aria-label="Terminal input"
@@ -757,7 +782,7 @@ function SkillsPipCard({
 
 // ── Skills ────────────────────────────────────────────────────────────────
 
-function SkillsSection({ skills, person, about }: { skills: SkillGroup[]; person: Person; about: About }) {
+const SkillsSection = memo(function SkillsSection({ skills, person, about }: { skills: SkillGroup[]; person: Person; about: About }) {
   const [selected, setSelected] = useState(skills[0]?.label ?? '');
   const [pipOpen, setPipOpen] = useState(false);
   const [pipRunId, setPipRunId] = useState(0);
@@ -778,7 +803,7 @@ function SkillsSection({ skills, person, about }: { skills: SkillGroup[]; person
 
   const activeGroup = skills.find((g) => g.label === selected) ?? skills[0];
 
-  const nodes = skills.map((group, index) => {
+  const nodes = useMemo(() => skills.map((group, index) => {
     const angle = -90 + (360 / Math.max(skills.length, 1)) * index;
     const rad   = (angle * Math.PI) / 180;
     const TARGET_GAP = 74;
@@ -794,7 +819,7 @@ function SkillsSection({ skills, person, about }: { skills: SkillGroup[]; person
     const x = 50 + Math.cos(rad) * focusR;
     const y = 50 + Math.sin(rad) * focusR;
     return { group, angle, x, y };
-  });
+  }), [skills]);
 
   return (
     <section id="skills" className="section page-wrapper">
@@ -885,7 +910,7 @@ function SkillsSection({ skills, person, about }: { skills: SkillGroup[]; person
       </div>
     </section>
   );
-}
+});
 
 // ── Experience ────────────────────────────────────────────────────────────
 
@@ -893,7 +918,31 @@ const MONTHS: Record<string, number> = {
   Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11,
 };
 
-function UptimeChip({
+let currentSecond = Date.now();
+let uptimeInterval: ReturnType<typeof setInterval> | null = null;
+const uptimeListeners = new Set<() => void>();
+
+function subscribeToUptime(listener: () => void) {
+  uptimeListeners.add(listener);
+  if (!uptimeInterval) {
+    uptimeInterval = setInterval(() => {
+      currentSecond = Date.now();
+      uptimeListeners.forEach((notify) => notify());
+    }, 1000);
+  }
+  return () => {
+    uptimeListeners.delete(listener);
+    if (uptimeListeners.size === 0 && uptimeInterval) {
+      clearInterval(uptimeInterval);
+      uptimeInterval = null;
+    }
+  };
+}
+
+const getCurrentSecond = () => currentSecond;
+const getServerSecond = () => 0;
+
+const UptimeChip = memo(function UptimeChip({
   dates,
   startHour = 0,
   startMinute = 0,
@@ -904,6 +953,7 @@ function UptimeChip({
   startMinute?: number;
   startSecond?: number;
 }) {
+  const now = useSyncExternalStore(subscribeToUptime, getCurrentSecond, getServerSecond);
   const startTime = useMemo(() => {
     const match = dates.match(/^([A-Za-z]+)\s+(\d{4})/);
     if (!match) return null;
@@ -912,24 +962,17 @@ function UptimeChip({
     return new Date(parseInt(match[2]!), month, 1, startHour, startMinute, startSecond).getTime();
   }, [dates, startHour, startMinute, startSecond]);
 
-  const [label, setLabel] = useState('');
-
-  useEffect(() => {
-    if (!startTime) return;
-    const compute = () => {
-      const diff = Date.now() - startTime;
-      const days = Math.floor(diff / 86400000);
-      const rem = diff % 86400000;
-      const h = Math.floor(rem / 3600000);
-      const m = Math.floor((rem % 3600000) / 60000);
-      const s = Math.floor((rem % 60000) / 1000);
-      const p = (n: number) => String(n).padStart(2, '0');
-      setLabel(`${days}d ${p(h)}:${p(m)}:${p(s)}`);
-    };
-    compute();
-    const id = setInterval(compute, 1000);
-    return () => clearInterval(id);
-  }, [startTime]);
+  const label = useMemo(() => {
+    if (!startTime || now === 0) return;
+    const diff = now - startTime;
+    const days = Math.floor(diff / 86400000);
+    const rem = diff % 86400000;
+    const h = Math.floor(rem / 3600000);
+    const m = Math.floor((rem % 3600000) / 60000);
+    const s = Math.floor((rem % 60000) / 1000);
+    const p = (n: number) => String(n).padStart(2, '0');
+    return `${days}d ${p(h)}:${p(m)}:${p(s)}`;
+  }, [now, startTime]);
 
   if (!startTime || !label) return null;
   return (
@@ -937,9 +980,9 @@ function UptimeChip({
       {label}
     </span>
   );
-}
+});
 
-function ExperienceItem({ entry }: { entry: ExperienceEntry }) {
+const ExperienceItem = memo(function ExperienceItem({ entry }: { entry: ExperienceEntry }) {
   return (
     <div className="exp-item">
       <div className="exp-meta">
@@ -965,9 +1008,9 @@ function ExperienceItem({ entry }: { entry: ExperienceEntry }) {
       </div>
     </div>
   );
-}
+});
 
-function ExperienceSection({ experience }: { experience: ExperienceEntry[] }) {
+const ExperienceSection = memo(function ExperienceSection({ experience }: { experience: ExperienceEntry[] }) {
   return (
     <section id="experience" className="section page-wrapper">
       <SectionHead title="Experience" />
@@ -978,12 +1021,12 @@ function ExperienceSection({ experience }: { experience: ExperienceEntry[] }) {
       </div>
     </section>
   );
-}
+});
 
 
 // ── Contact ───────────────────────────────────────────────────────────────
 
-function ContactSection({ person }: { person: Person }) {
+const ContactSection = memo(function ContactSection({ person }: { person: Person }) {
   const [copied, setCopied] = useState(false);
 
   const copyEmail = async () => {
@@ -1045,17 +1088,17 @@ function ContactSection({ person }: { person: Person }) {
       </div>
     </section>
   );
-}
+});
 
 // ── Footer ────────────────────────────────────────────────────────────────
 
-function SiteFooter({ name }: { name: string }) {
+const SiteFooter = memo(function SiteFooter({ name }: { name: string }) {
   return (
     <footer className="site-footer page-wrapper">
       <span className="footer-text">{name} © {new Date().getFullYear()}</span>
     </footer>
   );
-}
+});
 
 // ── Root ──────────────────────────────────────────────────────────────────
 
