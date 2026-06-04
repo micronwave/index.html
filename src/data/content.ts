@@ -137,6 +137,32 @@ export const experience: ExperienceEntry[] = [
 
 export const projects: Project[] = [
   {
+    name: 'Orca',
+    tagline:
+      'Orchestration runtime that routes each part of a goal to the right agent, holds each to a contract, and returns a merge recommendation with the evidence attached.',
+    description:
+      'Give Orca a goal and it decides which agents handle which parts: Claude implements, Codex reviews, your CI gates verify. Each gets a briefing scoped to its role and works against a checkable contract. You get a merge recommendation with the test logs attached, not just an agent\'s word for it.',
+    bullets: [
+      'Delegates each task to the right agent automatically: Claude handles implementation, Codex handles review, and your CI gates run verification. No copy-pasting between windows, no re-explaining context.',
+      'Before any agent runs, Orca translates the goal into specific, checkable obligations. Conditions like "tests in internal/store must pass" are defined upfront so every agent works against a contract, not an open-ended instruction.',
+      'Each agent run is isolated in an Execution Capsule with exactly the files it needs, a token budget, and verification gates; a patch only advances when the gates clear and evidence is attached.',
+      'Writes every step to an event log before execution; if the process dies, `orca resume` picks up from the last checkpoint with no work lost.',
+    ],
+    stack: ['Go', 'TypeScript', 'Claude API', 'Codex', 'GitHub API'],
+    flow: ['goal', 'plan', 'capsule', 'verify', 'merge'],
+    githubUrl: 'https://github.com/micronwave/orca',
+    status: 'active',
+    detail: {
+      problem:
+        "An agent that says tests pass is not the same as one that shows you the logs. Most agent-assisted workflows collapse at that gap; there is no way to know if the agent actually ran the tests or just said it did. Orca defines what done means upfront, runs the gates, and stores the artifacts that prove it.",
+      decisions: [
+        'Exit conditions are defined before any agent runs, not negotiated after. An agent working against a contract cannot quietly decide it is done when it is not.',
+        'Each agent gets a briefing compiled from current goal state, not a replay of the full conversation. Claude does not need Codex\'s review notes, and Codex does not need Claude\'s implementation history; keeping them separate is what keeps each agent on task.',
+        'Every step is written to the event log before it runs, so a killed process always has a checkpoint. Reconstructing state from memory after a crash was too unreliable to trust.',
+      ],
+    },
+  },
+  {
     name: 'Claude Chaperone',
     tagline:
       'Installs a plan-build-audit-commit workflow into any Claude Code project with a single command.',
