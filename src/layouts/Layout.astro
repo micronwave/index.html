@@ -1092,9 +1092,21 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     border-radius: 3px;
     flex-shrink: 0;
   }
+  @keyframes status-active-pulse {
+    0%, 100% {
+      background: rgba(212, 168, 85, 0.22);
+      border-color: rgba(212, 168, 85, 0.38);
+    }
+    50% {
+      background: rgba(92, 122, 77, 0.32);
+      border-color: rgba(92, 122, 77, 0.36);
+    }
+  }
+
   .project-status.active {
-    color: var(--accent);
-    background: rgba(92, 122, 77, 0.14);
+    color: var(--text);
+    border: 1px solid rgba(212, 168, 85, 0.38);
+    animation: status-active-pulse 3.6s ease-in-out infinite;
   }
   .project-status.complete {
     color: var(--text);
