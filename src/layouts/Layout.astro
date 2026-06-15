@@ -6,7 +6,7 @@ interface Props {
 
 const {
   title = 'Aaron Altergott',
-  description = 'Operations engineer building cloud, AI, and automation systems. Based in Redlands, CA.',
+  description = 'Operations engineer building with cloud, security, and AI.',
 } = Astro.props;
 
 const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
@@ -431,541 +431,43 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     color: var(--accent);
   }
 
-  /* ── Skills System ── */
-  .skills-system {
-    position: relative;
-    display: grid;
-    grid-template-columns: minmax(460px, 1fr) minmax(320px, 420px);
-    align-items: center;
-    gap: clamp(32px, 5vw, 72px);
-    min-height: clamp(600px, 78vh, 800px);
-    padding: clamp(20px, 3vw, 36px) 0;
-  }
-
-  .skills-orbit {
-    position: relative;
-    width: 100%;
-    grid-column: 1;
-    grid-row: 1;
-    aspect-ratio: 1;
-    isolation: isolate;
-  }
-
-  .skills-system.pip-open .skills-orbit-lines {
-    opacity: 0.35;
-  }
-
-  .skills-orbit::before {
-    content: '';
-    position: absolute;
-    inset: 9%;
-    z-index: -1;
-    background:
-      linear-gradient(rgba(92, 122, 77, 0.07) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(92, 122, 77, 0.055) 1px, transparent 1px);
-    background-size: 38px 38px;
-    mask-image: radial-gradient(circle, #000 0 58%, transparent 75%);
-    opacity: 0.55;
-  }
-
-  .skills-orbit-lines {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-    transition: opacity 0.35s ease;
-  }
-
-  .skills-ring {
-    fill: none;
-    vector-effect: non-scaling-stroke;
-  }
-  .skills-ring.outer {
-    stroke: rgba(92, 122, 77, 0.22);
-    stroke-width: 0.32;
-    stroke-dasharray: 1.6 2.2;
-  }
-  .skills-ring.inner {
-    stroke: rgba(212, 168, 85, 0.16);
-    stroke-width: 0.22;
-  }
-
-  .skill-vector {
-    stroke: rgba(92, 122, 77, 0.18);
-    stroke-width: 0.24;
-    stroke-dasharray: 50;
-    stroke-dashoffset: 50;
-    vector-effect: non-scaling-stroke;
-    transition:
-      stroke 0.25s ease,
-      stroke-width 0.25s ease,
-      stroke-dashoffset 0.42s ease var(--skill-vector-delay);
-  }
-  .skill-vector.active {
-    stroke: rgba(212, 168, 85, 0.78);
-    stroke-width: 0.55;
-    stroke-dashoffset: 0;
-  }
-
-  .skills-rocker {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    z-index: 4;
-    transform: translate(-50%, -50%);
-    width: 30%;
-    max-width: 220px;
-    min-width: 120px;
-    height: 10%;
-    max-height: 54px;
-    min-height: 40px;
-
-    appearance: none;
-    display: flex;
-    align-items: stretch;
-    padding: 0;
-    background: rgba(14, 13, 10, 0.96);
-    border: 1px solid rgba(92, 122, 77, 0.38);
-    clip-path: polygon(
-      8px 0%, calc(100% - 8px) 0%,
-      100% 8px, 100% calc(100% - 8px),
-      calc(100% - 8px) 100%, 8px 100%,
-      0% calc(100% - 8px), 0% 8px
-    );
-    cursor: pointer;
-    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.36);
-    transition:
-      border-color 0.25s ease,
-      box-shadow 0.25s ease;
-  }
-
-  /* Vertical divider between halves */
-  .skills-rocker::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 20%;
-    bottom: 20%;
-    width: 1px;
-    background: rgba(92, 122, 77, 0.28);
-    pointer-events: none;
-    z-index: 2;
-  }
-
-  .skills-rocker:hover {
-    border-color: rgba(212, 168, 85, 0.46);
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.4), 0 0 18px rgba(212, 168, 85, 0.06);
-  }
-
-  .skills-rocker:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 4px;
-  }
-
-  .skills-rocker:active {
-    transform: translate(-50%, -50%) scale(0.97);
-    transition-duration: 0.08s;
-  }
-
-  .skills-rocker.active {
-    border-color: rgba(212, 168, 85, 0.48);
-    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.36), 0 0 28px rgba(212, 168, 85, 0.09);
-  }
-
-  .skills-rocker-label {
-    position: relative;
-    z-index: 1;
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    font-family: var(--font-mono);
-    font-size: clamp(9px, 1.4vw, 11px);
-    letter-spacing: 0.1em;
-    text-transform: lowercase;
-    user-select: none;
-    pointer-events: none;
-    line-height: 1;
-    transition: color 0.22s ease;
-  }
-
-  /* The > prompt glyph — always reserves its width so label text stays still */
-  .skills-rocker-label::before {
-    content: '>';
-    font-family: var(--font-mono);
-    font-size: inherit;
-    letter-spacing: 0;
-    display: inline-block;
-    width: 10px;
-    color: var(--accent);
-    opacity: 0;
-    transform: translateX(-2px);
-    transition:
-      opacity 0.22s ease,
-      transform 0.22s ease;
-  }
-
-  /* Browse active — left label shows > */
-  .skills-rocker:not(.active) .skills-rocker-label.left::before  { opacity: 1; transform: translateX(0); }
-  /* Run active — right label shows > */
-  .skills-rocker.active       .skills-rocker-label.right::before { opacity: 1; transform: translateX(0); }
-
-  .skills-rocker-label.left  { color: var(--green); }
-  .skills-rocker-label.right { color: var(--text-faint); }
-
-  .skills-rocker.active .skills-rocker-label.left  { color: var(--text-faint); }
-  .skills-rocker.active .skills-rocker-label.right { color: var(--accent); }
-
-  .skill-node {
-    position: absolute;
-    left: var(--skill-x);
-    top: var(--skill-y);
-    z-index: 2;
+  /* ── Skills ── */
+  .skills-table {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: clamp(168px, 18vw, 230px);
-    min-height: 58px;
-    padding: 11px 14px;
-    color: var(--text-dim);
-    background: rgba(26, 24, 20, 0.9);
-    border: 1px solid rgba(92, 122, 77, 0.24);
-    border-radius: 6px;
-    box-shadow:
-      inset 0 1px 0 rgba(224, 218, 202, 0.04),
-      0 14px 42px rgba(0, 0, 0, 0.2);
-    transform: translate(-50%, -50%);
-    cursor: default;
-    animation: skill-node-in 0.55s ease both;
-    animation-delay: var(--skill-delay);
-    transition:
-      left 0.48s cubic-bezier(0.2, 0.78, 0.2, 1),
-      top 0.48s cubic-bezier(0.2, 0.78, 0.2, 1),
-      color 0.2s ease,
-      border-color 0.2s ease,
-      background 0.2s ease,
-      box-shadow 0.2s ease,
-      transform 0.2s ease;
   }
-  .skill-node-top {
+  .skills-row {
     display: grid;
-    grid-template-columns: 22px 1fr 22px;
-    align-items: center;
-    width: 100%;
-  }
-
-  .skill-node::before {
-    content: none;
-  }
-  .skill-node:hover,
-  .skill-node:focus-visible,
-  .skill-node.active {
-    color: var(--text);
-    border-color: rgba(212, 168, 85, 0.52);
-    background: rgba(26, 24, 20, 0.96);
-    box-shadow:
-      inset 0 1px 0 rgba(212, 168, 85, 0.11),
-      0 18px 46px rgba(0, 0, 0, 0.28),
-      0 0 34px rgba(212, 168, 85, 0.06);
-    transform: translate(-50%, -50%) translateY(-2px);
-  }
-  .skill-node:hover::before,
-  .skill-node:focus-visible::before,
-  .skill-node.active::before {
-    content: none;
-  }
-
-  .skill-node-count {
-    grid-column: 1;
-    text-align: center;
-    font-family: var(--font-mono);
-    font-size: 18px;
-    line-height: 1;
-    color: rgba(212, 168, 85, 0.76);
-    opacity: 0;
-    transition: opacity 0.22s ease;
-  }
-  .skill-node:hover .skill-node-count,
-  .skill-node:focus-visible .skill-node-count,
-  .skill-node.active .skill-node-count {
-    opacity: 1;
-  }
-  .skill-node-label {
-    grid-column: 2;
-    font-family: var(--font-heading);
-    font-size: clamp(20px, 2.2vw, 27px);
-    line-height: 1.05;
-    color: currentColor;
-    text-align: center;
-    white-space: nowrap;
-  }
-  .skill-node-map { display: none; }
-
-  /* ── Pip card ── */
-  .pip-card {
-    position: relative;
-    grid-column: 2;
-    grid-row: 1;
-    align-self: center;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid rgba(92, 122, 77, 0.24);
-    border-radius: 8px;
-    background:
-      radial-gradient(circle at 0% 48%, rgba(92, 122, 77, 0.12), transparent 34%),
-      linear-gradient(135deg, rgba(212, 168, 85, 0.04), transparent 38%),
-      rgba(14, 13, 10, 0.78);
-    box-shadow: inset 0 1px 0 rgba(224, 218, 202, 0.04);
-    overflow: hidden;
-    animation: pip-card-in 0.36s cubic-bezier(0.18, 0.88, 0.2, 1) both;
-  }
-
-  @keyframes pip-card-in {
-    from { opacity: 0; transform: translateX(10px) scale(0.98); }
-    to   { opacity: 1; transform: translateX(0)    scale(1); }
-  }
-
-  .pip-titlebar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px clamp(12px, 1.6vw, 16px);
-    border-bottom: 1px solid rgba(92, 122, 77, 0.18);
-    background: rgba(14, 13, 10, 0.35);
-    flex-shrink: 0;
-  }
-.pip-title {
-    flex: 1;
-    text-align: center;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.04em;
-    color: var(--text-faint);
-    user-select: none;
-  }
-  .pip-close {
-    appearance: none;
-    background: transparent;
-    border: 0;
-    cursor: pointer;
-    padding: 5px;
-    color: var(--text-faint);
-    line-height: 1;
-    transition: color 0.18s ease;
-    flex-shrink: 0;
-  }
-  .pip-close:hover { color: var(--text-dim); }
-  .pip-close:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
-
-  .pip-scroll {
-    overflow-y: auto;
-    max-height: min(480px, 56vh);
-    padding: clamp(18px, 2.2vw, 28px);
-    padding-right: clamp(22px, 2.6vw, 32px);
-    padding-bottom: 10px;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(92, 122, 77, 0.28) transparent;
-  }
-  .pip-scroll::-webkit-scrollbar { width: 3px; }
-  .pip-scroll::-webkit-scrollbar-thumb { background: rgba(92, 122, 77, 0.28); border-radius: 2px; }
-
-  .pip-pre {
-    margin: 0;
-    white-space: pre-wrap;
-    font-family: var(--font-mono);
-    font-size: clamp(11px, 1.05vw, 13px);
-    line-height: 1.58;
-    color: rgba(190, 183, 166, 0.86);
-  }
-  .pip-line {
-    display: block;
-    animation: terminal-line-in 180ms ease both;
-  }
-  .pip-line.command  { color: rgba(236, 229, 210, 0.94); }
-  .pip-line.status   { color: rgba(212, 168, 85, 0.76); }
-  .pip-line.ok       { color: rgba(132, 175, 112, 0.9); }
-  .pip-line.success  { color: rgba(168, 220, 140, 1); font-weight: 500; text-shadow: 0 0 14px rgba(132, 175, 112, 0.45); }
-  .pip-line.warning  { color: rgba(210, 120, 50, 0.9); }
-  .pip-prompt-char   { color: var(--accent); }
-
-  .pip-line.help-row {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    column-gap: clamp(12px, 2vw, 20px);
-    align-items: baseline;
-  }
-  .help-cmd  { color: rgba(212, 168, 85, 0.9); white-space: nowrap; }
-  .help-desc { color: rgba(144, 138, 124, 0.78); }
-  .pip-cursor {
-    display: inline-block;
-    margin-left: 2px;
-    color: rgba(212, 168, 85, 0.86);
-    animation: terminal-cursor 940ms steps(2, end) infinite;
-  }
-
-  .pip-input-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px clamp(18px, 2.2vw, 28px);
-    border-top: 1px solid rgba(92, 122, 77, 0.15);
-  }
-  .pip-prompt {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--accent);
-    flex-shrink: 0;
-    line-height: 1;
-    user-select: none;
-  }
-  .pip-input {
-    flex: 1;
-    min-width: 0;
-    background: transparent;
-    border: 0;
-    outline: 0;
-    font-family: var(--font-mono);
-    font-size: clamp(11px, 1.05vw, 13px);
-    color: var(--text);
-    caret-color: var(--accent);
-  }
-  .pip-input::placeholder { color: var(--text-faint); }
-  .pip-input:disabled { opacity: 0.4; cursor: default; }
-  .pip-send {
-    appearance: none;
-    background: transparent;
-    border: 0;
-    cursor: pointer;
-    padding: 4px 6px;
-    color: var(--text-faint);
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-    transition: color 0.18s ease, transform 0.18s ease;
-  }
-  .pip-send:not(:disabled):hover { color: var(--accent); transform: translateX(2px); }
-  .pip-send:disabled { opacity: 0.28; cursor: default; }
-  .pip-send:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
-
-  .skills-detail-panel {
-    position: relative;
-    grid-column: 2;
-    grid-row: 1;
-    align-self: center;
-    padding: clamp(26px, 3vw, 36px);
-    border: 1px solid rgba(92, 122, 77, 0.24);
-    border-radius: 8px;
-    background:
-      linear-gradient(135deg, rgba(212, 168, 85, 0.06), transparent 34%),
-      rgba(26, 24, 20, 0.78);
-    box-shadow: inset 0 1px 0 rgba(224, 218, 202, 0.04);
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-    transform-origin: 0 45%;
-    visibility: visible;
-    transition:
-      clip-path 460ms cubic-bezier(0.2, 0.78, 0.2, 1),
-      opacity 360ms ease,
-      transform 480ms cubic-bezier(0.18, 0.88, 0.2, 1),
-      visibility 0ms linear 0ms;
-    will-change: clip-path, opacity, transform;
-    clip-path: inset(0 round 8px);
-    z-index: 1;
-  }
-  .skills-detail-kicker {
-    margin-bottom: 14px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--green);
-  }
-  .skills-detail-panel h3 {
-    font-family: var(--font-heading);
-    font-size: clamp(36px, 5vw, 56px);
-    font-weight: 400;
-    line-height: 0.98;
-    color: var(--accent);
-  }
-
-  .skill-ledger {
-    display: grid;
-    gap: 0;
-    margin-top: 28px;
-    list-style: none;
-    counter-reset: none;
-  }
-  .skill-ledger li {
-    display: grid;
-    grid-template-columns: 34px 1fr;
-    align-items: baseline;
-    gap: 16px;
-    padding: 11px 0;
+    grid-template-columns: 130px 1fr;
+    gap: 32px;
+    padding: 22px 0;
     border-top: 1px solid rgba(92, 122, 77, 0.18);
-    animation: skill-line-in 0.36s ease both;
-    animation-delay: var(--skill-delay);
+    align-items: baseline;
   }
-  .skill-ledger li:last-child {
+  .skills-row:last-child {
     border-bottom: 1px solid rgba(92, 122, 77, 0.18);
   }
-  .skill-ledger span {
+  .skills-row-label {
     font-family: var(--font-mono);
     font-size: 10px;
-    letter-spacing: 0.08em;
-    color: var(--green);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--row-color, var(--green));
+    padding-top: 3px;
   }
-  .skill-ledger strong {
-    font-family: var(--font-body);
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 1.35;
+  .skills-row-items {
+    font-size: 15px;
+    line-height: 1.65;
+  }
+  .skills-item {
+    color: var(--text-dim);
+  }
+  .skills-item--anchor {
     color: var(--text);
   }
-
-  @keyframes skill-node-in {
-    from {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-  }
-
-  @keyframes skill-line-in {
-    from {
-      opacity: 0;
-      transform: translateY(6px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes terminal-line-in {
-    from {
-      opacity: 0;
-      transform: translateY(3px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes terminal-cursor {
-    0%, 42% { opacity: 1; }
-    43%, 100% { opacity: 0; }
-  }
-
-  @keyframes ring-rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+  .skills-sep {
+    color: var(--row-color, var(--green));
+    opacity: 0.45;
   }
 
   /* ── Experience ── */
@@ -1614,23 +1116,6 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
 
   /* ── Responsive ── */
   @media (max-width: 900px) {
-    .skills-system {
-      grid-template-columns: 1fr;
-      min-height: 0;
-      gap: 24px;
-    }
-    .skills-orbit {
-      max-width: 520px;
-      min-height: 0;
-      margin: 0 auto;
-    }
-    .skills-detail-panel,
-    .pip-card {
-      grid-column: 1;
-      grid-row: 2;
-      max-width: none;
-      width: 100%;
-    }
     .about-content {
       grid-template-columns: 1fr;
       gap: 40px;
@@ -1648,97 +1133,10 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
   }
 
   @media (max-width: 700px) {
-    .skills-system:not(.pip-open) {
-      gap: 12px;
-    }
-    .skills-orbit {
-      aspect-ratio: auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      min-height: 0;
-    }
-    .skills-orbit::before,
-    .skills-orbit-lines {
-      display: none;
-    }
-
-    .skills-rocker {
-      position: relative;
-      left: auto;
-      top: auto;
-      transform: none;
-      grid-column: 1 / -1;
-      width: min(200px, 52vw);
-      height: 44px;
-      max-height: 44px;
-      min-height: 44px;
-      justify-self: center;
-      margin-bottom: 14px;
-    }
-    .skills-rocker:active {
-      transform: scale(0.97);
-    }
-    .skills-rocker-label {
-      font-size: 12px;
-    }
-
-    .skill-node {
-      position: relative;
-      left: auto;
-      top: auto;
-      width: 100%;
-      min-height: 0;
-      justify-content: flex-start;
-      align-items: flex-start;
-      padding: 13px 12px;
-      transform: none;
-      animation: none;
-    }
-    .skills-system.pip-open .skill-node {
-      display: none;
-    }
-    .skill-node:hover,
-    .skill-node:focus-visible,
-    .skill-node.active {
-      transform: none;
-    }
-    .skill-node-top {
+    .skills-row {
       grid-template-columns: 1fr;
-    }
-    .skill-node-count {
-      display: none;
-    }
-    .skill-node-label {
-      grid-column: 1;
-      font-size: 16px;
-    }
-    .skill-node-map { display: none; }
-
-    .skills-detail-panel {
-      display: block;
-      grid-column: 1 / -1;
-      grid-row: 2;
-      margin-top: 0;
-      padding: 22px 20px;
-    }
-    .pip-card {
-      grid-column: 1 / -1;
-      grid-row: 2;
-      height: min(420px, 54vh);
-    }
-    .pip-scroll {
-      flex: 1;
-      min-height: 0;
-      max-height: none;
-    }
-    .pip-pre {
-      font-size: 11px;
-      line-height: 1.62;
-    }
-    /* Prevent iOS Safari from zooming on input focus */
-    .pip-input {
-      font-size: 16px;
+      gap: 6px;
+      padding: 16px 0;
     }
     /* Experience */
     .exp-item {
@@ -1817,9 +1215,6 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
       padding-left: 16px;
       padding-right: 16px;
     }
-    .skill-node-label {
-      font-size: 14px;
-    }
     .hero-sub {
       font-size: 16px;
       line-height: 1.6;
@@ -1892,9 +1287,6 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     .detail-group-full {
       grid-column: 1 / -1;
     }
-    .skills-orbit {
-      gap: 6px;
-    }
     .contact-grid {
       grid-template-columns: 1fr;
     }
@@ -1915,18 +1307,6 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
       opacity: 1;
       transform: none;
       transition: none;
-    }
-    .skill-node,
-    .skill-ledger li {
-      animation: none;
-    }
-    .skills-detail-panel,
-    .pip-card {
-      animation: none;
-      transition: none;
-    }
-    .skills-ring.outer {
-      animation: none;
     }
   }
 

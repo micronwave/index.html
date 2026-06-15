@@ -81,11 +81,11 @@ export const person: Person = {
 
 export const about: About = {
   summary: [
-    "I've done work across customer ops, marketing, finance, and engineering. That mix means I have a different perspective than someone who came up through one track.",
+    "AWS Certified operations specialist who builds tools to make life easier. Worked across customer ops, marketing, finance, sales, and engineering which means it gives me a different perspective than someone who came up through one track.",
 
-    "Currently, I'm an Operations Specialist at Southwest Self Storage, where I've automated our auction mailing certification workflow, fixed a recurring autopay failure that was costing us time and money every month, and set up automatic SMS notifications for overdue accounts.",
+    "I've automated workflows, fixed recurring failures, and tightened up processes that were wasting time and money at work. That is what pulled me towards tech.",
 
-    "That work is what pulled me into tech. What I actually enjoy is figuring out why something isn't working and making it work, or taking something that kind of works and making it faster. Cloud, security, and AI is where that instinct makes the most sense. They're three layers that depend on each other, and I think you need to understand all of them to build anything worthwhile.",
+    "I enjoy figuring out why something isn't working and making it work, or taking something that kind of works and making it more efficient. Cloud, security, and AI is where that clicks for me. They overlap enough that you can't really work on one without running into the others.",
   ],
 };
 
@@ -99,12 +99,12 @@ export const experience: ExperienceEntry[] = [
     startMinute: 17,
     startSecond: 43,
     bullets: [
-      'Eliminated 60+ monthly AMEX and Discover autopay failures by tracing them to an AVS misconfiguration in billing.',
-      'Cut auction mail certification processing time by 90% with an automated workflow using file conversion and AI-assisted parsing; authored the companywide process document.',
-      'Reduced average monthly past-due balances by 13% after configuring automatic Sitelink SMS to overdue accounts.',
-      'Reconcile daily financial reports in Sitelink ERP; monitor AP for duplicates, fraud, and errors before payment.',
-      'Run customer support for 500 tenants, handling inquiries and account issues through to resolution.',
-      'Analyze competitors and adjust weekly pricing and promotions to stay competitive while maintaining monthly KPIs.',
+      'Eliminated 60+ monthly AMEX and Discover autopay failures by tracing them to an AVS misconfiguration',
+      'Cut auction mail certification processing time by 90% with an automated workflow using file conversion and AI-assisted parsing; authored the company process document',
+      'Reduced average monthly past-due balances by 13% after configuring automatic SMS to overdue accounts',
+      'Reconcile daily financial reports in ERP; monitor AP for duplicates, fraud, and errors before payment',
+      'Run customer support for 500 tenants, handling inquiries and account issues through to resolution',
+      'Analyze competitors and adjust weekly pricing and promotions to stay competitive while maintaining monthly KPIs',
     ],
     tags: ['Operations', 'ERP', 'Process Automation'],
   },
@@ -117,8 +117,8 @@ export const experience: ExperienceEntry[] = [
     startMinute: 42,
     startSecond: 11,
     bullets: [
-      'Run sponsor outreach for a cybersecurity research group, targeting hardware, crypto, cyber, and consulting firms.',
-      'Designed the Null404 sponsorship package PDF; assist in development of CTF challenges and game structure.',
+      'Lead sponsor outreach for a cybersecurity research group, secured 2 gear sponsorships',
+      'Designed the Null404 sponsorship package PDF; assist in development of CTF challenges',
     ],
     tags: ['Cybersecurity', 'CTF', 'Outreach'],
   },
@@ -128,8 +128,8 @@ export const experience: ExperienceEntry[] = [
     location: 'Remote',
     dates: 'May 2023 – Aug 2023',
     bullets: [
-      'Analyzed voter records across NYC districts to identify demographic patterns and developed targeted policy recommendations for a councilmember.',
-      'Vetted ~100 NYC organizations across industries and wrote partnership proposals that shaped client outreach decisions.',
+      'Analyzed voter records across NYC districts to identify demographic patterns and developed targeted policy recommendations for a councilmember',
+      'Vetted ~100 NYC organizations across industries and wrote partnership proposals that shaped client outreach decisions',
     ],
     tags: ['Research', 'Policy', 'Data Analysis'],
   },
@@ -143,10 +143,10 @@ export const projects: Project[] = [
     description:
       'Give Orca a goal and it decides which agents handle which parts: Claude implements, Codex reviews, your CI gates verify. Each gets a briefing scoped to its role and works against a checkable contract. You get a merge recommendation with the test logs attached, not just an agent\'s word for it.',
     bullets: [
-      'Delegates each task to the right agent automatically: Claude handles implementation, Codex handles review, and your CI gates run verification. No copy-pasting between windows, no re-explaining context.',
-      'Before any agent runs, Orca translates the goal into specific, checkable obligations. Conditions like "tests in internal/store must pass" are defined upfront so every agent works against a contract, not an open-ended instruction.',
-      'Each agent run is isolated in an Execution Capsule with exactly the files it needs, a token budget, and verification gates; a patch only advances when the gates clear and evidence is attached.',
-      'Writes every step to an event log before execution; if the process dies, `orca resume` picks up from the last checkpoint with no work lost.',
+      'Delegates each task to the right agent automatically: Claude handles implementation, Codex handles review, and your CI gates run verification. No copy-pasting between windows, no re-explaining context',
+      'Before any agent runs, Orca translates the goal into specific, checkable obligations. Conditions like "tests in internal/store must pass" are defined upfront so every agent works against a contract, not an open-ended instruction',
+      'Each agent run is isolated in an Execution Capsule with exactly the files it needs, a token budget, and verification gates; a patch only advances when the gates clear and evidence is attached',
+      'Writes every step to an event log before execution; if the process dies, `orca resume` picks up from the last checkpoint with no work lost',
     ],
     stack: ['Go', 'TypeScript', 'Claude API', 'Codex', 'GitHub API'],
     flow: ['goal', 'plan', 'capsule', 'verify', 'merge'],
@@ -169,10 +169,10 @@ export const projects: Project[] = [
     description:
       'A collection of slash commands, Python hooks, and a routing skill that enforce a structured development loop inside Claude Code. The key mechanic is mandatory /clear calls between stages, which wipes session context so each phase runs in a fresh context without accumulated drift.',
     bullets: [
-      'Twelve slash commands step through planning, phase splitting, test-first building, diff auditing, and commit — each stage runs in its own cleared context so Claude does not carry assumptions from prior work.',
-      'Four stdlib Python hooks handle scope drift warnings at end-of-turn, git push confirmation prompts, build log sync reminders, and session state injection after /clear so Claude picks up where it left off.',
-      'The installer merges settings.json without clobbering existing hooks and runs a 58-test suite to confirm the install is clean; idempotent and safe to re-run on existing projects.',
-      'A routing skill auto-triggers on phrases like "build phase" or "audit"; running /chaperone with no arguments reads current workflow state and tells you the exact next command to run.',
+      'Twelve slash commands step through planning, phase splitting, test-first building, diff auditing, and commit — each stage runs in its own cleared context so Claude does not carry assumptions from prior work',
+      'Four stdlib Python hooks handle scope drift warnings at end-of-turn, git push confirmation prompts, build log sync reminders, and session state injection after /clear so Claude picks up where it left off',
+      'The installer merges settings.json without clobbering existing hooks and runs a 58-test suite to confirm the install is clean; idempotent and safe to re-run on existing projects',
+      'A routing skill auto-triggers on phrases like "build phase" or "audit"; running /chaperone with no arguments reads current workflow state and tells you the exact next command to run',
     ],
     stack: ['Python', 'Claude Code', 'Slash Commands', 'Python Hooks'],
     flow: ['plan', 'build', 'audit', 'commit'],
@@ -195,11 +195,11 @@ export const projects: Project[] = [
     description:
       'An 11-stage pipeline running on a 4-hour schedule that clusters documents into narratives and tracks how those narratives grow, shift, and decay. Not a trading system. It watches the stories that move markets, not the markets themselves.',
     bullets: [
-      'Deduplicates incoming documents with LSH MinHash (0.85 Jaccard threshold), clusters survivors into narratives using HDBSCAN, and tracks centroid drift over time as a signal of narrative mutation.',
-      'Maps narratives to S&P 500 tickers by computing cosine similarity between narrative embeddings and a pre-built library of ticker embeddings generated from SEC 10-K summaries.',
-      'Flags coordinated campaigns: five or more sources posting about the same narrative within 300 seconds triggers the adversarial burst detector.',
-      'Uses Claude Haiku for routine topic labeling and Claude Sonnet only for mutation analysis, with a configurable daily token budget cap to keep LLM costs predictable.',
-      'FastAPI backend with 66 routes; Next.js frontend with views for signal radar, constellation graph, coordination detection, and velocity-price correlation explorer.',
+      'Deduplicates incoming documents with LSH MinHash (0.85 Jaccard threshold), clusters survivors into narratives using HDBSCAN, and tracks centroid drift over time as a signal of narrative mutation',
+      'Maps narratives to S&P 500 tickers by computing cosine similarity between narrative embeddings and a pre-built library of ticker embeddings generated from SEC 10-K summaries',
+      'Flags coordinated campaigns: five or more sources posting about the same narrative within 300 seconds triggers the adversarial burst detector',
+      'Uses Claude Haiku for routine topic labeling and Claude Sonnet only for mutation analysis, with a configurable daily token budget cap to keep LLM costs predictable',
+      'FastAPI backend with 66 routes; Next.js frontend with views for signal radar, constellation graph, coordination detection, and velocity-price correlation explorer',
     ],
     stack: [
       'Python',
@@ -233,10 +233,10 @@ export const projects: Project[] = [
     description:
       'A full serverless RAG pipeline deployed on AWS. The ingestion side runs once to scrape, chunk, embed, and index AWS documentation. The query side runs per-request inside Lambda, retrieving the closest document chunks and passing them to Claude via Bedrock.',
     bullets: [
-      'Scraped about 120 pages across five AWS services, split into 1000-character chunks with 200-character overlap, embedded with Amazon Titan v2 (1024 dimensions), and indexed in Pinecone with cosine similarity.',
-      'At query time: embeds the question with the same Titan model, retrieves the top 5 chunks from Pinecone, assembles a grounded prompt with anti-hallucination instructions, calls Claude via Bedrock, and returns the answer with source URLs.',
-      'Each ingestion script writes a manifest and checks that the previous stage completed before running, so partial failures do not corrupt the index.',
-      'Lambda runs with a scoped IAM policy (Bedrock invoke and CloudWatch only); quota enforcement via API Gateway; the frontend is a single static HTML file on CloudFront.',
+      'Scraped about 120 pages across five AWS services, split into 1000-character chunks with 200-character overlap, embedded with Amazon Titan v2 (1024 dimensions), and indexed in Pinecone with cosine similarity',
+      'At query time: embeds the question with the same Titan model, retrieves the top 5 chunks from Pinecone, assembles a grounded prompt with anti-hallucination instructions, calls Claude via Bedrock, and returns the answer with source URLs',
+      'Each ingestion script writes a manifest and checks that the previous stage completed before running, so partial failures do not corrupt the index',
+      'Lambda runs with a scoped IAM policy (Bedrock invoke and CloudWatch only); quota enforcement via API Gateway; the frontend is a single static HTML file on CloudFront',
     ],
     stack: [
       'Python',
@@ -289,24 +289,29 @@ export const skills: SkillGroup[] = [
     items: [
       'AWS Bedrock',
       'Lambda',
+      'API Gateway',
       'S3',
       'CloudFront',
-      'API Gateway',
       'IAM',
       'CloudWatch',
       'Serverless',
+      'AWS CLI',
     ],
   },
   {
     label: 'AI / ML',
-    items: ['RAG', 'Vector DB (Pinecone, FAISS)', 'HDBSCAN Clustering', 'LSH MinHash', 'Embeddings', 'Semantic Search'],
+    items: ['RAG', 'Vector DB (Pinecone, FAISS)', 'Embeddings', 'HDBSCAN Clustering', 'LSH MinHash', 'Semantic Search'],
   },
   {
-    label: 'Languages',
-    items: ['Python', 'FastAPI', 'REST APIs', 'SQLite', 'CI/CD'],
+    label: 'Backend',
+    items: ['Python', 'FastAPI', 'REST APIs', 'SQL', 'SQLite', 'CI/CD'],
   },
   {
     label: 'Tools',
-    items: ['Claude Code', 'GitHub', 'Linux', 'Docker', 'PowerShell'],
+    items: ['Claude Code', 'GitHub', 'Docker', 'Codex', 'Linux', 'PowerShell', 'Notion', 'Vercel', 'Supabase', 'Sitelink ERP'],
+  },
+  {
+    label: 'Ops',
+    items: ['Customer & tech support', 'Financial reporting', 'Competitive analysis', 'Client outreach', 'Accounts Payable', 'Marketing materials'],
   },
 ];
