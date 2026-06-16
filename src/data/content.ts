@@ -81,11 +81,11 @@ export const person: Person = {
 
 export const about: About = {
   summary: [
-    "AWS Certified operations specialist who builds tools to make life easier. Worked across customer ops, marketing, finance, sales, and engineering which means it gives me a different perspective than someone who came up through one track.",
+    "AWS Certified operations specialist who builds tools to make life easier. Worked across customer ops, marketing, finance, sales, and engineering which gives me a different perspective than someone who came up through one track.",
 
     "I've automated workflows, fixed recurring failures, and tightened up processes that were wasting time and money at work. That is what pulled me towards tech.",
 
-    "I enjoy figuring out why something isn't working and making it work, or taking something that kind of works and making it more efficient. Cloud, security, and AI is where that clicks for me. They overlap enough that you can't really work on one without running into the others.",
+    "I enjoy figuring out why something isn't working and making it work, or taking something that kind of works and making it more efficient. Cloud and AI is where that clicks for me. They overlap enough that you can't really work on one without running into the other.",
   ],
 };
 
@@ -312,6 +312,6 @@ export const skills: SkillGroup[] = [
   },
   {
     label: 'Ops',
-    items: ['Customer & tech support', 'Financial reporting', 'Competitive analysis', 'Client outreach', 'Accounts Payable', 'Marketing materials'],
+    items: ['Customer & tech support', 'Financial reporting', 'Competitive analysis', 'Client outreach', 'Accounts Payable'],
   },
 ];

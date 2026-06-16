@@ -175,7 +175,7 @@ const HeroSection = memo(function HeroSection({ person }: { person: Person }) {
         <em>{lastName}</em>
       </h1>
       <p className="hero-sub">
-        Operations engineer building with cloud, security, and AI. I find what's inefficient and build tools to fix it.
+        Operations engineer building with cloud and AI. If a workflow is slow or doesn't have a good solution yet, I build one.
       </p>
       <div className="hero-links-group">
         <div className="hero-links">
@@ -289,7 +289,7 @@ const AboutSection = memo(function AboutSection({
           </div>
           <div className="detail-group">
             <span className="detail-label">Focus</span>
-            <span className="detail-value">Cloud&nbsp;·&nbsp;Security&nbsp;·&nbsp;AI</span>
+            <span className="detail-value">Cloud&nbsp;·&nbsp;AI</span>
           </div>
           {certifications.map((cert) => (
             <div className="detail-group" key={cert.name}>
