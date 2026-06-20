@@ -81,44 +81,41 @@ export const person: Person = {
 
 export const about: About = {
   summary: [
-    "AWS Certified operations specialist who builds tools to make life easier. Worked across customer ops, marketing, finance, sales, and engineering which gives me a different perspective than someone who came up through one track.",
+    "AWS Certified operations specialist who builds tools to make life easier. Working across customer ops, marketing, finance, sales, and engineering gives me a different perspective than someone who came up through one track.",
 
-    "I've automated workflows, fixed recurring failures, and tightened up processes that were wasting time and money at work. That is what pulled me towards tech.",
-
-    "I enjoy figuring out why something isn't working and making it work, or taking something that kind of works and making it more efficient. Cloud and AI is where that clicks for me. They overlap enough that you can't really work on one without running into the other.",
+    "I've automated workflows, fixed recurring failures, and tightened up processes that were wasting my company time and money. I enjoy figuring out why something isn't working and making it work, or taking something that kind of works and making it more efficient.",
   ],
 };
 
 export const experience: ExperienceEntry[] = [
   {
     company: 'Southwest Self Storage',
-    role: 'Operations Specialist (CSR)',
+    role: 'Operations Specialist',
     location: 'Redlands, CA',
     dates: 'Nov 2024 – Present',
     startHour: 8,
     startMinute: 17,
     startSecond: 43,
     bullets: [
-      'Eliminated 60+ monthly AMEX and Discover autopay failures by tracing them to an AVS misconfiguration',
-      'Cut auction mail certification processing time by 90% with an automated workflow using file conversion and AI-assisted parsing; authored the company process document',
-      'Reduced average monthly past-due balances by 13% after configuring automatic SMS to overdue accounts',
-      'Reconcile daily financial reports in ERP; monitor AP for duplicates, fraud, and errors before payment',
-      'Run customer support for 500 tenants, handling inquiries and account issues through to resolution',
-      'Analyze competitors and adjust weekly pricing and promotions to stay competitive while maintaining monthly KPIs',
+      'Automated an auction processing workflow using file conversion and AI-assisted parsing; trained the team and wrote the companywide procedure doc',
+      'Built a scraper that pulls competitor pricing and promotion data daily into a dashboard for the COO, replacing a manual weekly spreadsheet process',
+      'Diagnosed and fixed recurring AMEX and Discover autopay processing failures by reconfiguring billing settings',
+      'Cut past-due balances by 13% by configuring SMS automation for overdue accounts via CallPotential',
+      'Manage account operations for 500 tenants, troubleshooting billing, access, and account issues',
     ],
     tags: ['Operations', 'ERP', 'Process Automation'],
   },
   {
     company: 'Null404',
-    role: 'Operations Volunteer',
+    role: 'Partnerships Lead (Volunteer)',
     location: 'Remote',
     dates: 'May 2026 – Present',
     startHour: 18,
     startMinute: 42,
     startSecond: 11,
     bullets: [
-      'Lead sponsor outreach for a cybersecurity research group, secured 2 gear sponsorships',
-      'Designed the Null404 sponsorship package PDF; assist in development of CTF challenges',
+      'Lead sponsor outreach for a cybersecurity research group, coordinated with leadership to secure 2 gear sponsorships',
+      'Designed the sponsorship package; help design CTF challenges',
     ],
     tags: ['Cybersecurity', 'CTF', 'Outreach'],
   },
@@ -128,8 +125,8 @@ export const experience: ExperienceEntry[] = [
     location: 'Remote',
     dates: 'May 2023 – Aug 2023',
     bullets: [
-      'Analyzed voter records across NYC districts to identify demographic patterns and developed targeted policy recommendations for a councilmember',
-      'Vetted ~100 NYC organizations across industries and wrote partnership proposals that shaped client outreach decisions',
+      'Vetted ~100 NYC organizations across industries and wrote partnership proposals with fellow interns to shape outreach decisions',
+      'Analyzed voter data and patterns to develop targeted policy recommendations for NYC councilmember client',
     ],
     tags: ['Research', 'Policy', 'Data Analysis'],
   },

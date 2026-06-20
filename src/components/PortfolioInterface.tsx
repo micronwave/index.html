@@ -175,7 +175,7 @@ const HeroSection = memo(function HeroSection({ person }: { person: Person }) {
         <em>{lastName}</em>
       </h1>
       <p className="hero-sub">
-        Operations engineer building with cloud and AI. If a workflow is slow or doesn't have a good solution yet, I build one.
+        Building automations and tools that cut out boring, manual work.
       </p>
       <div className="hero-links-group">
         <div className="hero-links">
@@ -287,10 +287,7 @@ const AboutSection = memo(function AboutSection({
             <span className="detail-label">Location</span>
             <span className="detail-value">{person.location}</span>
           </div>
-          <div className="detail-group">
-            <span className="detail-label">Focus</span>
-            <span className="detail-value">Cloud&nbsp;·&nbsp;AI</span>
-          </div>
+
           {certifications.map((cert) => (
             <div className="detail-group" key={cert.name}>
               <span className="detail-label">Certification</span>
