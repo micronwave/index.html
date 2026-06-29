@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.astro/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs and temp verification artifacts
+*.log
+_verify_tmp.js
+
+# OS
+.DS_Store
+Thumbs.db

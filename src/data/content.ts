@@ -42,6 +42,7 @@ export interface Project {
   flow?: string[];
   githubUrl?: string;
   liveUrl?: string;
+  screenshotUrl?: string;
   status: 'active' | 'complete' | 'prototype' | 'archived';
   detail?: ProjectDetail;
 }
@@ -97,11 +98,12 @@ export const experience: ExperienceEntry[] = [
     startMinute: 17,
     startSecond: 43,
     bullets: [
-      'Automated an auction processing workflow using file conversion and AI-assisted parsing; trained the team and wrote the companywide procedure doc',
-      'Built a scraper that pulls competitor pricing and promotion data daily into a dashboard for the COO, replacing a manual weekly spreadsheet process',
-      'Diagnosed and fixed recurring AMEX and Discover autopay processing failures by reconfiguring billing settings',
-      'Cut past-due balances by 13% by configuring SMS automation for overdue accounts via CallPotential',
-      'Manage account operations for 500 tenants, troubleshooting billing, access, and account issues',
+      'Cut past-due balances by 13% after configuring SMS automation in CallPotential via Sitelink ERP API',
+      'Built the COO a competitor pricing dashboard in Python and Playwright that auto updates in Google Sheets, replacing the weekly manual spreadsheet',
+      'Identified and escalated a security vulnerability in our third-party AI vendor\'s S3 infrastructure that publicly exposed customer data and backups',
+      'Built an AI pipeline that pulls tenant names from hundreds of unsearchable TIF scans and verifies lien letter compliance, replacing the manual process. Wrote the procedure doc',
+      'Fixed long standing AMEX and Discover autopay failures that the team had been working around manually, traced it to the ERP billing config',
+      'Run the full customer lifecycle for 500 tenants, from closing rentals to collections and billing/account issues',
     ],
     tags: ['Operations', 'ERP', 'Process Automation'],
   },
@@ -109,11 +111,12 @@ export const experience: ExperienceEntry[] = [
     company: 'Null404',
     role: 'Partnerships Lead (Volunteer)',
     location: 'Remote',
-    dates: 'May 2026 – Present',
-    startHour: 18,
+    dates: 'Apr 2026 – Present',
+    startHour: 402,
     startMinute: 42,
     startSecond: 11,
     bullets: [
+      'Built an n8n pipeline on Oracle Cloud\'s free tier that syncs sponsor deal stages between Notion and HubSpot daily so Null leadership can track progress',
       'Lead sponsor outreach for a cybersecurity research group, coordinated with leadership to secure 2 gear sponsorships',
       'Designed the sponsorship package; help design CTF challenges',
     ],
@@ -148,6 +151,7 @@ export const projects: Project[] = [
     stack: ['Go', 'TypeScript', 'Claude API', 'Codex', 'GitHub API'],
     flow: ['goal', 'plan', 'capsule', 'verify', 'merge'],
     githubUrl: 'https://github.com/micronwave/orca',
+    screenshotUrl: '/screenshot-orca.png',
     status: 'active',
     detail: {
       problem:
@@ -211,6 +215,7 @@ export const projects: Project[] = [
     ],
     flow: ['sources', 'cluster', 'score', 'map'],
     githubUrl: 'https://github.com/micronwave/market-narrative-engine',
+    screenshotUrl: '/screenshot-nie.png',
     status: 'complete',
     detail: {
       problem:
@@ -248,6 +253,7 @@ export const projects: Project[] = [
     flow: ['docs', 'chunks', 'embed', 'retrieve', 'answer'],
     githubUrl: 'https://github.com/micronwave/aws-docs-rag',
     liveUrl: 'https://d3d0zch3u8ca61.cloudfront.net',
+    screenshotUrl: '/screenshot-rag.png',
     status: 'complete',
     detail: {
       problem:
@@ -284,31 +290,25 @@ export const skills: SkillGroup[] = [
   {
     label: 'Cloud',
     items: [
-      'AWS Bedrock',
-      'Lambda',
-      'API Gateway',
-      'S3',
-      'CloudFront',
-      'IAM',
-      'CloudWatch',
-      'Serverless',
-      'AWS CLI',
+      'AWS (Bedrock, Lambda, S3, CloudFront, API Gateway, IAM, CloudWatch, CLI)',
+      'Oracle Cloud',
+      'Vercel',
     ],
   },
   {
     label: 'AI / ML',
-    items: ['RAG', 'Vector DB (Pinecone, FAISS)', 'Embeddings', 'HDBSCAN Clustering', 'LSH MinHash', 'Semantic Search'],
+    items: ['RAG', 'Semantic Search', 'Embeddings', 'Vector DB (Pinecone, FAISS)', 'HDBSCAN Clustering', 'LSH MinHash'],
   },
   {
     label: 'Backend',
-    items: ['Python', 'FastAPI', 'REST APIs', 'SQL', 'SQLite', 'CI/CD'],
+    items: ['Python', 'SQL', 'REST APIs', 'Webhooks', 'FastAPI', 'CI/CD', 'Supabase', 'Web scraping', 'SQLite'],
   },
   {
     label: 'Tools',
-    items: ['Claude Code', 'GitHub', 'Docker', 'Codex', 'Linux', 'PowerShell', 'Notion', 'Vercel', 'Supabase', 'Sitelink ERP'],
+    items: ['HubSpot', 'n8n', 'Retool', 'Notion', 'Playwright', 'Claude Code', 'GitHub', 'Docker', 'Sitelink ERP', 'Codex'],
   },
   {
     label: 'Ops',
-    items: ['Customer & tech support', 'Financial reporting', 'Competitive analysis', 'Client outreach', 'Accounts Payable'],
+    items: ['LLM ops', 'Financial ops', 'Competitive analysis', 'Customer & tech support', 'AP/AR', 'Client outreach'],
   },
 ];

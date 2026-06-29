@@ -736,8 +736,8 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     flex-direction: column;
     gap: 22px;
     padding: 18px 20px 20px;
-    background: rgba(0, 0, 0, 0.22);
-    border: 1px solid var(--border);
+    background: var(--bg-surface);
+    border: 1px solid rgba(212, 168, 85, 0.16);
     border-radius: 3px;
     margin-top: 14px;
     position: relative;
@@ -783,6 +783,7 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
   .project-detail.open .project-detail-content > *:nth-child(1) { animation-delay: 0.08s; }
   .project-detail.open .project-detail-content > *:nth-child(2) { animation-delay: 0.18s; }
   .project-detail.open .project-detail-content > *:nth-child(3) { animation-delay: 0.28s; }
+  .project-detail.open .project-detail-content > *:nth-child(4) { animation-delay: 0.36s; }
 
   /* Stat ledger */
   .stat-ledger {
@@ -822,7 +823,7 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
   }
   .project-detail-section + .project-detail-section {
     padding-top: 18px;
-    border-top: 1px solid rgba(92, 122, 77, 0.10);
+    border-top: 1px solid rgba(92, 122, 77, 0.22);
   }
   /* First section after the stat ledger */
   .stat-ledger + .project-detail-section {
@@ -835,14 +836,14 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     font-size: 10px;
     letter-spacing: 0.13em;
     text-transform: uppercase;
-    color: var(--green);
+    color: var(--accent);
   }
   .project-detail-desc {
+    font-family: var(--font-heading);
+    font-style: italic;
     font-size: 15px;
     line-height: 1.78;
-    color: var(--text-dim);
-    padding-left: 14px;
-    border-left: 1px solid rgba(212, 168, 85, 0.22);
+    color: var(--text);
     max-width: 680px;
   }
 
@@ -891,6 +892,84 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     padding-top: 2px;
     flex-shrink: 0;
     line-height: 1;
+  }
+
+  /* ── Project preview screenshot ── */
+  .project-preview-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* separator: standalone preview → next section (screenshot-only case) */
+  .project-preview-section + .project-detail-section {
+    padding-top: 18px;
+    border-top: 1px solid rgba(92, 122, 77, 0.22);
+  }
+
+  /* ── Preview + problem side-by-side row ── */
+  .project-preview-problem-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* problem column inside the row: no stacked-section border */
+  .project-preview-problem-row .project-detail-section {
+    padding-top: 0;
+    border-top: none;
+  }
+
+  /* frame inside the row: let the grid column control width */
+  .project-preview-problem-row .project-preview-frame {
+    max-width: none;
+  }
+
+  /* separator: row → decisions below */
+  .project-preview-problem-row + .project-detail-section {
+    padding-top: 18px;
+    border-top: 1px solid rgba(92, 122, 77, 0.22);
+  }
+
+  .project-preview-frame {
+    position: relative;
+    border: 1px solid rgba(212, 168, 85, 0.28);
+    border-radius: 3px;
+    max-width: 680px;
+  }
+  .project-preview-frame::before,
+  .project-preview-frame::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .project-preview-frame::before {
+    top: -1px;
+    left: -1px;
+    border-top: 1px solid rgba(212, 168, 85, 0.5);
+    border-left: 1px solid rgba(212, 168, 85, 0.5);
+  }
+  .project-preview-frame::after {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 1px solid rgba(212, 168, 85, 0.5);
+    border-right: 1px solid rgba(212, 168, 85, 0.5);
+  }
+
+  .project-preview-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 2px;
+    filter: saturate(0.65) brightness(0.82);
+    transition: filter 0.18s ease-out;
+  }
+  .project-preview-frame:hover .project-preview-img {
+    filter: saturate(1) brightness(1);
   }
 
   /* ── Contact ── */
@@ -961,7 +1040,7 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
   }
   .resume-link:hover {
     color: var(--green);
-    border-color: var(--accent);
+    border-color: var(--green);
     background: rgba(212, 168, 85, 0.06);
   }
 
@@ -1190,6 +1269,12 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     .project-link { min-height: 44px; padding: 8px 0; }
     .contact-item a { min-height: 44px; display: inline-flex; align-items: center; }
     .resume-link { min-height: 44px; }
+
+    /* Preview+problem row: stack vertically on mobile */
+    .project-preview-problem-row {
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
 
     /* Mobile content typography — 15–16px floor */
     .project-bullets li { font-size: 15px; }

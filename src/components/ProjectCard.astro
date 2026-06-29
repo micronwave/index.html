@@ -68,30 +68,65 @@ const flow = project.flow ?? [];
 
         {flow.length > 0 && <ProjectFlow steps={flow} />}
 
-        {project.detail ? (
-          <>
+        {project.screenshotUrl && project.detail ? (
+          <div class="project-preview-problem-row">
+            <div class="project-preview-section">
+              <span class="project-detail-label">preview</span>
+              <div class="project-preview-frame">
+                <img
+                  src={project.screenshotUrl}
+                  alt={`${project.name} interface`}
+                  class="project-preview-img"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+            </div>
             <div class="project-detail-section">
               <span class="project-detail-label">The problem</span>
               <p class="project-detail-desc">{project.detail.problem}</p>
             </div>
-            <div class="project-detail-section">
-              <span class="project-detail-label">Decisions</span>
-              <ul class="project-detail-decisions">
-                {project.detail.decisions.map((d) => (
-                  <li>
-                    <span class="decision-num" aria-hidden="true">/</span>
-                    <span>{d}</span>
-                  </li>
-                ))}
-              </ul>
+          </div>
+        ) : project.screenshotUrl ? (
+          <div class="project-preview-section">
+            <span class="project-detail-label">preview</span>
+            <div class="project-preview-frame">
+              <img
+                src={project.screenshotUrl}
+                alt={`${project.name} interface`}
+                class="project-preview-img"
+                loading="lazy"
+                decoding="async"
+              />
             </div>
-          </>
+          </div>
+        ) : project.detail ? (
+          <div class="project-detail-section">
+            <span class="project-detail-label">The problem</span>
+            <p class="project-detail-desc">{project.detail.problem}</p>
+          </div>
+        ) : null}
+
+        {project.detail ? (
+          <div class="project-detail-section">
+            <span class="project-detail-label">Decisions</span>
+            <ul class="project-detail-decisions">
+              {project.detail.decisions.map((d) => (
+                <li>
+                  <span class="decision-num" aria-hidden="true">/</span>
+                  <span>{d}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         ) : (
           <>
-            <div class="project-detail-section">
-              <span class="project-detail-label">Overview</span>
-              <p class="project-detail-desc">{project.description}</p>
-            </div>
+            {!project.screenshotUrl && (
+              <div class="project-detail-section">
+                <span class="project-detail-label">Overview</span>
+                <p class="project-detail-desc">{project.description}</p>
+              </div>
+            )}
             {extraBullets.length > 0 && (
               <div class="project-detail-section">
                 <ul class="project-detail-bullets">

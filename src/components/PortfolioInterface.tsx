@@ -320,11 +320,11 @@ const AboutSection = memo(function AboutSection({
 // ── Skills ────────────────────────────────────────────────────────────────
 
 const SKILL_CONFIG: Record<string, { color: string; anchors: string[] }> = {
-  'Cloud':   { color: '#5c7a4d', anchors: ['AWS Bedrock', 'Lambda', 'API Gateway'] },
-  'AI / ML': { color: '#6e8d3f', anchors: ['RAG', 'Vector DB (Pinecone, FAISS)', 'Embeddings'] },
-  'Backend': { color: '#a09b3c', anchors: ['Python', 'FastAPI', 'REST APIs'] },
-  'Tools':   { color: '#c4a648', anchors: ['Claude Code', 'GitHub', 'Docker'] },
-  'Ops':     { color: '#d4a855', anchors: ['Customer & tech support', 'Financial reporting', 'Competitive analysis'] },
+  'Cloud':   { color: '#5c7a4d', anchors: ['AWS (Bedrock, Lambda, S3, CloudFront, API Gateway, IAM, CloudWatch, CLI)'] },
+  'AI / ML': { color: '#6e8d3f', anchors: ['RAG', 'Semantic Search', 'Embeddings'] },
+  'Backend': { color: '#a09b3c', anchors: ['Python', 'SQL', 'REST APIs'] },
+  'Tools':   { color: '#c4a648', anchors: ['HubSpot', 'Retool', 'n8n'] },
+  'Ops':     { color: '#d4a855', anchors: ['LLM ops', 'Financial ops', 'Competitive analysis'] },
 };
 
 const SkillsSection = memo(function SkillsSection({ skills }: { skills: SkillGroup[] }) {
