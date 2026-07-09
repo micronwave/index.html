@@ -81,9 +81,11 @@ export const person: Person = {
 
 export const about: About = {
   summary: [
-    "AWS Certified operations specialist who builds tools to make life easier. Working across customer ops, marketing, finance, sales, and engineering gives me a different perspective than someone who came up through one track.",
+    "I build and automate the internal systems that cut busy work and protect revenue. My background runs through customer ops, marketing, sales, and finance, and underneath that is a technical layer of backend configuration and API integration.",
 
-    "I've automated workflows, fixed recurring failures, and tightened up processes that were wasting my company time and money. I enjoy figuring out why something isn't working and making it work, or taking something that kind of works and making it more efficient.",
+    "I've automated workflows, fixed recurring failures, and cleaned up processes that were costing time and money. I like working the whole arc of a problem, from figuring out why something's broken to building the fix that makes it better.",
+
+    "I'm AWS certified and working toward Solutions Architect to have a real technical footing on the infrastructure side of the business. It's also why the projects below skew toward cloud infra, data pipelines, and agent orchestration.",
   ],
 };
 
@@ -301,8 +303,7 @@ export const skills: SkillGroup[] = [
     label: 'Cloud',
     items: [
       'AWS (Bedrock, Lambda, S3, CloudFront, API Gateway, IAM, CloudWatch, CLI)',
-      'Oracle Cloud',
-      'Vercel',
+      'Oracle Cloud (OCI)',
     ],
   },
   {
