@@ -36,7 +36,6 @@ export interface ProjectDetail {
 export interface Project {
   name: string;
   tagline: string;
-  description: string;
   bullets: string[];
   stack: string[];
   flow?: string[];
@@ -98,12 +97,12 @@ export const experience: ExperienceEntry[] = [
     startMinute: 17,
     startSecond: 43,
     bullets: [
-      'Cut past-due balances by 13% after configuring SMS automation in CallPotential via Sitelink ERP API',
-      'Built the COO a competitor pricing dashboard in Python and Playwright that auto updates in Google Sheets, replacing the weekly manual spreadsheet',
-      'Identified and escalated a security vulnerability in our third-party AI vendor\'s S3 infrastructure that publicly exposed customer data and backups',
-      'Built an AI pipeline that pulls tenant names from hundreds of unsearchable TIF scans and verifies lien letter compliance, replacing the manual process. Wrote the procedure doc',
-      'Fixed long standing AMEX and Discover autopay failures that the team had been working around manually, traced it to the ERP billing config',
-      'Run the full customer lifecycle for 500 tenants, from closing rentals to collections and billing/account issues',
+      'Reduced past-due balances by 13% by implementing SMS automation in CallPotential, integrating customer data via the SiteLink API to trigger payment reminders',
+      'Constructed an automated competitor pricing dashboard for the COO using Python, Playwright, and the Google Sheets API, replacing manual spreadsheets with real-time data insights',
+      'Discovered and responsibly disclosed a security vulnerability in our third-party AI vendor\'s infrastructure that publicly exposed customer data and production backups; coordinated with vendor to validate and patch',
+      'Designed an AI pipeline that automates the review of TIF image scans to verify customer lien compliance',
+      'Recovered $85K in on-time monthly revenue by fixing an ERP billing config error causing AMEX/Discover autopay declines. Verified issue by auditing payment logs and billing rules',
+      'Run the full customer lifecycle for 500 tenants, from lead follow-up and account setup to accounts receivable',
     ],
     tags: ['Operations', 'ERP', 'Process Automation'],
   },
@@ -139,14 +138,11 @@ export const projects: Project[] = [
   {
     name: 'Orca',
     tagline:
-      'Orchestration runtime that routes each part of a goal to the right agent, holds each to a contract, and returns a merge recommendation with the evidence attached.',
-    description:
-      'Give Orca a goal and it decides which agents handle which parts: Claude implements, Codex reviews, your CI gates verify. Each gets a briefing scoped to its role and works against a checkable contract. You get a merge recommendation with the test logs attached, not just an agent\'s word for it.',
+      "Splits a goal across multiple AI agents — Claude, Codex, your CI — and won't call it done until every gate passes and the logs prove it.",
     bullets: [
-      'Delegates each task to the right agent automatically: Claude handles implementation, Codex handles review, and your CI gates run verification. No copy-pasting between windows, no re-explaining context',
-      'Before any agent runs, Orca translates the goal into specific, checkable obligations. Conditions like "tests in internal/store must pass" are defined upfront so every agent works against a contract, not an open-ended instruction',
-      'Each agent run is isolated in an Execution Capsule with exactly the files it needs, a token budget, and verification gates; a patch only advances when the gates clear and evidence is attached',
-      'Writes every step to an event log before execution; if the process dies, `orca resume` picks up from the last checkpoint with no work lost',
+      'Routes each part of a goal to the right agent automatically: Claude implements, Codex reviews, CI gates verify. No copy-pasting context between windows or re-explaining what you\'re doing',
+      'Before any agent starts, the goal gets broken into specific, checkable conditions, like "tests in internal/store must pass", so every agent works against a contract instead of a vague instruction',
+      'Each run gets its own sandboxed capsule: only the files it needs, a token budget, and a set of gates it has to clear before a patch moves forward',
     ],
     stack: ['Go', 'TypeScript', 'Claude API', 'Codex', 'GitHub API'],
     flow: ['goal', 'plan', 'capsule', 'verify', 'merge'],
@@ -155,37 +151,46 @@ export const projects: Project[] = [
     status: 'active',
     detail: {
       problem:
-        "An agent that says tests pass is not the same as one that shows you the logs. Most agent-assisted workflows collapse at that gap; there is no way to know if the agent actually ran the tests or just said it did. Orca defines what done means upfront, runs the gates, and stores the artifacts that prove it.",
+        'An agent telling you the tests pass isn\'t the same as an agent showing you the logs. Most agent workflows fall apart right there, you can\'t tell if it actually ran the tests or just said so. Orca decides what "done" means before anything runs, then keeps the proof.',
       decisions: [
-        'Exit conditions are defined before any agent runs, not negotiated after. An agent working against a contract cannot quietly decide it is done when it is not.',
-        'Each agent gets a briefing compiled from current goal state, not a replay of the full conversation. Claude does not need Codex\'s review notes, and Codex does not need Claude\'s implementation history; keeping them separate is what keeps each agent on task.',
-        'Every step is written to the event log before it runs, so a killed process always has a checkpoint. Reconstructing state from memory after a crash was too unreliable to trust.',
+        "Exit conditions get defined before any agent runs, not negotiated after the fact, so an agent can't quietly decide it's done when it isn't.",
+        "Each agent gets a briefing built from the current goal state, not a replay of the whole conversation. Claude doesn't need Codex's review notes, and Codex doesn't need Claude's implementation history. Keeping them apart is what keeps each one focused.",
+        'Every step gets written to the event log before it runs, so a killed process always has a checkpoint to resume from. Reconstructing state from memory after a crash was never reliable enough to trust.',
       ],
     },
   },
   {
-    name: 'Claude Chaperone',
+    name: 'AWS Docs RAG',
     tagline:
-      'Installs a plan-build-audit-commit workflow into any Claude Code project with a single command.',
-    description:
-      'A collection of slash commands, Python hooks, and a routing skill that enforce a structured development loop inside Claude Code. The key mechanic is mandatory /clear calls between stages, which wipes session context so each phase runs in a fresh context without accumulated drift.',
+      'Answers questions about AWS services by retrieving relevant documentation and generating grounded responses with Claude.',
     bullets: [
-      'Twelve slash commands step through planning, phase splitting, test-first building, diff auditing, and commit — each stage runs in its own cleared context so Claude does not carry assumptions from prior work',
-      'Four stdlib Python hooks handle scope drift warnings at end-of-turn, git push confirmation prompts, build log sync reminders, and session state injection after /clear so Claude picks up where it left off',
-      'The installer merges settings.json without clobbering existing hooks and runs a 58-test suite to confirm the install is clean; idempotent and safe to re-run on existing projects',
-      'A routing skill auto-triggers on phrases like "build phase" or "audit"; running /chaperone with no arguments reads current workflow state and tells you the exact next command to run',
+      'Ingestion side: scraped about 120 pages across five AWS services, chunked them (1000 characters, 200-character overlap), embedded with Amazon Titan v2, and indexed in Pinecone',
+      "Query side: embeds your question with the same Titan model, pulls the top 5 matching chunks from Pinecone, and hands them to Claude via Bedrock along with instructions not to answer beyond what's retrieved",
+      "Each ingestion script writes a manifest and checks the previous stage finished before it runs, so a partial failure can't silently corrupt the index",
     ],
-    stack: ['Python', 'Claude Code', 'Slash Commands', 'Python Hooks'],
-    flow: ['plan', 'build', 'audit', 'commit'],
-    githubUrl: 'https://github.com/micronwave/claude-chaperone',
+    stack: [
+      'Python',
+      'Claude (Bedrock)',
+      'Amazon Titan Embeddings',
+      'Pinecone',
+      'AWS Lambda',
+      'API Gateway',
+      'S3',
+      'CloudFront',
+    ],
+    flow: ['docs', 'chunks', 'embed', 'retrieve', 'answer'],
+    githubUrl: 'https://github.com/micronwave/aws-docs-rag',
+    liveUrl: 'https://d3d0zch3u8ca61.cloudfront.net',
+    screenshotUrl: '/screenshot-rag.png',
     status: 'complete',
     detail: {
       problem:
-        "Claude accumulates issues in long sessions by carrying assumptions, filling in gaps it shouldn't, and drifting from scope. Mandatory /clear between every stage fixes this as each phase runs in a fresh context. session_start.py injects previous state after /clear so the thread doesn't break.",
+        "Claude can describe AWS services confidently from training data — which is exactly the problem, since training data isn't the current docs. This pulls the relevant chunks from the actual documentation at query time and builds the prompt around them, so answers come back grounded with source URLs attached. I built it to study for my AWS Cloud Practitioner exam.",
       decisions: [
-        "A one-file fix or a typo doesn't need this workflow, only scoped for multi-phase work. The overhead only pays off when the task spans multiple sessions.",
-        'If codex, gemini, or aider are on PATH, they run the audit pass. If none are present, an isolated fresh subagent handles it.',
-        'Three loop cap on /re-audit keeps the workflow from turning into its own kind of scope drift. /handoff writes a self-contained state file mid workflow and the next session reads it and picks up without you re-explaining what happened.',
+        'S3, EC2, Lambda, DynamoDB, and VPC cover what shows up in almost every AWS architecture question, since a question about one usually involves another.',
+        "A concept that starts near the end of one chunk still shows up at the start of the next, thanks to the 200-character overlap. Retrieval doesn't miss it just because of an arbitrary split boundary.",
+        "Pinecone's free tier over OpenSearch Serverless keeps this around $3 a month instead of $700, for the same architecture. That price difference is what makes it worth running long-term.",
+        'Adding a new AWS service is just adding its URLs to the first ingestion script and re-running it.',
       ],
     },
   },
@@ -193,14 +198,10 @@ export const projects: Project[] = [
     name: 'Narrative Intelligence Engine',
     tagline:
       'Tracks financial narratives across news, SEC filings, and Reddit, scores their momentum, and maps them to S&P 500 tickers.',
-    description:
-      'An 11-stage pipeline running on a 4-hour schedule that clusters documents into narratives and tracks how those narratives grow, shift, and decay. Not a trading system. It watches the stories that move markets, not the markets themselves.',
     bullets: [
-      'Deduplicates incoming documents with LSH MinHash (0.85 Jaccard threshold), clusters survivors into narratives using HDBSCAN, and tracks centroid drift over time as a signal of narrative mutation',
-      'Maps narratives to S&P 500 tickers by computing cosine similarity between narrative embeddings and a pre-built library of ticker embeddings generated from SEC 10-K summaries',
-      'Flags coordinated campaigns: five or more sources posting about the same narrative within 300 seconds triggers the adversarial burst detector',
-      'Uses Claude Haiku for routine topic labeling and Claude Sonnet only for mutation analysis, with a configurable daily token budget cap to keep LLM costs predictable',
-      'FastAPI backend with 66 routes; Next.js frontend with views for signal radar, constellation graph, coordination detection, and velocity-price correlation explorer',
+      "Deduplicates incoming documents with LSH MinHash, then clusters what's left into narratives with HDBSCAN. When a cluster's center drifts over time, that's the signal the narrative is mutating",
+      'Maps each narrative to S&P 500 tickers by comparing its embedding against a library of ticker embeddings built from SEC 10-K summaries',
+      'Flags coordinated campaigns automatically: five or more sources posting the same narrative within 300 seconds trips the adversarial burst detector',
     ],
     stack: [
       'Python',
@@ -221,48 +222,57 @@ export const projects: Project[] = [
       problem:
         'Financial narratives are scattered, so the same story surfaces as an RSS headline, a Reddit thread, and an SEC filing. NIE aggregates those fragments across sources every four hours, clusters them into tracked narratives, and watches how they evolve.',
       decisions: [
-        "The number of active narratives at any moment isn't knowable in advance, HDBSCAN discovers it in the data.",
-        "When a narrative cluster's center shifts semantically, that movement is what gets flagged, not a keyword change or title match.",
-        'Emerging, Growing, Mature, Declining, Dormant lifecycle stages. A dormant narrative that spikes past 0.10 velocity reverts to Growing automatically because going quiet and then spiking is itself a signal.',
-        'The 300-second window in the coordination detector is short enough to catch a coordinated burst, long enough to filter organic spread across sources. False positive filtering is straight forward when sent to Sonnet for analysis.',
+        "The number of active narratives at any moment isn't knowable in advance, so HDBSCAN discovers it in the data instead of using a fixed cluster count.",
+        "When a narrative cluster's center shifts semantically, that's what gets flagged, not a keyword change or title match.",
+        'Narratives move through five lifecycle stages: Emerging, Growing, Mature, Declining, Dormant. A dormant one that spikes past 0.10 velocity reverts straight to Growing, since going quiet and then spiking back up is itself a signal.',
+        'The 300-second coordination window is short enough to catch a real burst but long enough to ignore organic spread across sources. Sonnet handles the false-positive filtering from there.',
       ],
     },
   },
   {
-    name: 'AWS Docs RAG',
+    name: 'Propagandle',
     tagline:
-      'Answers questions about AWS services by retrieving relevant documentation and generating grounded responses with Claude.',
-    description:
-      'A full serverless RAG pipeline deployed on AWS. The ingestion side runs once to scrape, chunk, embed, and index AWS documentation. The query side runs per-request inside Lambda, retrieving the closest document chunks and passing them to Claude via Bedrock.',
+      'A daily five-round trivia game about real historical events, declassified programs, and the myths that get mistaken for them.',
     bullets: [
-      'Scraped about 120 pages across five AWS services, split into 1000-character chunks with 200-character overlap, embedded with Amazon Titan v2 (1024 dimensions), and indexed in Pinecone with cosine similarity',
-      'At query time: embeds the question with the same Titan model, retrieves the top 5 chunks from Pinecone, assembles a grounded prompt with anti-hallucination instructions, calls Claude via Bedrock, and returns the answer with source URLs',
-      'Each ingestion script writes a manifest and checks that the previous stage completed before running, so partial failures do not corrupt the index',
-      'Lambda runs with a scoped IAM policy (Bedrock invoke and CloudWatch only); quota enforcement via API Gateway; the frontend is a single static HTML file on CloudFront',
+      'Four round types pull from a pool of real, sourced historical events and programs, mixed in with fabricated ones written to sound just as plausible',
+      "The daily puzzle is served from a Supabase edge function instead of being baked into the client bundle, so opening dev tools doesn't spoil the day's answers",
+      "Streaks and scores track through an anonymous UUID cookie, so there's no signup wall before your first round",
     ],
-    stack: [
-      'Python',
-      'Claude (Bedrock)',
-      'Amazon Titan Embeddings',
-      'Pinecone',
-      'AWS Lambda',
-      'API Gateway',
-      'S3',
-      'CloudFront',
+    stack: ['React', 'Vite', 'TypeScript', 'Supabase', 'Vercel', 'Vercel OG'],
+    flow: ['issue', 'play', 'reveal', 'share'],
+    liveUrl: 'https://propagandle.com',
+    screenshotUrl: '/screenshot-propagandle.png',
+    status: 'active',
+    detail: {
+      problem:
+        "Most daily browser games either lock everything behind an account or turn into an endless quiz. Propagandle borrows Wordle's shape instead: one short session a day, five rounds, done in a few minutes, nothing to sign up for.",
+      decisions: [
+        'An anonymous UUID cookie handles streaks instead of an account, so there is zero friction on day one. It is a clean migration path to real accounts later if that is ever worth building.',
+        'The daily puzzle is fetched from a Supabase edge function at request time instead of shipping with the client bundle, so the day\'s answers are not just sitting in the page source.',
+        'Hosted on Vercel instead of a dedicated server, since a five-round daily quiz does not need infrastructure to provision, patch, or scale. Deploys are free and there is nothing running that I have to keep alive myself.',
+      ],
+    },
+  },
+  {
+    name: 'Claude Chaperone',
+    tagline:
+      'Installs a plan-build-audit-commit workflow into any Claude Code project with a single command.',
+    bullets: [
+      'Twelve slash commands step through planning, phase splitting, test-first building, diff auditing, and commit. Each stage runs in its own cleared context, so Claude never carries assumptions in from a prior step',
+      "Four Python hooks (no extra dependencies) handle the rest: scope-drift warnings at the end of a turn, a confirmation prompt before git push, build-log sync reminders, and state injection right after /clear so Claude picks up where it left off",
+      "The installer merges into your settings.json without clobbering existing hooks, then runs a 58-test suite to confirm the install is clean. It's idempotent, so it's safe to re-run on a project you've already set up",
     ],
-    flow: ['docs', 'chunks', 'embed', 'retrieve', 'answer'],
-    githubUrl: 'https://github.com/micronwave/aws-docs-rag',
-    liveUrl: 'https://d3d0zch3u8ca61.cloudfront.net',
-    screenshotUrl: '/screenshot-rag.png',
+    stack: ['Python', 'Claude Code', 'Slash Commands', 'Python Hooks'],
+    flow: ['plan', 'build', 'audit', 'commit'],
+    githubUrl: 'https://github.com/micronwave/claude-chaperone',
     status: 'complete',
     detail: {
       problem:
-        "Claude can describe AWS services confidently from training data, which is precisely the issue, training data isn't the current documentation. This RAG retrieves the relevant chunks from the actual docs at query time and builds the prompt around them. Responses come back grounded in reality with source URLs attached. I used this to study for my AWS CP exam.",
+        "In long sessions, Claude accumulates problems: carried-over assumptions, gaps it filled in when it shouldn't have guessed, scope drift. A mandatory /clear between every stage fixes that, since each phase then runs in a fresh context. A hook injects the previous state right after /clear, so the thread doesn't actually break.",
       decisions: [
-        'S3, EC2, Lambda, DynamoDB, and VPC cover what shows up in almost every AWS architecture question, questions about one usually involve another.',
-        'A concept that starts near the end of one chunk appears at the start of the next because of the 200 character chunk overlap. Retrieval does not miss it because of an arbitrary split boundary.',
-        'Pinecone free tier over OpenSearch Serverless keeps it at ~$3/month vs ~$700. Same architecture but that price difference is what made this easily deployable.',
-        'Adding new AWS services is as easy as putting the URLs in the first ingestion script and triggering a rerun.',
+        "A one-file fix or a typo doesn't need this workflow, it's scoped for multi-phase work, where the overhead actually pays for itself.",
+        'If codex, gemini, or aider are on PATH, one of them runs the audit pass. If none are, an isolated fresh subagent handles it instead.',
+        "/re-audit is capped at three loops, so the workflow doesn't turn into its own kind of scope drift. /handoff writes a self-contained state file mid-workflow, and the next session picks it up without you re-explaining what happened.",
       ],
     },
   },

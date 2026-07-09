@@ -8,7 +8,6 @@ interface Props {
 
 const { project } = Astro.props;
 const detailId = `project-detail-${project.name.replace(/\s+/g, '-').toLowerCase()}`;
-const extraBullets = project.bullets.slice(3);
 const flow = project.flow ?? [];
 ---
 
@@ -107,7 +106,7 @@ const flow = project.flow ?? [];
           </div>
         ) : null}
 
-        {project.detail ? (
+        {project.detail && (
           <div class="project-detail-section">
             <span class="project-detail-label">Decisions</span>
             <ul class="project-detail-decisions">
@@ -119,22 +118,6 @@ const flow = project.flow ?? [];
               ))}
             </ul>
           </div>
-        ) : (
-          <>
-            {!project.screenshotUrl && (
-              <div class="project-detail-section">
-                <span class="project-detail-label">Overview</span>
-                <p class="project-detail-desc">{project.description}</p>
-              </div>
-            )}
-            {extraBullets.length > 0 && (
-              <div class="project-detail-section">
-                <ul class="project-detail-bullets">
-                  {extraBullets.map((b) => <li>{b}</li>)}
-                </ul>
-              </div>
-            )}
-          </>
         )}
 
       </div>
