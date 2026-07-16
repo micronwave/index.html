@@ -175,7 +175,7 @@ const HeroSection = memo(function HeroSection({ person }: { person: Person }) {
         <em>{lastName}</em>
       </h1>
       <p className="hero-sub">
-        Building automations and tools that cut out boring, manual work.
+        I build automations that cut manual work and protect revenue.
       </p>
       <div className="hero-links-group">
         <div className="hero-links">

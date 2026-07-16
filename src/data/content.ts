@@ -81,9 +81,9 @@ export const person: Person = {
 
 export const about: About = {
   summary: [
-    "I build and automate the internal systems that cut busy work and protect revenue. My background runs through customer ops, marketing, sales, and finance, and underneath that is a technical layer of backend configuration and API integration.",
+    "I sit between business operations and the tools that run them. I'm close enough to the process to see what's breaking, and technical enough to build the fix. My background runs through customer ops, marketing, sales, and finance, with a layer of backend configuration and API integration underneath.",
 
-    "I've automated workflows, fixed recurring failures, and cleaned up processes that were costing time and money. I like working the whole arc of a problem, from figuring out why something's broken to building the fix that makes it better.",
+    "I've automated workflows, fixed recurring failures, and cleaned up processes that were costing time and money. I like working the whole arc of a problem, from figuring out why something's broken to fixing it.",
 
     "I'm AWS certified and working toward Solutions Architect to have a real technical footing on the infrastructure side of the business. It's also why the projects below skew toward cloud infra, data pipelines, and agent orchestration.",
   ],
@@ -140,11 +140,11 @@ export const projects: Project[] = [
   {
     name: 'Orca',
     tagline:
-      "Splits a goal across multiple AI agents — Claude, Codex, your CI — and won't call it done until every gate passes and the logs prove it.",
+      "Splits a goal across Claude, Codex, and CI, and won't call it done until every gate passes and the logs prove it.",
     bullets: [
-      'Routes each part of a goal to the right agent automatically: Claude implements, Codex reviews, CI gates verify. No copy-pasting context between windows or re-explaining what you\'re doing',
-      'Before any agent starts, the goal gets broken into specific, checkable conditions, like "tests in internal/store must pass", so every agent works against a contract instead of a vague instruction',
-      'Each run gets its own sandboxed capsule: only the files it needs, a token budget, and a set of gates it has to clear before a patch moves forward',
+      'Routes work to the right agent: Claude implements, Codex reviews, CI gates verify',
+      'Breaks each goal into checkable exit conditions, like "tests in internal/store must pass", before any agent runs',
+      'Runs each agent in a sandboxed capsule with only the files it needs, a token budget, and gates to clear',
     ],
     stack: ['Go', 'TypeScript', 'Claude API', 'Codex', 'GitHub API'],
     flow: ['goal', 'plan', 'capsule', 'verify', 'merge'],
@@ -153,21 +153,21 @@ export const projects: Project[] = [
     status: 'active',
     detail: {
       problem:
-        'An agent telling you the tests pass isn\'t the same as an agent showing you the logs. Most agent workflows fall apart right there, you can\'t tell if it actually ran the tests or just said so. Orca decides what "done" means before anything runs, then keeps the proof.',
+        'Agents report success whether or not they earned it. When Claude says the tests pass, you can\'t tell if it ran them or just said so. Orca defines what "done" means before anything runs, checks it mechanically, and keeps the logs as proof.',
       decisions: [
-        "Exit conditions get defined before any agent runs, not negotiated after the fact, so an agent can't quietly decide it's done when it isn't.",
-        "Each agent gets a briefing built from the current goal state, not a replay of the whole conversation. Claude doesn't need Codex's review notes, and Codex doesn't need Claude's implementation history. Keeping them apart is what keeps each one focused.",
-        'Every step gets written to the event log before it runs, so a killed process always has a checkpoint to resume from. Reconstructing state from memory after a crash was never reliable enough to trust.',
+        "Exit conditions are locked in before any agent runs, so an agent can't quietly decide it's done when it isn't.",
+        "Each agent gets a briefing built from the current goal state, not the full conversation. Claude never sees Codex's review notes, and vice versa, which keeps both focused.",
+        'Every step is written to the event log before it executes, so a killed process always has a checkpoint to resume from.',
       ],
     },
   },
   {
     name: 'AWS Docs RAG',
     tagline:
-      'Answers questions about AWS services by retrieving relevant documentation and generating grounded responses with Claude.',
+      'Answers AWS questions from the current documentation, with source URLs attached, for about $3 a month.',
     bullets: [
-      'Ingestion side: scraped about 120 pages across five AWS services, chunked them (1000 characters, 200-character overlap), embedded with Amazon Titan v2, and indexed in Pinecone',
-      "Query side: embeds your question with the same Titan model, pulls the top 5 matching chunks from Pinecone, and hands them to Claude via Bedrock along with instructions not to answer beyond what's retrieved",
+      'Ingestion: scrapes ~120 doc pages across five AWS services, embeds them with Amazon Titan v2, and indexes them in Pinecone',
+      'Query: embeds the question, pulls the top 5 matching chunks, and hands them to Claude with instructions not to answer beyond what was retrieved',
       "Each ingestion script writes a manifest and checks the previous stage finished before it runs, so a partial failure can't silently corrupt the index",
     ],
     stack: [
@@ -187,12 +187,11 @@ export const projects: Project[] = [
     status: 'complete',
     detail: {
       problem:
-        "Claude can describe AWS services confidently from training data — which is exactly the problem, since training data isn't the current docs. This pulls the relevant chunks from the actual documentation at query time and builds the prompt around them, so answers come back grounded with source URLs attached. I built it to study for my AWS Cloud Practitioner exam.",
+        "I built this to study for my AWS Cloud Practitioner exam. Claude describes AWS services confidently from training data, but training data isn't the current docs. This retrieves the relevant doc chunks at query time and builds the prompt around them, so answers come back grounded, with sources.",
       decisions: [
-        'S3, EC2, Lambda, DynamoDB, and VPC cover what shows up in almost every AWS architecture question, since a question about one usually involves another.',
-        "A concept that starts near the end of one chunk still shows up at the start of the next, thanks to the 200-character overlap. Retrieval doesn't miss it just because of an arbitrary split boundary.",
-        "Pinecone's free tier over OpenSearch Serverless keeps this around $3 a month instead of $700, for the same architecture. That price difference is what makes it worth running long-term.",
-        'Adding a new AWS service is just adding its URLs to the first ingestion script and re-running it.',
+        'S3, EC2, Lambda, DynamoDB, and VPC cover most AWS architecture questions, and a question about one usually involves another.',
+        'Chunks are 1000 characters with a 200-character overlap, so a concept that spans a split boundary still surfaces in retrieval.',
+        "Pinecone's free tier runs about $3 a month where OpenSearch Serverless would run $700, for the same architecture.",
       ],
     },
   },
@@ -201,9 +200,9 @@ export const projects: Project[] = [
     tagline:
       'Tracks financial narratives across news, SEC filings, and Reddit, scores their momentum, and maps them to S&P 500 tickers.',
     bullets: [
-      "Deduplicates incoming documents with LSH MinHash, then clusters what's left into narratives with HDBSCAN. When a cluster's center drifts over time, that's the signal the narrative is mutating",
-      'Maps each narrative to S&P 500 tickers by comparing its embedding against a library of ticker embeddings built from SEC 10-K summaries',
-      'Flags coordinated campaigns automatically: five or more sources posting the same narrative within 300 seconds trips the adversarial burst detector',
+      "Deduplicates incoming documents with LSH MinHash, then clusters what's left into narratives with HDBSCAN",
+      'Maps each narrative to S&P 500 tickers by comparing embeddings against a library built from SEC 10-K summaries',
+      'Flags coordinated campaigns: five or more sources posting the same narrative within 300 seconds trips the burst detector',
     ],
     stack: [
       'Python',
@@ -222,12 +221,12 @@ export const projects: Project[] = [
     status: 'complete',
     detail: {
       problem:
-        'Financial narratives are scattered, so the same story surfaces as an RSS headline, a Reddit thread, and an SEC filing. NIE aggregates those fragments across sources every four hours, clusters them into tracked narratives, and watches how they evolve.',
+        'The same financial story surfaces as an RSS headline, a Reddit thread, and an SEC filing. NIE pulls those fragments together every four hours, clusters them into tracked narratives, and watches how they evolve.',
       decisions: [
-        "The number of active narratives at any moment isn't knowable in advance, so HDBSCAN discovers it in the data instead of using a fixed cluster count.",
-        "When a narrative cluster's center shifts semantically, that's what gets flagged, not a keyword change or title match.",
-        'Narratives move through five lifecycle stages: Emerging, Growing, Mature, Declining, Dormant. A dormant one that spikes past 0.10 velocity reverts straight to Growing, since going quiet and then spiking back up is itself a signal.',
-        'The 300-second coordination window is short enough to catch a real burst but long enough to ignore organic spread across sources. Sonnet handles the false-positive filtering from there.',
+        "The number of active narratives isn't knowable in advance, so HDBSCAN discovers it from the data rather than using a fixed cluster count.",
+        "A narrative counts as mutating when its cluster center shifts semantically, not when a keyword or title changes.",
+        'Narratives move through five lifecycle stages, Emerging through Dormant. A dormant one that spikes past 0.10 velocity reverts straight to Growing, since going quiet and spiking back is itself a signal.',
+        'The coordination window is tuned to catch real bursts while ignoring organic spread across sources; Sonnet filters the false positives from there.',
       ],
     },
   },
@@ -236,9 +235,9 @@ export const projects: Project[] = [
     tagline:
       'A daily five-round trivia game about real historical events, declassified programs, and the myths that get mistaken for them.',
     bullets: [
-      'Four round types pull from a pool of real, sourced historical events and programs, mixed in with fabricated ones written to sound just as plausible',
-      "The daily puzzle is served from a Supabase edge function instead of being baked into the client bundle, so opening dev tools doesn't spoil the day's answers",
-      "Streaks and scores track through an anonymous UUID cookie, so there's no signup wall before your first round",
+      'Four round types pull from a pool of real, sourced historical events and programs, mixed with fabricated ones written to sound just as plausible',
+      'One puzzle a day, done in a few minutes: guess, reveal, keep the streak going',
+      'No account needed — streaks and scores start tracking from the first round',
     ],
     stack: ['React', 'Vite', 'TypeScript', 'Supabase', 'Vercel', 'Vercel OG'],
     flow: ['issue', 'play', 'reveal', 'share'],
@@ -247,11 +246,11 @@ export const projects: Project[] = [
     status: 'active',
     detail: {
       problem:
-        "Most daily browser games either lock everything behind an account or turn into an endless quiz. Propagandle borrows Wordle's shape instead: one short session a day, five rounds, done in a few minutes, nothing to sign up for.",
+        "Daily browser games tend to demand an account or sprawl into an endless quiz. Propagandle borrows Wordle's shape: five rounds, a few minutes, nothing to sign up for.",
       decisions: [
-        'An anonymous UUID cookie handles streaks instead of an account, so there is zero friction on day one. It is a clean migration path to real accounts later if that is ever worth building.',
-        'The daily puzzle is fetched from a Supabase edge function at request time instead of shipping with the client bundle, so the day\'s answers are not just sitting in the page source.',
-        'Hosted on Vercel instead of a dedicated server, since a five-round daily quiz does not need infrastructure to provision, patch, or scale. Deploys are free and there is nothing running that I have to keep alive myself.',
+        'An anonymous UUID cookie tracks streaks instead of an account. Zero friction on day one, with a clean migration path to real accounts later.',
+        "The daily puzzle comes from a Supabase edge function at request time, so the answers never ship in the page source.",
+        'Fabricated entries are written to match the tone and specificity of the real ones. The game only works if the fakes are as believable as the truth.',
       ],
     },
   },
@@ -260,9 +259,9 @@ export const projects: Project[] = [
     tagline:
       'Installs a plan-build-audit-commit workflow into any Claude Code project with a single command.',
     bullets: [
-      'Twelve slash commands step through planning, phase splitting, test-first building, diff auditing, and commit. Each stage runs in its own cleared context, so Claude never carries assumptions in from a prior step',
-      "Four Python hooks (no extra dependencies) handle the rest: scope-drift warnings at the end of a turn, a confirmation prompt before git push, build-log sync reminders, and state injection right after /clear so Claude picks up where it left off",
-      "The installer merges into your settings.json without clobbering existing hooks, then runs a 58-test suite to confirm the install is clean. It's idempotent, so it's safe to re-run on a project you've already set up",
+      'Twelve slash commands step through planning, test-first building, diff auditing, and commit, each stage in its own cleared context',
+      'Dependency-free Python hooks handle scope-drift warnings, a confirmation prompt before git push, and state injection right after /clear',
+      'The installer merges into settings.json without clobbering existing hooks, runs its test suite to verify, and is safe to re-run',
     ],
     stack: ['Python', 'Claude Code', 'Slash Commands', 'Python Hooks'],
     flow: ['plan', 'build', 'audit', 'commit'],
@@ -270,11 +269,12 @@ export const projects: Project[] = [
     status: 'complete',
     detail: {
       problem:
-        "In long sessions, Claude accumulates problems: carried-over assumptions, gaps it filled in when it shouldn't have guessed, scope drift. A mandatory /clear between every stage fixes that, since each phase then runs in a fresh context. A hook injects the previous state right after /clear, so the thread doesn't actually break.",
+        "In long sessions, Claude accumulates problems: carried-over assumptions, gaps it guessed at, scope drift. A mandatory /clear between stages fixes that, and a hook injects the previous state right after, so the thread doesn't actually break.",
       decisions: [
-        "A one-file fix or a typo doesn't need this workflow, it's scoped for multi-phase work, where the overhead actually pays for itself.",
-        'If codex, gemini, or aider are on PATH, one of them runs the audit pass. If none are, an isolated fresh subagent handles it instead.',
-        "/re-audit is capped at three loops, so the workflow doesn't turn into its own kind of scope drift. /handoff writes a self-contained state file mid-workflow, and the next session picks it up without you re-explaining what happened.",
+        "It's scoped for multi-phase work, where the overhead pays for itself. A one-file fix doesn't need a workflow.",
+        'If codex, gemini, or aider are on PATH, one of them runs the audit pass. Otherwise a fresh subagent handles it.',
+        "/re-audit is capped at three loops, so the workflow can't turn into its own kind of scope drift.",
+        '/handoff writes a self-contained state file mid-workflow, and the next session picks it up without re-explaining anything.',
       ],
     },
   },
