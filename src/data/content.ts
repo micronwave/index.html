@@ -4,7 +4,6 @@ export interface Person {
   name: string;
   tagline: string;
   email: string;
-  phone: string;
   location: string;
   portfolio: string;
   linkedin: string;
@@ -23,9 +22,8 @@ export interface ExperienceEntry {
   dates: string;
   bullets: string[];
   tags: string[];
-  startHour?: number;
-  startMinute?: number;
-  startSecond?: number;
+  /** ISO datetime the uptime counter starts from (for "Present" roles) */
+  startDate?: string;
 }
 
 export interface ProjectDetail {
@@ -42,6 +40,8 @@ export interface Project {
   githubUrl?: string;
   liveUrl?: string;
   screenshotUrl?: string;
+  screenshotWidth?: number;
+  screenshotHeight?: number;
   status: 'active' | 'complete' | 'prototype' | 'archived';
   detail?: ProjectDetail;
 }
@@ -71,9 +71,8 @@ export const person: Person = {
   name: 'Aaron Altergott',
   tagline: 'Operations Engineer',
   email: 'adaltergott@gmail.com',
-  phone: '(909) 280-1882',
   location: 'Redlands, CA',
-  portfolio: 'https://aaronaltergott.cv',
+  portfolio: 'https://altergott.dev',
   linkedin: 'https://www.linkedin.com/in/aaronaltergott/',
   github: 'https://github.com/micronwave',
   resumeUrl: '/Aaron_Altergott_Resume.pdf',
@@ -95,9 +94,7 @@ export const experience: ExperienceEntry[] = [
     role: 'Operations Specialist',
     location: 'Redlands, CA',
     dates: 'Nov 2024 – Present',
-    startHour: 8,
-    startMinute: 17,
-    startSecond: 43,
+    startDate: '2024-11-01T08:17:43',
     bullets: [
       'Reduced past-due balances by 13% by implementing SMS automation in CallPotential, integrating customer data via the SiteLink API to trigger payment reminders',
       'Constructed an automated competitor pricing dashboard for the COO using Python, Playwright, and the Google Sheets API, replacing manual spreadsheets with real-time data insights',
@@ -113,9 +110,7 @@ export const experience: ExperienceEntry[] = [
     role: 'Partnerships Lead (Volunteer)',
     location: 'Remote',
     dates: 'Apr 2026 – Present',
-    startHour: 402,
-    startMinute: 42,
-    startSecond: 11,
+    startDate: '2026-04-17T18:42:11',
     bullets: [
       'Built an n8n pipeline on Oracle Cloud\'s free tier that syncs sponsor deal stages between Notion and HubSpot daily so Null leadership can track progress',
       'Lead sponsor outreach for a cybersecurity research group, coordinated with leadership to secure 2 gear sponsorships',
@@ -150,6 +145,8 @@ export const projects: Project[] = [
     flow: ['goal', 'plan', 'capsule', 'verify', 'merge'],
     githubUrl: 'https://github.com/micronwave/orca',
     screenshotUrl: '/screenshot-orca.png',
+    screenshotWidth: 624,
+    screenshotHeight: 447,
     status: 'active',
     detail: {
       problem:
@@ -184,6 +181,8 @@ export const projects: Project[] = [
     githubUrl: 'https://github.com/micronwave/aws-docs-rag',
     liveUrl: 'https://d3d0zch3u8ca61.cloudfront.net',
     screenshotUrl: '/screenshot-rag.png',
+    screenshotWidth: 1011,
+    screenshotHeight: 674,
     status: 'complete',
     detail: {
       problem:
@@ -218,6 +217,8 @@ export const projects: Project[] = [
     flow: ['sources', 'cluster', 'score', 'map'],
     githubUrl: 'https://github.com/micronwave/market-narrative-engine',
     screenshotUrl: '/screenshot-nie.png',
+    screenshotWidth: 932,
+    screenshotHeight: 578,
     status: 'complete',
     detail: {
       problem:
@@ -242,7 +243,9 @@ export const projects: Project[] = [
     stack: ['React', 'Vite', 'TypeScript', 'Supabase', 'Vercel', 'Vercel OG'],
     flow: ['issue', 'play', 'reveal', 'share'],
     liveUrl: 'https://propagandle.com',
-    screenshotUrl: '/screenshot-propagandle.png',
+    screenshotUrl: '/screenshot-propagandle.webp',
+    screenshotWidth: 1200,
+    screenshotHeight: 809,
     status: 'active',
     detail: {
       problem:

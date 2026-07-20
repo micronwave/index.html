@@ -1,15 +1,29 @@
 ---
+import { person } from '../data/content';
+
 interface Props {
   title?: string;
   description?: string;
 }
 
 const {
-  title = 'Aaron Altergott',
+  title = 'Aaron Altergott — Operations Engineer',
   description = 'Operations engineer building automations that cut manual work and protect revenue.',
 } = Astro.props;
 
-const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
+const siteUrl = 'https://altergott.dev';
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl);
+const ogImageUrl = new URL('/og-image.png', siteUrl);
+
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: person.name,
+  jobTitle: person.tagline,
+  url: person.portfolio,
+  email: `mailto:${person.email}`,
+  sameAs: [person.github, person.linkedin],
+};
 ---
 
 <!doctype html>
@@ -21,23 +35,37 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl.href} />
 
+    <meta name="theme-color" content="#0e0d0a" />
+
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl.href} />
+    <meta property="og:image" content={ogImageUrl.href} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl.href} />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=5" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Mono&family=Libre+Baskerville:ital@0;1&display=swap"
       rel="stylesheet"
     />
+
+    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+
+    <noscript>
+      <style>
+        .reveal { opacity: 1 !important; transform: none !important; }
+      </style>
+    </noscript>
   </head>
   <body>
     <slot />
@@ -55,11 +83,14 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     --bg-deep:      #0e0d0a;
     --bg-surface:   #1a1814;
     --accent:       #d4a855;
-    --green:        #5c7a4d;
+    --green:        #6e8961;
     --text:         #e0daca;
     --text-dim:     #908a7c;
-    --text-faint:   #5a554a;
+    --text-faint:   #7e7a72;
     --border:       #2a2620;
+    /* Hairline rules only — kept at the old --text-faint value so the AA text
+       fix doesn't brighten decorative dividers. Not used for text. */
+    --divider:      #5a554a;
     --font-heading: 'Libre Baskerville', Georgia, serif;
     --font-body:    'DM Mono', 'Menlo', monospace;
     --font-mono:    'DM Mono', 'Menlo', monospace;
@@ -92,7 +123,9 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
   }
   a:hover { color: var(--green); }
 
-  a:focus-visible {
+  a:focus-visible,
+  .hero-link:focus-visible,
+  .nav-hamburger:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 4px;
     border-radius: 2px;
@@ -207,6 +240,7 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     cursor: pointer;
     font-family: var(--font-mono);
     font-size: 12px;
+    line-height: 1.6;
     letter-spacing: 0.04em;
     color: var(--accent);
     display: inline-flex;
@@ -490,7 +524,7 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     left: 20%;
     width: 60%;
     height: 1px;
-    background: var(--text-faint);
+    background: var(--divider);
   }
   .exp-item:last-child::after { display: none; }
 
@@ -566,7 +600,7 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     left: 20%;
     width: 60%;
     height: 1px;
-    background: var(--text-faint);
+    background: var(--divider);
   }
   .project-item:last-child::after { display: none; }
 
@@ -690,7 +724,7 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     border: none;
     cursor: pointer;
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 0.07em;
     text-transform: lowercase;
     color: var(--green);
@@ -785,36 +819,6 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
   .project-detail.open .project-detail-content > *:nth-child(3) { animation-delay: 0.28s; }
   .project-detail.open .project-detail-content > *:nth-child(4) { animation-delay: 0.36s; }
 
-  /* Stat ledger */
-  .stat-ledger {
-    display: grid;
-    margin-bottom: 8px;
-  }
-  .stat-row {
-    display: grid;
-    grid-template-columns: 54px 1fr;
-    gap: 20px;
-    align-items: baseline;
-    padding: 8px 0;
-    border-top: 1px solid rgba(92, 122, 77, 0.13);
-  }
-  .stat-row:last-child {
-    border-bottom: 1px solid rgba(92, 122, 77, 0.13);
-  }
-  .stat-value {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--accent);
-    text-align: right;
-    letter-spacing: 0.04em;
-  }
-  .stat-label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    color: var(--text-dim);
-  }
-
   /* Sections */
   .project-detail-section {
     display: flex;
@@ -824,11 +828,6 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
   .project-detail-section + .project-detail-section {
     padding-top: 18px;
     border-top: 1px solid rgba(92, 122, 77, 0.22);
-  }
-  /* First section after the stat ledger */
-  .stat-ledger + .project-detail-section {
-    border-top: none;
-    padding-top: 0;
   }
 
   .project-detail-label {
@@ -971,6 +970,10 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
   .project-preview-frame:hover .project-preview-img {
     filter: saturate(1) brightness(1);
   }
+  /* Touch devices never hover, so the resting tint would be permanent there. */
+  @media (hover: none) {
+    .project-preview-img { filter: none; }
+  }
 
   /* ── Contact ── */
   .contact-content {
@@ -982,8 +985,7 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
   .contact-cta {
     font-family: var(--font-heading);
     font-size: clamp(14px, 1.5vw, 18px);
-    font-weight: 500;
-    color: var(--text-muted, #888);
+    color: var(--text-dim);
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }
@@ -1097,7 +1099,7 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     font-size: 11px;
     letter-spacing: 0.03em;
     color: var(--accent);
-    opacity: 0.65;
+    opacity: 0.7;
   }
 
   /* ── Scroll Reveals ── */
@@ -1156,12 +1158,15 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     border-bottom: 1px solid var(--border);
     transform: translateY(-8px);
     opacity: 0;
-    transition: transform 0.25s ease, opacity 0.2s ease;
+    visibility: hidden;
+    transition: transform 0.25s ease, opacity 0.2s ease, visibility 0s linear 0.25s;
     pointer-events: none;
   }
   .mobile-menu.open {
     opacity: 1;
     transform: translateY(0);
+    visibility: visible;
+    transition: transform 0.25s ease, opacity 0.2s ease, visibility 0s;
     pointer-events: auto;
   }
 
@@ -1364,7 +1369,7 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
     .hero-email-drop .hero-copy-btn::after {
       content: '';
       position: absolute;
-      inset: -14px -10px;
+      inset: -14px -13px;
     }
     .about-sidebar {
       grid-template-columns: 1fr 1fr;
@@ -1388,10 +1393,24 @@ const canonicalUrl = new URL(Astro.url.pathname, 'https://aaronaltergott.cv');
   }
 
   @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
     .reveal {
       opacity: 1;
       transform: none;
       transition: none;
+    }
+    .project-status.active {
+      animation: none;
+      background: rgba(212, 168, 85, 0.22);
+    }
+    .project-detail,
+    .project-detail.open {
+      transition: none;
+    }
+    .project-detail.open .project-detail-content > * {
+      animation: none;
     }
   }
 

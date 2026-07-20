@@ -70,7 +70,9 @@ const { projects } = Astro.props;
         obs.unobserve(e.target);
       }
     }),
-    { threshold: 0.12 }
+    // See useReveal in PortfolioInterface.tsx — anything at or above the
+    // viewport counts as seen so instant scroll jumps don't skip reveals.
+    { threshold: 0.12, rootMargin: '100000px 0px 0px 0px' }
   );
   document.querySelectorAll('#projects .section-header.reveal').forEach(el => obs.observe(el));
 </script>

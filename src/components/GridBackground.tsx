@@ -113,14 +113,22 @@ export default function GridBackground({ reducedMotion, fadeIn }: { reducedMotio
       }
     }
 
+    function onMobileQueryChange() {
+      stopAnimation();
+      drawAurora(performance.now(), true);
+      if (document.visibilityState !== 'hidden') startAnimation();
+    }
+
     resize();
     window.addEventListener('resize', onResize);
     document.addEventListener('visibilitychange', onVisibilityChange);
+    mobileQuery.addEventListener('change', onMobileQueryChange);
     startAnimation();
 
     return () => {
       window.removeEventListener('resize', onResize);
       document.removeEventListener('visibilitychange', onVisibilityChange);
+      mobileQuery.removeEventListener('change', onMobileQueryChange);
       cancelAnimationFrame(auroraRafRef.current);
       if (auroraTimeout) clearTimeout(auroraTimeout);
       cancelAnimationFrame(resizeRaf);

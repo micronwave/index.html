@@ -51,7 +51,11 @@ function useReveal(threshold = 0.12) {
           obs.unobserve(el);
         }
       },
-      { threshold }
+      // Huge top margin: anything at or above the viewport counts as already
+      // seen, so instant jumps (End key, scrollbar drag, Ctrl+F) don't leave
+      // skipped-over headings stuck at opacity 0. Reveal-on-scroll-down is
+      // unchanged — elements below still have to enter normally.
+      { threshold, rootMargin: '100000px 0px 0px 0px' }
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -63,6 +67,7 @@ function useReveal(threshold = 0.12) {
 
 const NAV_LINKS = [
   { href: '#about', label: 'about' },
+  { href: '#skills', label: 'skills' },
   { href: '#experience', label: 'experience' },
   { href: '#projects', label: 'projects' },
   { href: '#contact', label: 'contact' },
@@ -320,7 +325,7 @@ const AboutSection = memo(function AboutSection({
 // ── Skills ────────────────────────────────────────────────────────────────
 
 const SKILL_CONFIG: Record<string, { color: string; anchors: string[] }> = {
-  'Cloud':   { color: '#5c7a4d', anchors: ['AWS (Bedrock, Lambda, S3, CloudFront, API Gateway, IAM, CloudWatch, CLI)'] },
+  'Cloud':   { color: 'var(--green)', anchors: ['AWS (Bedrock, Lambda, S3, CloudFront, API Gateway, IAM, CloudWatch, CLI)'] },
   'AI / ML': { color: '#6e8d3f', anchors: ['RAG', 'Semantic Search', 'Embeddings'] },
   'Backend': { color: '#a09b3c', anchors: ['Python', 'SQL', 'REST APIs'] },
   'Tools':   { color: '#c4a648', anchors: ['HubSpot', 'Retool', 'n8n'] },
@@ -357,10 +362,6 @@ const SkillsSection = memo(function SkillsSection({ skills }: { skills: SkillGro
 
 // ── Experience ────────────────────────────────────────────────────────────
 
-const MONTHS: Record<string, number> = {
-  Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11,
-};
-
 let currentSecond = Date.now();
 let uptimeInterval: ReturnType<typeof setInterval> | null = null;
 const uptimeListeners = new Set<() => void>();
@@ -385,25 +386,12 @@ function subscribeToUptime(listener: () => void) {
 const getCurrentSecond = () => currentSecond;
 const getServerSecond = () => 0;
 
-const UptimeChip = memo(function UptimeChip({
-  dates,
-  startHour = 0,
-  startMinute = 0,
-  startSecond = 0,
-}: {
-  dates: string;
-  startHour?: number;
-  startMinute?: number;
-  startSecond?: number;
-}) {
+const UptimeChip = memo(function UptimeChip({ startDate }: { startDate: string }) {
   const now = useSyncExternalStore(subscribeToUptime, getCurrentSecond, getServerSecond);
   const startTime = useMemo(() => {
-    const match = dates.match(/^([A-Za-z]+)\s+(\d{4})/);
-    if (!match) return null;
-    const month = MONTHS[match[1]!];
-    if (month === undefined) return null;
-    return new Date(parseInt(match[2]!), month, 1, startHour, startMinute, startSecond).getTime();
-  }, [dates, startHour, startMinute, startSecond]);
+    const time = new Date(startDate).getTime();
+    return Number.isNaN(time) ? null : time;
+  }, [startDate]);
 
   const label = useMemo(() => {
     if (!startTime || now === 0) return;
@@ -430,13 +418,8 @@ const ExperienceItem = memo(function ExperienceItem({ entry }: { entry: Experien
     <div className="exp-item">
       <div className="exp-meta">
         <span className="exp-dates">{entry.dates}</span>
-        {entry.dates.includes('Present') && (
-          <UptimeChip
-            dates={entry.dates}
-            startHour={entry.startHour ?? 0}
-            startMinute={entry.startMinute ?? 0}
-            startSecond={entry.startSecond ?? 0}
-          />
+        {entry.dates.includes('Present') && entry.startDate && (
+          <UptimeChip startDate={entry.startDate} />
         )}
         <span className="exp-company">{entry.company}</span>
         <span className="exp-location">{entry.location}</span>
@@ -581,8 +564,8 @@ export default function PortfolioInterface({
   return (
     <>
       <GridBackground reducedMotion={reducedMotion} fadeIn={backgroundReady} />
+      <SiteNav name={person.name} />
       <main>
-        <SiteNav name={person.name} />
         <HeroSection person={person} />
         <AboutSection
           about={about}
@@ -594,8 +577,8 @@ export default function PortfolioInterface({
         <ExperienceSection experience={experience} />
         {children}
         <ContactSection person={person} />
-        <SiteFooter name={person.name} />
       </main>
+      <SiteFooter name={person.name} />
     </>
   );
 }

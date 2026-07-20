@@ -13,7 +13,7 @@ const flow = project.flow ?? [];
 
 <div class="project-item">
   <div class="project-top">
-    <span class="project-name">{project.name}</span>
+    <h3 class="project-name">{project.name}</h3>
     <span class={`project-status ${project.status}`}>{project.status}</span>
   </div>
   <p class="project-tagline">{project.tagline}</p>
@@ -76,6 +76,8 @@ const flow = project.flow ?? [];
                   src={project.screenshotUrl}
                   alt={`${project.name} interface`}
                   class="project-preview-img"
+                  width={project.screenshotWidth}
+                  height={project.screenshotHeight}
                   loading="lazy"
                   decoding="async"
                 />
@@ -94,6 +96,8 @@ const flow = project.flow ?? [];
                 src={project.screenshotUrl}
                 alt={`${project.name} interface`}
                 class="project-preview-img"
+                width={project.screenshotWidth}
+                height={project.screenshotHeight}
                 loading="lazy"
                 decoding="async"
               />

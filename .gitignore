@@ -13,6 +13,14 @@ dist/
 # Logs and temp verification artifacts
 *.log
 _verify_tmp.js
+live.html
+
+# Working notes / planning docs
+content-draft.md
+idea.md
+prebuild.md
+frontend_changes
+phases/
 
 # OS
 .DS_Store

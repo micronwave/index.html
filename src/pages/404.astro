@@ -1,0 +1,33 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Page not found — Aaron Altergott" description="This page doesn't exist.">
+  <main class="page-wrapper not-found">
+    <span class="hero-label">404</span>
+    <h1>Page <em>not found</em></h1>
+    <p class="hero-sub">Nothing lives at this address. The portfolio is one page, and this isn't it.</p>
+    <a class="resume-link" href="/">Back to home</a>
+  </main>
+</Layout>
+
+<style>
+  .not-found {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 24px;
+  }
+  .not-found h1 {
+    font-family: var(--font-heading);
+    font-size: clamp(40px, 7vw, 72px);
+    line-height: 1.05;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+  .not-found h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+</style>
