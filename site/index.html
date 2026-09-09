@@ -1,0 +1,1639 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Aaron Altergott — Operations Engineer</title>
+<meta name="theme-color" content="#e9e9e3" />
+<meta name="description" content="Aaron Altergott — operations engineer in SoCal. Operations, automation, and cloud infrastructure." />
+<link rel="canonical" href="https://altergott.dev/" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Aaron Altergott" />
+<meta property="og:title" content="Aaron Altergott — Operations Engineer" />
+<meta property="og:description" content="Aaron Altergott — operations engineer in SoCal. Operations, automation, and cloud infrastructure." />
+<meta property="og:url" content="https://altergott.dev/" />
+<meta property="og:image" content="https://altergott.dev/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Aaron Altergott — Operations Engineer" />
+<meta name="twitter:description" content="Aaron Altergott — operations engineer in SoCal. Operations, automation, and cloud infrastructure." />
+<meta name="twitter:image" content="https://altergott.dev/og-image.png" />
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Person","name":"Aaron Altergott","jobTitle":"Operations Engineer","url":"https://altergott.dev","email":"mailto:adaltergott@gmail.com","sameAs":["https://github.com/micronwave","https://www.linkedin.com/in/aaronaltergott/"]}
+</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23e9e9e3'/%3E%3Crect x='13' y='4' width='6' height='24' fill='%23dd2f19'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..800,0..100,0..1;1,9..144,300..800,0..100,0..1&display=swap" rel="stylesheet" />
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   A contents page that opens in place.
+   One typeface (Fraunces, wonked and unsoftened), three inks,
+   real rules. No mono, no grain, no gradients.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --snap:  cubic-bezier(.5, 0, .2, 1);   /* mechanical, decisive */
+
+  /* ink — three greys, each with one job. ink-3 is darkened from #787b81
+     so it clears 4.5:1 on paper; ink-4 is the only grey that is never text. */
+  --paper:   #e9e9e3;
+  --ink:     #15171a;   /* 11.4:1 — headings, structural rules, emphasis   */
+  --ink-2:   #52565c;   /*  6.1:1 — body copy                              */
+  --ink-3:   #656870;   /*  4.6:1 — captions, tags, closed register labels */
+  --ink-4:   #9a9da3;   /*   —    — decoration only (dot leaders)          */
+
+  --red:     #dd2f19;   /* marks, rules, fills                             */
+  --red-ink: #c22a16;   /*  4.7:1 — the same accent when it has to be read */
+
+  /* the red's opposite number, for the one thing that is finished rather than
+     moving. green carries more luminance than red at the same saturation, so
+     the readable one has to sit darker than --red-ink to clear the same bar. */
+  --green:     #1f8f57;   /*  3.2:1 — the tick, a mark and never text        */
+  --green-ink: #1c7046;   /*  5.0:1 — the accent when it has to be read      */
+
+  /* the tick, as a shape to mask --green through. it runs to the edges of its
+     viewBox so `contain` fills the dot's box, and the stroke is heavy because
+     the box is five pixels across at the size this sits in. */
+  --tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M.9 6.4 4.4 10.2 11.1 1.9' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+
+  /* rules — four weights, so structure always outranks subdivision */
+  --rule-strong: rgba(21,23,26,.45);  /* closes a block inside a band     */
+  --rule-soft:   rgba(21,23,26,.20);  /* column dividers, sat in a gutter */
+  --rule-hair:   rgba(21,23,26,.11);  /* between list items               */
+
+  /* type — seven steps, and nothing in between */
+  --t-display: clamp(26px,   3.6cqi,  46px);
+  --t-lede:    clamp(18px,   2.4cqi,  32px);
+  --t-word:    clamp(19px,   2.15cqi, 27px);
+  --t-title:   clamp(15px,   1.7cqi,  22px);
+  --t-sub:     clamp(14px,   1.36cqi, 17px);
+  --t-body:    clamp(13px,   1.19cqi, 15px);
+  --t-small:   clamp(12.6px, 1.14cqi, 14.2px);
+
+  /* one grid: twelve columns, one gutter, every band */
+  --gutter: clamp(18px, 2.4cqi, 42px);
+  --rail:   clamp(14px, 1.9vw, 30px);   /* where the revision bar sits */
+
+  --pad-x: clamp(30px, 4vw, 62px);
+  --pad-y: clamp(15px, 2.1vh, 25px);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* the page is one screen and never scrolls, so the screen has to be the one
+   the reader can actually see. a percentage resolves against the initial
+   containing block, which on a phone is the *large* viewport — the height the
+   window would have with the toolbar retracted — so the sheet ran taller than
+   the glass and the foot sat behind the address bar with no way to scroll to
+   it. svh, not dvh: dvh tracks the toolbar as it moves, and every one of those
+   frames is a resize, a new room, and a fresh bullet count in the work
+   register. the small viewport is the one height that never moves.
+   the plain 100% stays underneath it for anything that has no svh. */
+html, body { height: 100%; height: 100svh; }
+body {
+  overflow: hidden;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Fraunces', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  font-optical-sizing: auto;
+  font-variation-settings: 'SOFT' 0, 'WONK' 1;
+  -webkit-font-smoothing: antialiased;
+  display: grid;
+}
+
+button, a { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; text-decoration: none; }
+li { list-style: none; }
+[hidden] { display: none !important; }
+::selection { background: var(--red); color: var(--paper); }
+:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+
+i, .it { font-style: italic; }
+
+/* ── sheet ─────────────────────────────────────────────────── */
+
+.sheet {
+  container-type: inline-size;
+  width: 100%; max-width: 1360px;
+  height: 100%; max-height: 900px;
+  margin: auto;
+  padding: var(--pad-y) var(--pad-x);
+  display: grid;
+  grid-template-rows: auto minmax(0,1fr) auto;
+}
+
+/* ── head ──────────────────────────────────────────────────── */
+
+.head {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 24px; padding-bottom: clamp(10px, 1.5vh, 16px);
+}
+.head h1 {
+  font-size: var(--t-display);
+  font-weight: 600;
+  letter-spacing: -.032em;
+  line-height: .92;
+}
+.head .sub {
+  margin-top: 7px;
+  font-size: var(--t-body);
+  color: var(--ink-2);
+}
+.head .sub em { font-style: italic; color: var(--ink); }
+
+/* the interpuncts are flex items too, so the gap has to stay small enough
+   that "email · github" reads as one run, not three */
+.contact { display: flex; align-items: baseline; gap: clamp(7px, .85cqi, 11px); font-size: var(--t-body); }
+/* the interpuncts only — the copy button carries spans of its own, and they
+   set their own ink */
+.contact > span { color: var(--ink-4); }
+.a { color: var(--ink-2); transition: color .1s linear; }
+.a:hover {
+  color: var(--red-ink);
+  text-decoration: underline; text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px; text-decoration-color: currentColor;
+}
+
+/* the two places that link off the page carry a resting underline, so they
+   read as links before you touch them */
+.contact .a, .plinks .a, .creds .a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--rule-soft);
+}
+.contact .a:hover, .plinks .a:hover, .creds .a:hover { text-decoration-thickness: 1.5px; }
+
+/* the address copies rather than handing you off to a mail client, so the
+   link has to say so afterwards. both words sit in one grid cell and the cell
+   is given the width of whichever is showing: the word that is leaving slides
+   out to the left as the word arriving slides in from the right, and the box
+   travels between the two widths with them. the row is set from its right
+   edge, so all of that movement happens to the left of this button — the
+   interpuncts and the two links beside it never shift. the underline belongs
+   to the word rather than the button for the same reason: on the cell it
+   would run the full width and overhang the shorter of the two. */
+.contact .copy { display: inline-block; text-decoration: none; }
+/* clipped, not overflow-hidden: an overflow box takes its baseline from its
+   bottom edge, and this sits in a baseline row next to two real links. the
+   inset opens the top and bottom so nothing crops the descender or the tick. */
+.cface {
+  display: inline-grid;
+  clip-path: inset(-.45em 0);
+  /* both widths are measured once the face is set — until then the cell holds
+     the wider word, which is wrong by a few pixels and never wrong enough to
+     see. transitioning width needs two lengths, so neither can stay a keyword. */
+  width: var(--w-rest, max-content);
+  /* the box travels for the whole gesture, under both halves of the hand-off */
+  transition: width .44s var(--snap);
+}
+.copy.is-copied .cface { width: var(--w-done, max-content); }
+.cw {
+  grid-area: 1 / 1;
+  /* sized to its own words, not to the cell: the cell is the width of the other
+     one for half of every swap, and a stretched item would be cut to fit it */
+  justify-self: start;
+  white-space: nowrap;
+  /* a hand-off, not a cross-fade: whichever word is leaving goes at once, and
+     the one arriving waits for the cell to be empty before it starts. the two
+     delays swap with the state, so the swap reads the same in both directions. */
+  transition: transform .34s var(--snap), opacity .15s linear;
+}
+.cw.rest {
+  transition-delay: .13s;   /* in this state it is the one arriving */
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--rule-soft);
+}
+/* the resting underline takes the accent on hover exactly as the two real
+   links beside it do — the rule lives on the word, so the override has to too */
+.copy:hover .cw.rest { text-decoration-thickness: 1.5px; text-decoration-color: currentColor; }
+/* a touch device leaves :hover on whatever was tapped last, and this is the one
+   link in the row that is still on screen afterwards — it would sit there in the
+   accent long after the copy, as though it were still being pointed at. where
+   there is no pointer there is nothing to answer, so the hover is taken back. */
+@media (hover: none) {
+  .contact .copy:hover { color: var(--ink-2); }
+  .copy:hover .cw.rest { text-decoration-thickness: 1px; text-decoration-color: var(--rule-soft); }
+}
+/* the confirmation is the register's finished state, in its colour: green,
+   marked with a tick, and never underlined — nothing is left to click */
+.cw.done {
+  transition-delay: 0s;     /* in this state it is the one leaving */
+  display: inline-flex; align-items: center; gap: .36em;
+  color: var(--green-ink);
+  transform: translateX(.85em); opacity: 0;
+}
+.copy.is-copied .cw.rest { transition-delay: 0s;   transform: translateX(-.85em); opacity: 0; }
+.copy.is-copied .cw.done { transition-delay: .13s; transform: none; opacity: 1; }
+
+/* the same tick the projects register uses, drawn rather than masked: a
+   stroke can be dashed off and let back on, so the mark writes itself in
+   behind the word instead of appearing whole */
+.ck { width: .6em; height: .6em; flex: none; overflow: visible; }
+.ck path {
+  fill: none; stroke: var(--green); stroke-width: 2.6;
+  stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 16; stroke-dashoffset: 16;
+  /* on the way back the delay outlasts the word's fade, so the mark leaves
+     whole with it and unwrites itself in an empty cell */
+  transition: stroke-dashoffset .3s var(--snap) .15s;
+}
+/* last: the word has to be standing still before the mark is made on it */
+.copy.is-copied .ck path { stroke-dashoffset: 0; transition-delay: .24s; }
+
+/* for the announcement only: present to a reader, absent from the page */
+.vh {
+  position: absolute; width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+
+/* ── the register stack ────────────────────────────────────── */
+
+.bands {
+  /* 2px, not 2.5 — a half pixel lands differently at every scroll offset */
+  border-top: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+  display: flex; flex-direction: column;
+  min-height: 0;
+}
+
+.band {
+  position: relative;
+  display: flex; flex-direction: column;
+  min-height: 0;
+  flex: 0 1 auto;
+  flex-grow: 0;
+}
+.band + .band { border-top: 1px solid var(--ink); }
+.ready .band { transition: flex-grow .36s var(--snap); }
+.band.is-open { flex-grow: 1; }
+
+/* a brace in the margin, like a marked-up proof: the open band is annotated
+   rather than highlighted. it sits on a rail of its own so it never moves with
+   the page padding, and it marks the open band only — hover is already carried
+   by the word and its leader.
+
+   built the way typesetting builds a tall brace, not by scaling a glyph: a
+   `{` stretched over a 600px band is a smear, so the two hooks and the middle
+   spur are drawn at a fixed size and only the stems between them run long. the
+   three pieces share one 16-unit viewBox, so the whole mark — stroke weight
+   included — scales from --bw alone and the narrow widths are one line each.
+
+   the accent is spelled out inside the data URIs: a URI is a document of its
+   own and --red does not cross into it. keep #dd2f19 in step with :root. */
+.band::before {
+  --bw: 16px;                      /* the brace's width; everything follows */
+  --bh: calc(var(--bw) * .625);    /* hook height   10/16 */
+  --bs: calc(var(--bw) * 1.25);    /* spur height   20/16 */
+  --bx: calc(var(--bw) * .544);    /* stem's left    8.7/16 */
+  --bt: calc(var(--bw) * .1);      /* stem's weight  1.6/16 */
+  content: '';
+  position: absolute; left: calc(var(--rail) * -1); top: 0; bottom: 0;
+  width: var(--bw);
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 10'%3E%3Cpath d='M15 1.2C11.8 1.2 9.5 2.8 9.5 5.6L9.5 10' fill='none' stroke='%23dd2f19' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") left top / var(--bw) var(--bh) no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 20'%3E%3Cpath d='M9.5 0C9.5 4 9.5 8 1.6 10C9.5 12 9.5 16 9.5 20' fill='none' stroke='%23dd2f19' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") left center / var(--bw) var(--bs) no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 10'%3E%3Cpath d='M9.5 0L9.5 4.4C9.5 7.2 11.8 8.8 15 8.8' fill='none' stroke='%23dd2f19' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") left bottom / var(--bw) var(--bh) no-repeat,
+    /* each stem anchors to its own end of the box. a percentage in the
+       four-value position form resolves against (area - image), not the box,
+       so a centre-anchored stem lands hundreds of pixels short on a tall
+       band. the +1px is overlap: butted exactly, the join shows a seam. */
+    linear-gradient(var(--red), var(--red))
+      left var(--bx) top var(--bh) / var(--bt) calc(50% - var(--bs) / 2 - var(--bh) + 1px) no-repeat,
+    linear-gradient(var(--red), var(--red))
+      left var(--bx) bottom var(--bh) / var(--bt) calc(50% - var(--bs) / 2 - var(--bh) + 1px) no-repeat;
+  opacity: 0; transition: opacity .12s linear;
+}
+.band.is-open::before { opacity: 1; }
+
+.strip-h { font: inherit; font-weight: inherit; letter-spacing: inherit; }
+.strip {
+  display: flex; align-items: baseline; gap: 12px;
+  width: 100%; text-align: left;
+  padding: clamp(9px, 1.35vh, 15px) 0;
+}
+.word {
+  font-size: var(--t-word);
+  font-weight: 400;
+  letter-spacing: -.026em;
+  line-height: 1;
+  color: var(--ink-3);
+  transition: color .1s linear;
+}
+.strip:hover .word { color: var(--red-ink); }
+.band.is-open .word { color: var(--ink); font-weight: 600; letter-spacing: -.032em; }
+.band.is-open .strip:hover .word { color: var(--ink); }
+
+/* the strip runs the full width, so the default ring draws a box around the
+   whole row and keeps it there while the arrows walk the registers. it marks
+   its focus the way it marks a hover instead — the word, not a box. the
+   panels take the same treatment: they are only focusable so the rails have
+   somewhere to send you, and a ring around a whole band reads as an error. */
+.strip:focus-visible, .pdetail:focus-visible, .wdetail:focus-visible { outline: none; }
+.strip:focus-visible .word { color: var(--red-ink); }
+.band.is-open .strip:focus-visible .word { color: var(--ink); }
+
+/* an empty flex item takes its baseline from its bottom margin edge, so
+   `baseline` is what actually seats the dots on the line the words sit on */
+.leader {
+  flex: 1 1 auto; height: 1em; align-self: baseline; min-width: 20px;
+  background-image: radial-gradient(circle, var(--ink-4) 1.1px, transparent 1.2px);
+  background-size: 7px 7px;
+  background-position: left bottom 4px;
+  background-repeat: repeat-x;
+}
+/* the red dots are ONE layer, drawn once, at one colour and one size. hover
+   and open differ only in how far the run travels — never in opacity, which
+   would pale the colour and shrink the dot's antialiased edge with it. */
+@property --run {
+  syntax: '<length-percentage>';
+  inherits: false;
+  initial-value: 0px;
+}
+.leader { position: relative; }
+.leader::before {
+  content: '';
+  position: absolute; inset: 0;
+  /* identical geometry to the grey dots underneath, so they register exactly */
+  background-image: radial-gradient(circle, var(--red) 1.1px, transparent 1.2px);
+  background-size: 7px 7px;
+  background-position: left bottom 4px;
+  background-repeat: repeat-x;
+  --run: 0px;
+  -webkit-mask-image: linear-gradient(90deg, #000 var(--run), transparent var(--run));
+  mask-image: linear-gradient(90deg, #000 var(--run), transparent var(--run));
+  transition: --run .16s steps(10, end);
+}
+/* hover: ten dots. 70px is exactly ten 7px cells, so it ends between dots */
+.strip:hover .leader::before { --run: 70px; }
+/* open: the same run, all the way. smooth here rather than stepped, and timed
+   to the band's own .36s, so the rule fills as the band opens */
+.band.is-open .leader::before,
+.band.is-open .strip:hover .leader::before {
+  --run: 100%;
+  transition: --run .34s var(--snap);
+}
+
+.body { flex: 1 1 0; min-height: 0; overflow: hidden; }
+.inner { height: 100%; padding-bottom: clamp(12px, 2vh, 22px); }
+.inner { transition: visibility 0s 0s; }
+/* stays visible while the band clips it away, then drops out of the tab order */
+.band:not(.is-open) .inner { visibility: hidden; transition: visibility 0s .36s; }
+
+/* ── foot ──────────────────────────────────────────────────── */
+
+/* space-between only centres the middle item when the outer two match; they
+   never do, so the hint drifts. a 1fr auto 1fr grid pins it to the page axis. */
+.foot {
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: baseline; gap: 18px;
+  padding-top: clamp(8px, 1.2vh, 13px);
+  font-size: var(--t-small);
+  font-style: italic;
+  color: var(--ink-2);
+}
+.foot > :last-child { text-align: right; }
+.foot b { font-weight: 500; font-style: normal; color: var(--ink); font-variant-numeric: tabular-nums; }
+#pos { grid-column: 1; }
+.keys { grid-column: 2; color: var(--ink-3); font-style: normal; text-align: center; }
+#clock { grid-column: 3; }
+
+/* ── shared text ───────────────────────────────────────────── */
+
+.ruled > li {
+  border-top: 1px solid var(--rule-hair);
+  padding: 6px 0 0;
+  margin-bottom: 6px;
+  font-size: var(--t-small);
+  line-height: 1.45;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+.ruled > li:first-child { border-top: 0; padding-top: 0; }
+/* tags used to run larger than the bullets they annotate; they now share the
+   small step and separate on style and colour instead */
+.tags { font-style: italic; font-size: var(--t-small); color: var(--ink-3); margin-top: 10px; }
+
+/* ── 01 about ──────────────────────────────────────────────── */
+
+.about { display: flex; flex-direction: column; height: 100%; }
+.about__top {
+  flex: 1 1 auto;
+  display: grid; grid-template-columns: repeat(12, minmax(0,1fr));
+  column-gap: var(--gutter);
+  /* vh, not a share of the band: the band's height animates and this must not.
+     only in play once the two blocks stack, under 1000px */
+  row-gap: clamp(13px, 2.4vh, 28px);
+  align-items: baseline;     /* the notes seat on the deck's first baseline */
+  /* start, not centre: the band grows over .36s, and centred rows re-centre on
+     every frame of it, so the text slid down as the band opened. every other
+     band anchors its content to the top and is simply revealed — this matches. */
+  align-content: start;
+  padding-bottom: clamp(8px, 3.2vh, 38px);
+}
+/* seven and five, not six and six: at this size the deck wants the longer
+   measure, and five columns is still ~60 characters for the notes beside it */
+.lede {
+  grid-column: 1 / 8;
+  font-size: var(--t-lede);
+  font-weight: 400;
+  line-height: 1.29;
+  letter-spacing: -.018em;
+  text-wrap: pretty;
+}
+/* these two used to sit side by side in half of this, which gave each of them
+   a 30-character measure — marginalia, whatever they said. one under the other
+   in the whole five columns is one column of ~60, and the pair comes out level
+   with the deck it sits beside. */
+.about__two {
+  grid-column: 8 / 13;
+  display: grid;
+  row-gap: clamp(9px, 1.4vh, 15px);
+  align-content: start;   /* the row is as tall as the deck; the notes are not */
+}
+.about__two p {
+  font-size: var(--t-sub);
+  line-height: 1.56; color: var(--ink-2); text-wrap: pretty;
+}
+/* it sits at the foot of the band on space alone: the band's own rule is a few
+   lines below it, and a second one this close made a box of the last two lines */
+.now {
+  margin-top: auto; padding-top: clamp(14px, 2.2vh, 22px);
+  display: flex; flex-wrap: wrap; gap: 6px clamp(24px, 3.4cqi, 60px);
+  font-size: var(--t-body);
+}
+/* the same accent the dates and the tags carry — --red-ink, the readable one */
+.now li i { color: var(--red-ink); }
+.now li b { font-weight: 500; }
+
+/* ── shared: the index rail ────────────────────────────────── */
+
+/* two bands are contents pages of their own — work and projects. both use
+   2 + 10 of the same twelve columns, so the index rule and the detail's left
+   edge land on lines the other bands already use. */
+.plist, .wlist {
+  grid-column: span 2; min-width: 0;
+  border-right: 1px solid var(--rule-soft);
+  margin-right: calc(var(--gutter) / -2);
+  padding-right: calc(var(--gutter) / 2);
+}
+.plist button, .wlist button {
+  display: block; width: 100%; text-align: left;
+  padding: 5px 0 5px 24px; position: relative;
+  font-size: var(--t-sub);
+  line-height: 1.22; letter-spacing: -.015em;
+  color: var(--ink-2);
+  transition: color .1s linear;
+}
+/* not the band's mark shrunk down — that would put a second brace on the page
+   and make the page look like it only owns the one idea. the register leaders
+   are the other half of the vocabulary, so the selection is marked in dots
+   here: three of them lead into the entry, at the leaders' own cell and
+   radius. the run is boxed to the first line rather than the whole button,
+   because a name that wraps to three lines should not grow its mark. */
+.plist button::before, .wlist button::before {
+  content: ''; position: absolute; left: 0; top: 5px;
+  width: 19px; height: 1.22em;
+  background-image: radial-gradient(circle, var(--red) 1.1px, transparent 1.2px);
+  background-size: 7px 7px;
+  background-position: left bottom 4px;
+  background-repeat: repeat-x;
+  opacity: 0;
+}
+.plist button:hover, .wlist button:hover { color: var(--red-ink); }
+.plist button[aria-selected="true"], .wlist button[aria-selected="true"] { color: var(--ink); font-weight: 600; }
+.plist button[aria-selected="true"]::before, .wlist button[aria-selected="true"]::before { opacity: 1; }
+
+/* the foot of a detail column. the source link and the status moved under the
+   screenshot, where they caption the thing they describe, so what is left here
+   is the stack alone — one line of keywords needs no rule to hold it off. */
+.pbar {
+  margin-top: auto; padding-top: clamp(9px, 1.4vh, 14px);
+  display: flex; align-items: baseline; justify-content: space-between;
+  flex-wrap: wrap; gap: 6px 20px;
+}
+.pbar .tags { margin-top: 0; color: var(--red-ink); }   /* the same accent the roles carry */
+
+/* ── 02 work ───────────────────────────────────────────────── */
+
+/* three roles used to sit side by side in 6/3/3, which gave the longest one a
+   column it could not fill legibly and the other two more rule than text.
+   one role at a time, picked from the index, is the same measure as a project. */
+.work {
+  display: grid; grid-template-columns: repeat(12, minmax(0,1fr));
+  column-gap: var(--gutter); height: 100%;
+}
+/* the bullets take the whole detail, not six tenths of it: projects holds the
+   rest back for a screenshot and work has none, and a role read at half the
+   band's width runs twice as deep as the band can hold */
+.wdetail { grid-column: span 10; min-width: 0; }
+
+/* everything that is not a bullet sits above one rule: what the role was and
+   when on the first line, where and what it touched on the second. it was a
+   bar across the foot before, which cost a rule, a gap and a line of height
+   the longest role could not spare. */
+.whead {
+  padding-bottom: clamp(6px, .95vh, 10px);
+  margin-bottom: clamp(8px, 1.3vh, 13px);
+  border-bottom: 1px solid var(--rule-strong);
+}
+.wline {
+  display: flex; align-items: baseline; justify-content: space-between;
+  flex-wrap: wrap; gap: 0 clamp(14px, 1.8cqi, 28px);
+}
+.wline + .wline { margin-top: 2px; }
+.wrole { font-size: var(--t-title); font-weight: 600; letter-spacing: -.02em; line-height: 1.15; }
+/* the accent, not the mark: --red-ink is the one that clears 4.5:1 and is
+   meant to be read. the dates are the only thing on the right of this header,
+   so they carry it alone against the greys on the left. */
+.wdates { font-style: italic; font-size: var(--t-body); color: var(--red-ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.wwhere { font-size: var(--t-small); color: var(--ink-2); }
+.wwhere span { color: var(--ink-3); }
+
+/* two measures rather than one long one. the column width is stated, not the
+   count, so the second column appears exactly when it can hold a real measure
+   and never splits the list into two thin ones. */
+.wdetail .ruled {
+  font-size: var(--t-small);          /* so the em below tracks the type scale */
+  columns: 26em 2; column-gap: var(--gutter);
+}
+.wdetail .ruled > li { break-inside: avoid; }
+.wdetail .ruled > li.opens-column { border-top: 0; padding-top: 0; }
+
+/* shown only when the window is too short to hold the whole entry — work and
+   projects are cut by one routine, so they say what was cut in one voice */
+.more { margin-top: 7px; font-style: italic; font-size: var(--t-small); color: var(--ink-3); }
+
+/* held for the length of one measurement, never across a paint */
+.band.is-measuring .inner,
+.band.is-measuring .work,
+.band.is-measuring .wdetail,
+.band.is-measuring .projects,
+.band.is-measuring .pdetail { height: auto; }
+
+/* ── 03 projects ───────────────────────────────────────────── */
+
+.projects { display: grid; grid-template-columns: repeat(12, minmax(0,1fr)); column-gap: var(--gutter); height: 100%; }
+
+.pdetail { grid-column: span 10; display: flex; flex-direction: column; min-width: 0; height: 100%; }
+/* ten tracks of the parent width, restated at the same gutter — the nesting
+   is exact, so 6 + 4 here sits on the parent's columns 3-8 and 9-12 */
+.ptop { display: grid; grid-template-columns: repeat(10, minmax(0,1fr)); column-gap: var(--gutter); align-items: start; }
+.pmain { grid-column: span 6; min-width: 0; }
+.ptag { font-size: var(--t-title); line-height: 1.32; letter-spacing: -.018em; text-wrap: pretty; }
+.pnote { margin-top: 10px; font-size: var(--t-body); line-height: 1.55; color: var(--ink-2); text-wrap: pretty; }
+.pflow { margin-top: 12px; font-style: italic; font-size: var(--t-small); color: var(--ink-2); }
+.pflow b { font-weight: 400; font-style: normal; color: var(--red-ink); padding: 0 5px; }
+.pmain ul { margin-top: clamp(10px, 1.6vh, 16px); }
+.plinks { display: flex; align-items: baseline; gap: clamp(12px, 1.4cqi, 20px); font-size: var(--t-body); }
+/* the caption line: name, where to read it, and whether it is still moving.
+   it sits under the plate when there is one and at the foot when there is not,
+   so it carries its own type and does not inherit the plinks body size */
+.pmeta {
+  display: flex; align-items: baseline; flex-wrap: wrap;
+  gap: 2px clamp(10px, 1.2cqi, 18px);
+  font-style: italic; font-size: var(--t-small); color: var(--ink-3);
+}
+.pmeta .plinks { font-size: inherit; gap: clamp(10px, 1.2cqi, 18px); }
+.pmeta .pname { color: var(--ink); }
+.plinks .st { font-style: italic; color: var(--ink-3); }
+.plinks .st.is-active { color: var(--red-ink); }
+.plinks .st.is-complete { color: var(--green-ink); }
+/* both states carry a mark in the same box at the same remove from the word,
+   so switching projects moves the colour and the shape, never the setting */
+.plinks .st.is-active::before,
+.plinks .st.is-complete::before {
+  content: ''; display: inline-block; width: .4em; height: .4em;
+  margin-right: .45em;
+}
+.plinks .st.is-active::before { border-radius: 50%; background: var(--red); }
+/* drawn rather than set: a tick glyph would take its width from whichever
+   fallback font owns U+2713, and the box has to stay the dot's box exactly */
+.plinks .st.is-complete::before {
+  background: var(--green);
+  -webkit-mask: var(--tick) center / contain no-repeat;
+          mask: var(--tick) center / contain no-repeat;
+}
+
+/* the height cap belongs to the figure, not the image: capping the image while
+   its width is held at 100% stretches the plate wider than 3:2, and every shot
+   then floats inside a box it does not fill. capping the width keeps the plate
+   at its ratio and lets it shrink whole. */
+.shot { grid-column: span 4; align-self: start; max-width: calc(34vh * 1.5); }
+.shot img {
+  width: 100%; display: block; border: 1px solid var(--ink);
+  /* shots run 1.40-1.61; a 3:2 plate holds all of them without cropping */
+  aspect-ratio: 3 / 2; object-fit: contain;
+  /* what shows where a shot's own ratio leaves the plate room. each shot names
+     the colour its own edge already is, so the margin reads as more of the
+     picture and the border lands on the picture, not around it. */
+  background: var(--plate, var(--paper));
+}
+.shot figcaption { margin-top: 6px; }
+
+/* the plate answers before it is clicked: the cursor says what it does and the
+   border takes the accent every other actionable thing here takes on hover */
+.shot .zoom { display: block; width: 100%; cursor: zoom-in; }
+.shot .zoom:hover img { border-color: var(--red-ink); }
+
+/* ── the expanded plate ────────────────────────────────────── */
+
+/* a shot opens at its own resolution and no further. the image is given no
+   width of its own, so the caps below can only ever shrink it: a 624px capture
+   is shown at 624px rather than blown up into mush. */
+.plate {
+  width: 100%; height: 100%; max-width: none; max-height: none;
+  padding: clamp(14px, 4vh, 44px);
+  border: 0; background: none; color: var(--ink);
+  /* the whole field outside the picture is a way out, so it has to be the
+     dialog itself that fills the viewport, not a box centred inside one */
+  display: none; place-items: center;
+  overflow: hidden;
+}
+.plate[open] { display: grid; }
+/* paper, near enough to opaque: the page behind goes to a ghost of itself
+   rather than to a dark room, and the shot stays a plate laid on the sheet */
+.plate::backdrop { background: rgba(233, 233, 227, .96); }
+.plate[open], .plate[open]::backdrop { animation: plate-in .16s var(--snap); }
+@keyframes plate-in { from { opacity: 0; } }
+
+/* the wrapper takes its width from the picture, so the caption sits on the
+   picture's own edges however the shot is shaped */
+.plate-inner { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.plate-inner:focus { outline: none; }
+.plate img {
+  display: block; max-width: 90vw; max-height: 82vh;
+  border: 1px solid var(--ink); background: var(--plate, var(--paper));
+  cursor: zoom-out;
+}
+.plate-meta { justify-content: space-between; gap: 18px; }
+.plate-meta .close { font-style: italic; color: var(--ink-3); transition: color .1s linear; }
+.plate-meta .close:hover { color: var(--red-ink); }
+.plate-meta .close b { font-style: normal; font-weight: 500; color: var(--ink-2); }
+
+/* ── 04 stack ──────────────────────────────────────────────── */
+
+.stack { display: flex; flex-direction: column; height: 100%; }
+/* five is the one count that cannot land on twelve; the band keeps its own
+   five-column measure, and everything inside it — including the credentials
+   row — is held to that same measure and the shared gutter */
+.groups { flex: 1 1 auto; display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); column-gap: var(--gutter); }
+/* the columns had rules between them, and those rules were the full height of
+   the band: they ran the length of the longest list and then kept going through
+   the empty half below it, ending on nothing. the heading rules mark where each
+   column starts and how wide it is, which is all the structure the lists need. */
+/* the heading used to be the smallest thing in its own column */
+.group h3 {
+  font-style: italic; font-weight: 500;
+  font-size: var(--t-body); color: var(--ink);
+  padding-bottom: 5px; margin-bottom: 8px;
+  border-bottom: 1px solid var(--rule-soft);
+}
+.group li { font-size: var(--t-small); line-height: 1.52; color: var(--ink-2); }
+.creds {
+  margin-top: auto; padding-top: clamp(14px, 2.2vh, 22px);
+  display: grid; grid-template-columns: repeat(5, minmax(0,1fr));
+  column-gap: var(--gutter); row-gap: 8px;
+  font-size: var(--t-body);
+}
+.creds > div:first-child { grid-column: 1 / 3; }
+.creds > div:last-child  { grid-column: 3 / 6; }
+.creds h4 { font-weight: 600; font-size: 1em; }
+.creds p { color: var(--ink-2); }
+/* it leaves the page like the header links do, so it wears their resting
+   underline. the hover has to be restated: `.a:hover` matches at the same
+   weight and is declared earlier, so it would lose to the colour above it. */
+.creds .a { font-style: italic; color: var(--ink); }
+.creds .a:hover { color: var(--red-ink); }
+
+/* ── narrow ────────────────────────────────────────────────── */
+
+/* the index needs a third column before the names start breaking mid-word;
+   the details restate nine tracks so the nesting stays exact */
+@media (max-width: 1080px) {
+  /* the rail is clamp(14px, 1.9vw, 30px), so below about 950px a 16px brace
+     would reach past the text's left edge. the mark scales instead. */
+  .band::before { --bw: 12px; }
+  .plist, .wlist { grid-column: span 3; }
+  .pdetail, .wdetail { grid-column: span 9; }
+  .ptop { grid-template-columns: repeat(9, minmax(0,1fr)); }
+  .shot { grid-column: span 3; }
+}
+@media (max-width: 1000px) {
+  /* the deck gives a column back rather than dropping below: six and six still
+     holds a real measure on both sides, and the band keeps its one-row shape */
+  .lede { grid-column: 1 / 7; }
+  .about__two { grid-column: 7 / 13; }
+  .groups { grid-template-columns: repeat(3, minmax(0,1fr)); row-gap: 14px; }
+  .creds { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .creds > div:first-child { grid-column: 1 / 2; }
+  .creds > div:last-child  { grid-column: 2 / 4; }
+}
+@media (max-width: 720px) {
+  :root { --pad-x: 20px; }
+  .head { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .band::before { --bw: 11px; }   /* the rail is at its 14px floor from here down */
+  .about__top { padding-bottom: 0; }
+  /* only here do the two blocks stack; the notes keep their own rhythm */
+  .lede, .about__two { grid-column: 1 / -1; }
+  .about__two { row-gap: 10px; }
+
+  .projects, .work {
+    grid-template-columns: 1fr;
+    /* the rail takes the height of its names and the detail takes what is
+       left. as two auto rows this grid still had a definite height and slack
+       to place, and a grid stretches its auto rows by an equal share of it —
+       so the rail grew by half of whatever the shorter entry gave back, and
+       the rule under it, the detail, and everything below moved down the band
+       on every tap. the rail is sized by its content now and nothing else. */
+    grid-template-rows: auto minmax(0, 1fr);
+    row-gap: 12px;
+  }
+  .plist, .pdetail, .wlist, .wdetail { grid-column: auto; }
+  .plist, .wlist {
+    display: flex; flex-wrap: wrap; gap: 2px 16px;
+    /* the same slack one level down: a wrapped flex row spreads its lines out
+       to fill the height it is given, and two names sat sixty pixels apart.
+       the lines stack from the top, at the row gap and nothing more. */
+    align-content: start;
+    border-right: 0; margin-right: 0; padding: 0 0 8px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .plist button, .wlist button { width: auto; padding: 6px 0; }
+  /* the selected name is set in 600, and on a row that wraps, that extra width
+     is enough to carry the next name onto a new line: the row re-wrapped and
+     the register shifted under it on every tap. each name is given the width
+     it takes in 600 whether or not it is the one selected, so the row is laid
+     out once and never again. a copy of the name, set in 600 and given no
+     height, is the only way to measure a bold word without setting it bold. */
+  .plist button::after, .wlist button::after {
+    content: attr(data-name);
+    display: block; height: 0; overflow: hidden;
+    font-weight: 600; visibility: hidden;
+  }
+  /* three dots leading into a name have nowhere to lead on a row of names, so
+     the same dots — one cell, one radius, one red — run underneath the
+     selected one instead. it is the leaders' mark, laid on its side. */
+  .plist button::before, .wlist button::before {
+    left: 0; right: 0; top: auto; bottom: 0;
+    width: auto; height: 7px;
+    background-position: left bottom 1px;
+  }
+  /* names are chips in a row here, so the rail's fixed break has to go */
+  .plist br, .wlist br { display: none; }
+  .ptop { grid-template-columns: 1fr; row-gap: 14px; }
+  .pmain { grid-column: auto; }
+  /* the stack line is pinned to the foot of the band on the sheet, where the
+     band is full and the pin is what squares it off. stacked, the entries run
+     to very different lengths, and the shortest of them left the line sitting
+     alone three hundred pixels under the rest of the register. it closes up
+     behind the copy instead — which is what the work detail beside it has
+     always done, having no foot bar to pin. */
+  .pbar { margin-top: 0; }
+  /* the plate goes — the words carry it at this width — but its caption stays,
+     because the source link and the status now live there. with no plate to
+     hold, the figure gives up its width cap: the caption runs the full row. */
+  .shot { grid-column: auto; max-width: none; }
+  .shot .zoom { display: none; }
+  .shot figcaption { margin-top: 0; }
+  .groups { grid-template-columns: 1fr 1fr; column-gap: 18px; row-gap: 12px; }
+  .group li { line-height: 1.42; }
+  .creds { grid-template-columns: 1fr; gap: 8px; }
+  /* has to match the specificity of the spans it undoes, or they win anyway */
+  .creds > div:first-child, .creds > div:last-child { grid-column: auto; }
+  .keys { display: none; }
+  .foot { grid-template-columns: 1fr auto; }   /* the hint is gone; don't leave its track */
+  #clock { grid-column: 2; }
+}
+/* shorter windows: tighten the rhythm */
+@media (max-height: 830px) {
+  .strip { padding: 8px 0; }
+  .head { padding-bottom: 9px; }
+  .inner { padding-bottom: 10px; }
+  .ruled > li { padding-top: 5px; margin-bottom: 5px; line-height: 1.4; }
+  .pnote { margin-top: 8px; }
+  .pflow { margin-top: 9px; }
+}
+
+@media (max-height: 680px) {
+  .ruled > li { padding-top: 4px; margin-bottom: 3px; line-height: 1.32; }
+  .inner { padding-bottom: 6px; }
+}
+
+/* phones: run the skill groups in-line and drop the decorative flow line */
+@media (max-width: 560px) {
+  .ruled > li { line-height: 1.38; padding-top: 5px; margin-bottom: 5px; }
+  .pflow { display: none; }
+  .ptag { line-height: 1.24; }
+  .pnote { margin-top: 7px; line-height: 1.45; }
+  .pbar { padding-top: 8px; }
+  .projects, .work { row-gap: 9px; }
+  .plist, .wlist { padding-bottom: 5px; }
+  .pmain .ruled > li { line-height: 1.4; }
+  /* the four strips are the page's fixed overhead, and at eleven pixels of
+     padding each they cost more than a bullet does. 33px still clears a
+     comfortable touch row. */
+  .strip { padding: 7px 0; }
+  /* the same argument for the page's own margins: on a phone every band is
+     fighting for the same pixels, so the chrome gives them up first */
+  .head { padding-bottom: 8px; gap: 6px; }
+  .inner { padding-bottom: 6px; }
+  .foot { padding-top: 6px; }
+  /* both rails are the same row of names now, so they give back the same
+     couple of pixels — the work rail alone would sit a line off the other */
+  .plist button, .wlist button { padding-top: 5px; padding-bottom: 5px; }
+  .whead { padding-bottom: 5px; margin-bottom: 7px; }
+  .wline + .wline { margin-top: 1px; }
+  .wdetail .ruled > li { line-height: 1.36; padding-top: 4px; margin-bottom: 4px; }
+  .groups { display: block; }
+  .group + .group { margin-top: 9px; }
+  .group h3 { display: inline; border: 0; padding: 0; margin: 0; }
+  .group h3::after { content: ':'; margin-right: .45em; }
+  .group ul, .group li { display: inline; }
+  .group li:not(:last-child)::after { content: ','; color: var(--ink-3); }
+  .group li { line-height: 1.5; }
+}
+
+/* touch and the stacked layout used to have the accordion taken off them: the
+   heavier registers could not keep up, so the band crept part of the way and
+   then jumped the rest, and an instant open was the better of two bad reads.
+   the creep was never the transition's fault. opening a register toggles the
+   classes and so dirties the layout, and the fit that ran on the same tap then
+   read the stack's height and the window's width straight back out of the
+   document — two reads that can only be answered by laying the page out again,
+   there and then, on the one frame the band had to start moving on. the band
+   stood still through it and arrived late. both numbers change with the window
+   and with nothing else, so they are taken when the window changes and read
+   from a variable in between (see measureRoom), and the tap now costs a class
+   toggle. all four registers open on the same curve, at the same length, on a
+   phone as on the sheet. */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="sheet">
+
+  <header class="head">
+    <div>
+      <h1>Aaron Altergott</h1>
+      <p class="sub"><em>operations engineer</em> in SoCal</p>
+    </div>
+    <nav class="contact" aria-label="Contact">
+      <button class="a copy" id="copy" type="button" data-address="adaltergott@gmail.com"
+              title="adaltergott@gmail.com" aria-label="Copy email address adaltergott@gmail.com"><span class="cface"><span class="cw rest">email</span><span class="cw done" aria-hidden="true"><svg class="ck" viewBox="0 0 12 12"><path d="M.9 6.4 4.4 10.2 11.1 1.9"/></svg>copied</span></span></button><span>·</span>
+      <a class="a" href="https://github.com/micronwave" target="_blank" rel="noopener">github</a><span>·</span>
+      <a class="a" href="https://www.linkedin.com/in/aaronaltergott/" target="_blank" rel="noopener">linkedin</a>
+    </nav>
+    <span class="vh" role="status" id="copystate"></span>
+  </header>
+
+  <main class="bands" id="bands"></main>
+
+  <footer class="foot">
+    <span id="pos"></span>
+    <span class="keys"></span>
+    <span id="clock"></span>
+  </footer>
+
+</div>
+
+<!-- the expanded shot. it sits outside the sheet because the sheet is a
+     container and a grid, and this belongs to the viewport, not to either. -->
+<dialog class="plate" id="plate" aria-label="Expanded screenshot">
+  <!-- the dialog hands its focus to the first thing that will take it, and a
+       ring around "close" is not how this should open. the wrapper takes it
+       instead: esc still answers, tab still reaches the button. -->
+  <div class="plate-inner" tabindex="-1" autofocus>
+    <img id="plate-img" alt="" decoding="async" />
+    <p class="pmeta plate-meta">
+      <span class="pname" id="plate-name"></span>
+      <button type="button" class="close" id="plate-close"><b>esc</b> close</button>
+    </p>
+  </div>
+</dialog>
+
+<script>
+/* ── content (mirrors src/data/content.ts) ───────────────────── */
+
+const about = [
+  "I sit between business operations and the tools that run them. Close enough to the process to see what's breaking, and technical enough to implement the fix. Experience includes customer ops, revenue systems, internal tooling, and CRM integrations.",
+  "I've automated workflows, fixed recurring failures, and cleaned up processes that were costing time and money. I like working the whole arc of a problem, from figuring out why something's broken to fixing it.",
+  "AWS certified and working toward Solutions Architect to have a technical footing on the infrastructure side of the business. It's also why the projects here skew toward cloud infra, data pipelines, and agent orchestration."
+];
+
+const experience = [
+  {
+    company: 'Southwest Self Storage',
+    role: 'Operations Specialist',
+    location: 'Redlands, CA',
+    dates: 'Nov 2024–Present',
+    bullets: [
+      'Recovered $85K in monthly revenue by tracing an ERP billing config error that was declining autopay accounts with AMEX and Discover credit cards',
+      'Reduced past due balances 13% by automating collections across SiteLink and CallPotential, using system events to trigger SMS payment reminders and autopay enrollment campaigns',
+      'Built a competitor pricing dashboard for the COO that updates daily via the Google Sheets API, providing richer data and replacing manual spreadsheets',
+      'Cut lead to move in time by triggering reservation follow up and move in instructions the moment a booking hits, removing a manual step from every customer inquiry',
+      "Discovered and disclosed a security vulnerability in our vendor's AI chatbot infrastructure that publicly exposed customer data and production backups; coordinated with vendor to patch and validate",
+      'Automated the mail certification audit that proves lien compliance for auctions with AI document parsing',
+      'Own AP invoice verification, monthly financial reconciliation, and daily revenue reporting to catch discrepancies before they reach accounting'
+    ]
+  },
+  {
+    company: 'Null404',
+    role: 'Partnerships Lead (Volunteer)',
+    location: 'Remote',
+    dates: 'Apr 2026–Present',
+    bullets: [
+      "Built an n8n pipeline on Oracle Cloud's free tier that syncs sponsor deal stages between Notion and HubSpot daily so Null leadership can track progress",
+      'Lead sponsor outreach for a cybersecurity research group, coordinated with leadership to secure 2 gear sponsorships',
+      'Designed the sponsorship package; help design CTF challenges'
+    ]
+  },
+  {
+    company: 'The Advance Group',
+    role: 'Intern',
+    location: 'Remote',
+    dates: 'May 2023–Aug 2023',
+    bullets: [
+      'Vetted ~100 NYC organizations across industries and wrote partnership proposals with fellow interns to shape outreach decisions',
+      'Analyzed voter data and patterns to develop targeted policy recommendations for NYC councilmember client'
+    ]
+  }
+];
+
+const projects = [
+  {
+    name: 'Orca',
+    tagline: "Coordinates the implementation and review of a user's goal and will not be considered complete until every gate passes and the logs prove it.",
+    note: 'Built to make agentic coding more trustworthy. Agents report success whether or not they earned it. Orca takes that call away from them: the agent writing a change never reviews it, and neither one decides whether it shipped.',
+    bullets: [
+      'Routes work to the right agent: Claude implements, Codex reviews, CI gates verify',
+      'Breaks each goal into checkable exit conditions before any agent runs',
+      'Runs each agent in a sandboxed capsule with only the files it needs, a token budget, and gates to clear'
+    ],
+    stack: 'Go, TypeScript, Claude API, Codex, GitHub API',
+    flow: ['goal', 'plan', 'capsule', 'verify', 'merge'],
+    githubUrl: 'https://github.com/micronwave/orca',
+    shot: 'img/screenshot-orca.png',
+    /* the colour this shot's own edge already is. the plate is a fixed 3:2 and
+       the shots are not, so whichever way a shot falls short it is met by more
+       of itself instead of by paper. sampled from the border pixels; a shot cut
+       to 3:2 can leave it out and take the paper default. */
+    plate: '#0c0c0c',
+    status: 'active'
+  },
+  {
+    name: 'AWS Docs RAG',
+    tagline: 'Answers AWS questions from the current documentation, with source URLs attached.',
+    note: "Built while studying for the AWS Cloud Practitioner exam. AI can and will hallucinate from training data or from expired documentation it finds on the internet. This retrieves the relevant docs at query time and builds the prompt around them, so answers come back with relevant sources.",
+    bullets: [
+      'Scrapes ~120 doc pages across five AWS services, embeds them with Amazon Titan v2, indexes them in Pinecone',
+      'Embeds the question, pulls the top 5 matching chunks, hands them to Claude with instructions not to answer beyond what was retrieved',
+      "Each ingestion script writes a manifest and checks the previous stage finished, so a partial failure can't silently corrupt the index"
+    ],
+    stack: 'Python, Claude (Bedrock), Titan Embeddings, Pinecone, Lambda, API Gateway, S3, CloudFront',
+    flow: ['docs', 'chunks', 'embed', 'retrieve', 'answer'],
+    githubUrl: 'https://github.com/micronwave/aws-docs-rag',
+    liveUrl: 'https://d3d0zch3u8ca61.cloudfront.net',
+    shot: 'img/screenshot-rag.png',
+    status: 'complete'
+  },
+  {
+    name: 'Narrative Intelligence Engine',
+    railName: 'Narrative\nIntelligence Engine',
+    tagline: 'Tracks financial narratives across news and filings, scores their momentum, and maps them to S&P 500 tickers and overall trends.',
+    note: 'Built to increase my situational awareness in the stock market. Financial stories surface as RSS headlines or SEC filings all the time. NIE pulls those fragments together every four hours, clusters them into tracked narratives, and watches how they evolve.',
+    bullets: [
+      "Deduplicates incoming documents with LSH MinHash, then clusters what's left into narratives with HDBSCAN",
+      'Maps each narrative to S&P 500 tickers by comparing embeddings against a library built from SEC 10-K summaries',
+      'Flags coordinated campaigns: five or more sources posting the same narrative within 300 seconds trips the burst detector'
+    ],
+    stack: 'Python, FastAPI, Claude API, HDBSCAN, FAISS, Sentence Transformers, SQLite, Next.js',
+    flow: ['sources', 'cluster', 'score', 'map'],
+    githubUrl: 'https://github.com/micronwave/market-narrative-engine',
+    shot: 'img/screenshot-nie.png',
+    plate: '#111418',
+    status: 'complete'
+  },
+  {
+    name: 'Propagandle',
+    tagline: 'A daily five-round trivia game about historical events and conspiracies.',
+    note: "Built because it doesn't exist yet and history is cool. Propagandle is meant to test your knowledge and media literacy. Flat earthers may not do well at this game.",
+    bullets: [
+      'Four round types pull from a pool of real historical events mixed with fabricated ones written to sound just as plausible',
+      'One new puzzle a day, keep the streak going',
+      'No account needed. No ads. No tracking. No data collection.'
+    ],
+    stack: 'React, Vite, TypeScript, Supabase, Vercel, Vercel OG',
+    flow: ['issue', 'play', 'reveal', 'share'],
+    liveUrl: 'https://propagandle.com',
+    shot: 'img/screenshot-propagandle.webp',
+    plate: '#f2ead4',
+    status: 'active'
+  },
+  {
+    name: 'Claude Chaperone',
+    tagline: 'Installs a plan-build-audit-commit workflow into any project with a single command.',
+    note: 'Claude accumulates problems in long sessions: carried-over assumptions, gaps it guessed at, scope drift. A hook injects the previous state right after each plan-build-audit step so the user does not have to waste time explaining the current stage.',
+    bullets: [
+      'Twelve slash commands step through planning, test-first building, diff auditing, and commit, each stage in its own cleared context',
+      'Dependency-free Python hooks handle scope-drift warnings, a confirmation prompt before git push, and state injection right after /clear',
+      'The installer merges into settings.json without clobbering existing hooks, runs its test suite to verify, and is safe to re-run'
+    ],
+    stack: 'Python, Claude Code, Slash Commands, Python Hooks',
+    flow: ['plan', 'build', 'audit', 'commit'],
+    githubUrl: 'https://github.com/micronwave/claude-chaperone',
+    shot: 'img/screenshot-chaperone.png',
+    plate: '#0c0c0c',
+    status: 'complete'
+  }
+];
+
+const skills = [
+  { label: 'cloud',   items: ['AWS — Bedrock, Lambda', 'S3, CloudFront', 'API Gateway, IAM', 'CloudWatch, CLI', 'Oracle Cloud (OCI)'] },
+  { label: 'ai / ml', items: ['RAG', 'Semantic search', 'Embeddings', 'Pinecone, FAISS', 'HDBSCAN clustering', 'LSH MinHash'] },
+  { label: 'backend', items: ['Python', 'SQL', 'REST APIs', 'Webhooks', 'FastAPI', 'CI/CD', 'Supabase', 'Web scraping', 'SQLite'] },
+  { label: 'tools',   items: ['HubSpot', 'n8n', 'Retool', 'Notion', 'Playwright', 'Claude Code', 'GitHub', 'Docker', 'SiteLink ERP', 'Codex'] },
+  { label: 'ops',     items: ['LLM ops', 'Financial ops', 'Competitive analysis', 'Customer support', 'AP/AR', 'Client outreach'] }
+];
+
+/* ── build ───────────────────────────────────────────────────── */
+
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const el = (h) => { const t = document.createElement('template'); t.innerHTML = h.trim(); return t.content.firstElementChild; };
+const ruled = (arr) => '<ul class="ruled">' + arr.map((b) => '<li>' + esc(b) + '</li>').join('') + '</ul>';
+
+const bandsEl = document.getElementById('bands');
+
+/* the room an open band gets, and the width its entry is set at. both are
+   settled by the window and read from here in between — see measureRoom. */
+let room = 0, span = 0;
+
+const REGISTERS = [
+  { id: 'about', word: 'about' },
+  { id: 'work', word: 'work' },
+  { id: 'projects', word: 'projects' },
+  { id: 'stack', word: 'stack' }
+];
+
+const views = {
+  about:
+    '<div class="about">' +
+      '<div class="about__top">' +
+        '<p class="lede">' + esc(about[0]) + '</p>' +
+        '<div class="about__two"><p>' + esc(about[1]) + '</p><p>' + esc(about[2]) + '</p></div>' +
+      '</div>' +
+      '<ul class="now">' +
+        '<li><i>currently</i> <b>Operations Specialist</b>, Southwest Self Storage</li>' +
+        '<li><i>also</i> <b>Partnerships Lead</b>, Null404</li>' +
+        '<li><i>next</i> <b>AWS Solutions Architect</b></li>' +
+      '</ul>' +
+    '</div>',
+
+  work:
+    '<div class="work">' +
+      '<div class="wlist" role="tablist" aria-orientation="vertical" aria-label="Roles"></div>' +
+      '<div class="wdetail" id="wdetail" role="tabpanel" tabindex="0"></div>' +
+    '</div>',
+
+  projects:
+    '<div class="projects">' +
+      '<div class="plist" role="tablist" aria-orientation="vertical" aria-label="Projects"></div>' +
+      '<div class="pdetail" id="pdetail" role="tabpanel" tabindex="0"></div>' +
+    '</div>',
+
+  stack:
+    '<div class="stack">' +
+      '<div class="groups">' +
+        skills.map((g) =>
+          /* the space between the items is load-bearing: on a phone these run
+             inline, and adjacent inline boxes with no whitespace between them
+             offer the line no place to break */
+          '<div class="group"><h3>' + esc(g.label) + '</h3><ul>' +
+          g.items.map((i) => '<li>' + esc(i) + '</li>').join(' ') + '</ul></div>'
+        ).join('') +
+      '</div>' +
+      '<div class="creds">' +
+        '<div><h4>California State University, Long Beach</h4>' +
+          '<p>BA, International Studies <i>· Aug 2019 to Dec 2023</i></p></div>' +
+        '<div><h4>AWS Certified Cloud Practitioner</h4>' +
+          '<p>Amazon Web Services, CLF-C02 <i>· Apr 2026</i> ' +
+          '<a class="a" href="https://www.credly.com/badges/eac4215c-2810-4a58-a293-7c4cfe690d7d/public_url" target="_blank" rel="noopener">verify</a></p></div>' +
+      '</div>' +
+    '</div>'
+};
+
+REGISTERS.forEach((r) => {
+  const band = el(
+    '<section class="band" data-id="' + r.id + '">' +
+      '<h2 class="strip-h">' +
+        '<button class="strip" type="button" id="strip-' + r.id + '"' +
+          ' aria-expanded="false" aria-controls="body-' + r.id + '">' +
+          '<span class="word">' + r.word + '</span>' +
+          '<span class="leader" aria-hidden="true"></span>' +
+        '</button>' +
+      '</h2>' +
+      '<div class="body" id="body-' + r.id + '" role="region" aria-labelledby="strip-' + r.id + '">' +
+        '<div class="inner">' + views[r.id] + '</div>' +
+      '</div>' +
+    '</section>'
+  );
+  band.querySelector('.strip').addEventListener('click', () => open(r.id));
+  bandsEl.appendChild(band);
+});
+
+/* ── the index rails: a contents list inside the contents ────── */
+
+/* both rails are one tab stop that the arrows move through, so the keydown
+   is the same in each — only what it selects differs. the focus call reads
+   the index back after selecting, since selecting is what wraps it. */
+function railKeys(list, select, index) {
+  return (e) => {
+    const step = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
+    if (!step) return;
+    e.preventDefault(); e.stopPropagation();
+    select(index() + step);
+    list.children[index()].focus();
+  };
+}
+
+const plist = bandsEl.querySelector('.plist');
+const pdetail = document.getElementById('pdetail');
+const projBand = bandsEl.querySelector('.band[data-id="projects"]');
+let projIdx = 0;
+
+/* the first fit reads both, so they have to be standing before it runs */
+measureRoom();
+
+const fitProjects = fitter({
+  band: projBand,
+  inner: projBand.querySelector('.inner'),
+  detail: pdetail,
+  index: () => projIdx,
+  floor: 0
+});
+
+/* the rail sets the chosen name in 600, and that extra width is enough to pull a
+   word down a line the moment it is picked. a name long enough to move carries
+   its own break in railName, so the rail reads the same before and after; the
+   break is dropped where the rail runs as a row of chips (see .plist br). */
+projects.forEach((p, i) => {
+  const b = el(
+    '<button type="button" role="tab" id="ptab-' + i + '" aria-controls="pdetail"' +
+    /* the width the name takes in 600 is reserved from this, so it is the name
+       on one line — the rail's own break is not in it (see .plist button::after) */
+    ' data-name="' + esc(p.name) + '"' +
+    ' aria-selected="' + (i === 0) + '" tabindex="' + (i === 0 ? '0' : '-1') + '">' +
+    esc(p.railName || p.name).replace(/\n/g, '<br> ') + '</button>'
+  );
+  b.addEventListener('click', () => selectProject(i));
+  b.addEventListener('keydown', railKeys(plist, selectProject, () => projIdx));
+  plist.appendChild(b);
+});
+
+/* keep the screenshots warm so switching never flashes an empty box */
+projects.filter((p) => p.shot).forEach((p) => { new Image().src = p.shot; });
+
+function selectProject(i) {
+  projIdx = (i + projects.length) % projects.length;
+  const p = projects[projIdx];
+  [...plist.children].forEach((b, n) => {
+    b.setAttribute('aria-selected', String(n === projIdx));
+    b.tabIndex = n === projIdx ? 0 : -1;
+  });
+  pdetail.setAttribute('aria-labelledby', 'ptab-' + projIdx);
+
+  const links = [];
+  if (p.liveUrl) links.push('<a class="a" href="' + p.liveUrl + '" target="_blank" rel="noopener">live</a>');
+  if (p.githubUrl) links.push('<a class="a" href="' + p.githubUrl + '" target="_blank" rel="noopener">source</a>');
+
+  /* name, links and status read as one caption; it captions the screenshot when
+     there is one and falls back to the foot bar when there is not */
+  const meta =
+    '<span class="pname">' + esc(p.name) + '</span>' +
+    '<span class="plinks">' + links.join('') +
+      '<span class="st is-' + esc(p.status) + '">' + esc(p.status) + '</span></span>';
+
+  pdetail.innerHTML =
+    '<div class="ptop">' +
+      '<div class="pmain">' +
+        '<p class="ptag">' + esc(p.tagline) + '</p>' +
+        '<p class="pnote">' + esc(p.note) + '</p>' +
+        '<p class="pflow">' + p.flow.map(esc).join('<b>&rarr;</b>') + '</p>' +
+        ruled(p.bullets) +
+        '<p class="more" hidden></p>' +
+      '</div>' +
+      /* the plate is a button: the shot is legible at this size but not readable,
+         and the expanded one is the same picture, not a second page */
+      (p.shot
+        ? '<figure class="shot"' + (p.plate ? ' style="--plate:' + p.plate + '"' : '') + '>' +
+          '<button type="button" class="zoom" aria-label="Expand the ' + esc(p.name) + ' screenshot">' +
+          '<img src="' + p.shot + '" alt="' + esc(p.name) + ' screenshot" decoding="async" />' +
+          '</button>' +
+          '<figcaption class="pmeta">' + meta + '</figcaption></figure>'
+        : '') +
+    '</div>' +
+    '<div class="pbar">' +
+      '<span class="tags">' + esc(p.stack) + '</span>' +
+      (p.shot ? '' : '<span class="pmeta">' + meta + '</span>') +
+    '</div>';
+
+  /* the detail this was measured from has just been rewritten, so the key
+     cannot be allowed to recognise the entry that replaced it */
+  fitProjects.clear();
+  fitProjects();
+}
+selectProject(0);
+
+/* ── the expanded plate ──────────────────────────────────────── */
+
+const plate = document.getElementById('plate');
+const plateImg = document.getElementById('plate-img');
+const plateName = document.getElementById('plate-name');
+
+/* it shows whichever project is selected rather than one it was handed, so the
+   same call opens it and moves it along when the arrows walk the rail */
+function showPlate() {
+  const p = projects[projIdx];
+  if (!p.shot) { plate.close(); return; }
+  plateImg.src = p.shot;
+  plateImg.alt = p.name + ' screenshot';
+  plateName.textContent = p.name;
+  if (p.plate) plate.style.setProperty('--plate', p.plate);
+  else plate.style.removeProperty('--plate');
+  /* showModal, not a div of our own: the top layer, the backdrop, esc and the
+     inert page behind are all the browser's, and they behave the way the rest
+     of the machine does */
+  if (!plate.open) plate.showModal();
+}
+
+/* delegated — the detail is rewritten for every project, and a listener bound
+   to the plate itself would be thrown away with it */
+pdetail.addEventListener('click', (e) => { if (e.target.closest('.zoom')) showPlate(); });
+
+/* the ways out are all the obvious one: the picture, the field around it, the
+   word, and esc, which the dialog answers itself */
+plate.addEventListener('click', (e) => { if (e.target === plate || e.target === plateImg) plate.close(); });
+document.getElementById('plate-close').addEventListener('click', () => plate.close());
+plate.addEventListener('close', () => {
+  /* walking the shots rewrites the plate this was opened from, so focus goes
+     back to the one standing there now rather than to a node off the page */
+  const b = pdetail.querySelector('.zoom');
+  if (b) b.focus({ preventScroll: true });
+});
+
+/* ── work: one role at a time, off the same rail ──────────────── */
+
+const wlist = bandsEl.querySelector('.wlist');
+const wdetail = document.getElementById('wdetail');
+const workBand = bandsEl.querySelector('.band[data-id="work"]');
+const workInner = workBand.querySelector('.inner');
+let roleIdx = 0;
+
+const fitWork = fitter({
+  band: workBand,
+  inner: workInner,
+  detail: wdetail,
+  index: () => roleIdx,
+  after: () => markColumnOpeners()
+});
+
+experience.forEach((j, i) => {
+  const b = el(
+    '<button type="button" role="tab" id="rtab-' + i + '" aria-controls="wdetail"' +
+    ' data-name="' + esc(j.company) + '"' +
+    ' aria-selected="' + (i === 0) + '" tabindex="' + (i === 0 ? '0' : '-1') + '">' +
+    esc(j.company) + '</button>'
+  );
+  b.addEventListener('click', () => selectRole(i));
+  b.addEventListener('keydown', railKeys(wlist, selectRole, () => roleIdx));
+  wlist.appendChild(b);
+});
+
+function selectRole(i) {
+  roleIdx = (i + experience.length) % experience.length;
+  const j = experience[roleIdx];
+  [...wlist.children].forEach((b, n) => {
+    b.setAttribute('aria-selected', String(n === roleIdx));
+    b.tabIndex = n === roleIdx ? 0 : -1;
+  });
+  wdetail.setAttribute('aria-labelledby', 'rtab-' + roleIdx);
+
+  wdetail.innerHTML =
+    '<div class="whead">' +
+      '<div class="wline">' +
+        '<h3 class="wrole">' + esc(j.role) + '</h3>' +
+        '<p class="wdates">' + esc(j.dates) + '</p>' +
+      '</div>' +
+      '<div class="wline">' +
+        '<p class="wwhere">' + esc(j.company) + ' <span>&middot; ' + esc(j.location) + '</span></p>' +
+      '</div>' +
+    '</div>' +
+    ruled(j.bullets) +
+    '<p class="more" hidden></p>';
+
+  /* the detail this was measured from no longer exists — re-selecting the
+     role that is already up rebuilds it too, so the key cannot see it */
+  fitWork.clear();
+  fitWork();
+}
+
+/* the band is one screen and never scrolls, so on a window too short to hold
+   the whole entry the last bullets are dropped rather than cropped, and a
+   count of what was dropped stands in for them.
+
+   the room a band gets when open is the stack less every strip, and the width
+   the entry is set at is the window's. neither answer can change without the
+   window changing, and both are questions the browser can only settle by
+   laying the page out — so they are asked here, when the window settles, and
+   never again during a gesture. asked inside the tap that opens a band, they
+   forced that layout on the frame the band was meant to start moving on. */
+function measureRoom() {
+  let strips = 3;   /* the 1px rules between the four bands */
+  bandsEl.querySelectorAll('.strip-h').forEach((h) => { strips += h.getBoundingClientRect().height; });
+  /* scrollHeight is a rounded integer, so floor this rather than compare a
+     fraction against it and lose a bullet to a rounding error */
+  room = Math.floor(bandsEl.clientHeight - strips);
+  span = innerWidth;
+  return room;
+}
+
+/* work and projects are the same shape — a rail, a detail, and a list of
+   bullets that is the only part of either one that can be given up — so both
+   are cut to fit by one routine, and the register that was silently losing
+   its last bullets and its source link on a short phone now says so the way
+   the other one always has.
+
+   the answer depends on three things and nothing else: which entry is up, how
+   much room the stack has, and how wide the window is. open() calls this on
+   every click into the register, where all three are usually the same as they
+   were the last time — and re-running the search then spends a forced layout
+   per probe to arrive back at what is already on the screen. that was the one
+   stall left on a phone, so identical inputs now do no work at all. each
+   register keeps its own key, because each is measured on its own selection.
+
+   the key is only ever as good as its invalidation: selecting rewrites the
+   detail under it and clears the key by hand, and the fonts clear it when they
+   land, because every measurement taken before them was taken in a fallback
+   face. a throw leaves it null rather than recording a fit that never ran. */
+function fitter(cfg) {
+  let key = null;
+  const fit = () => {
+    const k = cfg.index() + '|' + room + '|' + span;
+    if (k === key) return;
+    key = null;
+    runFit(cfg, room);
+    key = k;
+  };
+  fit.clear = () => { key = null; };
+  return fit;
+}
+
+function runFit(cfg, room) {
+  const lis = [...cfg.detail.querySelectorAll('.ruled > li')];
+  const more = cfg.detail.querySelector('.more');
+  const fits = () => cfg.inner.scrollHeight <= room;
+
+  /* a cut of c hides the last c bullets and puts the count in their place */
+  let applied = -1;
+  const apply = (c) => {
+    applied = c;
+    lis.forEach((li, n) => { li.hidden = n >= lis.length - c; });
+    more.hidden = c === 0;
+    if (c > 0) more.textContent = '+' + c + ' more';
+    /* work runs its bullets in two columns and has to re-mark the one that
+       opens the second; projects runs one column and has nothing to settle */
+    if (cfg.after) cfg.after();
+  };
+
+  /* the band's height is mid-transition whenever this runs on a click, and
+     the whole detail hangs off it at height:100% — measured then, the content
+     reads as nothing. the class drops that chain so the band reports what it
+     actually needs; nothing paints before it comes back off. */
+  cfg.band.classList.add('is-measuring');
+  try {
+    apply(0);
+    if (fits()) return;
+    /* how few bullets may stand. a role stripped of them says nothing it did,
+       so work keeps one; a project is already carried by its tagline and its
+       note, so on a window that can hold neither it gives up all three and
+       says so. with nothing left to cut there is nothing to search. */
+    const floor = cfg.floor === undefined ? 1 : cfg.floor;
+    if (lis.length <= floor) return;
+
+    /* hiding one more bullet can only make the list shorter — a cut that fits
+       still fits with another taken off it — so the smallest cut that fits is
+       found by halving the range rather than walking it: one layout pass per
+       doubling instead of one per bullet. at five bullets that saves little;
+       it is here so the cost stops tracking the length of the role. */
+    let lo = 1, hi = lis.length - floor, best = -1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      apply(mid);
+      if (fits()) { best = mid; hi = mid - 1; } else { lo = mid + 1; }
+    }
+    /* if nothing fits, the deepest cut stands. the search does not always end
+       on its own answer, so settle it explicitly. */
+    const settle = best === -1 ? lis.length - floor : best;
+    if (applied !== settle) apply(settle);
+  } finally {
+    cfg.band.classList.remove('is-measuring');
+  }
+}
+
+/* when the bullets run in two columns, the item that starts the second one
+   must not draw a rule above it — there is nothing above it. the balancer
+   chooses that item by height, so it moves with the width: find it by
+   measuring, not by counting. removing the rule shifts the balance by a
+   pixel, so measure once more and settle. */
+function markColumnOpeners() {
+  for (let pass = 0; pass < 2; pass++) {
+    const lis = [...wdetail.querySelectorAll('.ruled > li')].filter((li) => !li.hidden);
+    const opens = [];
+    let left = null;
+    lis.forEach((li) => {
+      const x = Math.round(li.getBoundingClientRect().left);
+      opens.push(x !== left);
+      left = x;
+    });
+    let moved = false;
+    lis.forEach((li, n) => {
+      if (li.classList.contains('opens-column') === opens[n]) return;
+      li.classList.toggle('opens-column', opens[n]);
+      moved = true;
+    });
+    if (!moved) return;
+  }
+}
+
+selectRole(0);
+
+/* only the register on the screen is worth measuring; the other one is fitted
+   when it is opened, off a key that already carries the width and the room */
+function refitOpen() {
+  if (current === 'work') fitWork();
+  if (current === 'projects') fitProjects();
+}
+
+let refit;
+addEventListener('resize', () => {
+  clearTimeout(refit);
+  /* both keys are stale the moment the window moves, and whichever register
+     is not on the screen is the one the next tap is most likely to open — so
+     both are re-fitted here, where nothing is animating, rather than on the
+     tap that would have had to wait for it */
+  refit = setTimeout(() => { measureRoom(); fitWork(); fitProjects(); measureCopy(); }, 120);
+});
+
+/* ── opening and closing ─────────────────────────────────────── */
+
+let current = null;
+
+const keysEl = document.querySelector('.keys');
+const posEl = document.getElementById('pos');
+const pad = (n) => String(n).padStart(2, '0');
+
+function open(id) {
+  if (id === current) return;
+  current = id;
+  bandsEl.querySelectorAll('.band').forEach((b) => {
+    const on = b.dataset.id === id;
+    b.classList.toggle('is-open', on);
+    b.querySelector('.strip').setAttribute('aria-expanded', String(on));
+  });
+  /* the room a band gets depends on nothing but the strips, so this settles
+     before the opening transition rather than after it */
+  refitOpen();
+  const sideways = id === 'projects' || id === 'work';
+  keysEl.innerHTML = sideways
+    ? '&uarr; &darr; registers &nbsp;&middot;&nbsp; &larr; &rarr; ' + id
+    : '1&ndash;4, or &uarr; &darr;';
+
+  /* where you are in the stack, in the same shape the clock uses opposite it:
+     the figures carry the weight, the word stays in the running italic */
+  const at = REGISTERS.findIndex((r) => r.id === id);
+  posEl.innerHTML = '<b>' + pad(at + 1) + ' / ' + pad(REGISTERS.length) + '</b> ' + id;
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  /* while a shot is open the page behind it is inert, so the arrows belong to
+     the shot: left and right walk the plates, the rail follows underneath, and
+     nothing else here acts on a page you cannot see. esc is the dialog's. */
+  if (plate.open) {
+    const s = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+    if (s) { e.preventDefault(); selectProject(projIdx + s); showPlate(); }
+    return;
+  }
+  const i = REGISTERS.findIndex((r) => r.id === current);
+  if (e.key >= '1' && e.key <= String(REGISTERS.length)) { open(REGISTERS[Number(e.key) - 1].id); return; }
+  if (e.key === 'ArrowDown' || e.key === 'j') { e.preventDefault(); open(REGISTERS[(i + 1) % REGISTERS.length].id); }
+  if (e.key === 'ArrowUp' || e.key === 'k') { e.preventDefault(); open(REGISTERS[(i - 1 + REGISTERS.length) % REGISTERS.length].id); }
+  const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+  if (!step) return;
+  if (current === 'projects') selectProject(projIdx + step);
+  if (current === 'work') selectRole(roleIdx + step);
+});
+
+/* ── the address ─────────────────────────────────────────────── */
+
+/* clicking the address puts it on the clipboard rather than opening a mail
+   client the visitor may not have. the button holds the state for a beat and
+   then goes back — long enough to read, short enough that the word "email"
+   is what the row says at rest. */
+
+const copyBtn = document.getElementById('copy');
+const copyFace = copyBtn.querySelector('.cface');
+const copyState = document.getElementById('copystate');
+let copyBack;
+
+/* the cell has to be told both widths for it to travel between them. each word
+   is measured on itself rather than on the cell — the cell is the other word's
+   width half the time — and the type is set in container units, so this runs
+   again whenever the sheet changes size. */
+function measureCopy() {
+  copyFace.querySelectorAll('.cw').forEach((word) => {
+    const w = Math.ceil(word.getBoundingClientRect().width) + 'px';
+    copyFace.style.setProperty(word.classList.contains('done') ? '--w-done' : '--w-rest', w);
+  });
+}
+measureCopy();
+/* Fraunces arrives after first paint and is wider than the fallback. the copy
+   cell is not the only thing measured in the fallback face: the first fit of
+   the work register is too, and every bullet in it is a line whose height just
+   changed. so it re-fits here as well, from a cleared key. */
+if (document.fonts) document.fonts.ready.then(() => {
+  measureCopy();
+  measureRoom();
+  fitWork.clear(); fitProjects.clear();
+  fitWork(); fitProjects();
+});
+
+/* the clipboard API needs a secure context and a live user gesture; when it
+   is refused, the old selection trick still works, and if that goes too the
+   mail client is the honest last answer. */
+function putOnClipboard(text) {
+  if (navigator.clipboard && isSecureContext) return navigator.clipboard.writeText(text);
+  return new Promise((resolve, reject) => {
+    const field = document.createElement('textarea');
+    field.value = text;
+    field.setAttribute('readonly', '');
+    field.style.cssText = 'position:fixed;top:-100px;opacity:0';
+    document.body.append(field);
+    field.select();
+    const ok = document.execCommand && document.execCommand('copy');
+    field.remove();
+    ok ? resolve() : reject(new Error('copy refused'));
+  });
+}
+
+copyBtn.addEventListener('click', () => {
+  const address = copyBtn.dataset.address;
+  putOnClipboard(address).then(() => {
+    clearTimeout(copyBack);
+    copyBtn.classList.add('is-copied');
+    /* the visible word is hidden from readers — this is what they hear, and
+       it has to change to be spoken, so it is cleared on the way back */
+    copyState.textContent = 'Email address copied';
+    copyBack = setTimeout(() => {
+      copyBtn.classList.remove('is-copied');
+      copyState.textContent = '';
+    }, 1900);
+  }).catch(() => {
+    location.href = 'mailto:' + address;
+  });
+});
+
+/* ── the live bits ───────────────────────────────────────────── */
+
+const clock = document.getElementById('clock');
+
+function tick() {
+  const now = new Date();
+  const zone = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Los_Angeles', timeZoneName: 'short'
+  }).formatToParts(now).find((p) => p.type === 'timeZoneName').value;
+  clock.textContent = zone + ' ' + now.toLocaleTimeString('en-US', {
+    timeZone: 'America/Los_Angeles', hour: 'numeric', minute: '2-digit', hour12: true
+  }).toLowerCase();
+}
+tick();
+setInterval(tick, 30000);
+
+/* ── go ──────────────────────────────────────────────────────── */
+
+open('about');
+void document.body.offsetHeight;
+document.body.classList.add('ready');
+</script>
+</body>
+</html>
