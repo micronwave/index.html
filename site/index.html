@@ -67,7 +67,7 @@
   --rule-hair:   rgba(21,23,26,.11);  /* between list items               */
 
   /* type — seven steps, and nothing in between */
-  --t-display: clamp(26px,   3.6cqi,  46px);
+  --t-display: clamp(34px,   4.9cqi,  62px);
   --t-lede:    clamp(18px,   2.4cqi,  32px);
   --t-word:    clamp(19px,   2.15cqi, 27px);
   --t-title:   clamp(15px,   1.7cqi,  22px);
@@ -128,22 +128,30 @@ i, .it { font-style: italic; }
 
 /* ── head ──────────────────────────────────────────────────── */
 
+/* baseline, not flex-end: the two things in this row are set eleven steps
+   apart, and what makes them read as one line is that their letters sit on it
+   — not that their boxes end together. aligned on the boxes, the links had to
+   drop to the depth of the name's g to square up, and the name then read as
+   floating above a row it was supposed to share. */
 .head {
-  display: flex; align-items: flex-end; justify-content: space-between;
-  gap: 24px; padding-bottom: clamp(10px, 1.5vh, 16px);
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 24px;
+  /* the floor is the name's own tail: the g hangs about eight pixels past the
+     box .92 gives it, so a ten pixel foot left two between the tail and the
+     rule on a short window and thirteen on a tall one. fourteen is the one
+     number that clears it by the same margin either way. */
+  padding-bottom: clamp(14px, 1.5vh, 16px);
 }
+/* the name carries the masthead alone now — the line that sat under it is gone
+   — so it is set at the step the two of them used to occupy between them, and
+   the room the second line took is given back to the register stack. it holds
+   the row's height on its own: nothing else here is set above the body step. */
 .head h1 {
   font-size: var(--t-display);
   font-weight: 600;
   letter-spacing: -.032em;
   line-height: .92;
 }
-.head .sub {
-  margin-top: 7px;
-  font-size: var(--t-body);
-  color: var(--ink-2);
-}
-.head .sub em { font-style: italic; color: var(--ink); }
 
 /* the interpuncts are flex items too, so the gap has to stay small enough
    that "email · github" reads as one run, not three */
@@ -382,7 +390,57 @@ i, .it { font-style: italic; }
 }
 
 .body { flex: 1 1 0; min-height: 0; overflow: hidden; }
-.inner { height: 100%; padding-bottom: clamp(12px, 2vh, 22px); }
+
+/* the sheet is one screen and the page never scrolls — but an entry is a fixed
+   length and the window is not, so on a short one the open band takes the
+   scroll rather than dropping the bullets it cannot show. only the open band:
+   a closed one is clipped to nothing and has nothing to scroll, and a scroll
+   container at zero height would still answer a stray wheel.
+
+   the bar the browser would draw is taken off: a scrollbar in the flow costs
+   the entry ten pixels of measure, which is ten pixels the leader above it and
+   the rule below it do not give up — and on a window where one project
+   overflows and the next does not, it is ten pixels handed back and forth on
+   every tap of the rail. what shows instead is drawn in the margin, opposite
+   the brace, where there is nothing to push. */
+.band.is-open .body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+.band.is-open .body::-webkit-scrollbar { display: none; }
+
+/* how deep the open band runs and where in it you are: one mark on the rail
+   the brace does not use, set from the band's own scroll (see markScroll).
+   --ink-4, the grey that is only ever decoration — this is a position, not a
+   thing to read, and never a thing to drag. */
+.band::after {
+  content: '';
+  position: absolute;
+  right: calc(var(--rail) * -1 + 4px);
+  top: 0; width: 2px;
+  /* the height is the class's, not the variable's: a mark left at its last
+     length on a band that has since closed is an invisible four-hundred-pixel
+     box hanging off a thirty-pixel strip, and the page counts it */
+  height: 0;
+  transform: translateY(var(--thumb-y, 0px));
+  background: var(--ink-4);
+  opacity: 0; transition: opacity .12s linear;
+  pointer-events: none;
+}
+/* it arrives once the band has finished opening and knows its own height */
+.band.is-scrollable::after { height: var(--thumb-h, 0px); opacity: 1; }
+
+/* min-height, not height: the inner fills the band when the entry is short and
+   runs past it when the entry is long, which is the only way the band above it
+   has anything to scroll. it is a column so the four views can still stretch to
+   the full band the way height:100% used to make them — and they grow rather
+   than shrink, since a flex item that gives way here is one that clips again. */
+.inner {
+  min-height: 100%;
+  display: flex; flex-direction: column;
+  padding-bottom: clamp(12px, 2vh, 22px);
+}
 .inner { transition: visibility 0s 0s; }
 /* stays visible while the band clips it away, then drops out of the tab order */
 .band:not(.is-open) .inner { visibility: hidden; transition: visibility 0s .36s; }
@@ -422,9 +480,9 @@ i, .it { font-style: italic; }
 
 /* ── 01 about ──────────────────────────────────────────────── */
 
-.about { display: flex; flex-direction: column; height: 100%; }
+.about { display: flex; flex-direction: column; flex: 1 0 auto; }
 .about__top {
-  flex: 1 1 auto;
+  flex: 1 0 auto;
   display: grid; grid-template-columns: repeat(12, minmax(0,1fr));
   column-gap: var(--gutter);
   /* vh, not a share of the band: the band's height animates and this must not.
@@ -506,6 +564,9 @@ i, .it { font-style: italic; }
   background-repeat: repeat-x;
   opacity: 0;
 }
+/* the short form is a phone's business only — see the narrow block, where the
+   rail stops being a column and becomes a row of chips */
+.plist .abbr { display: none; }
 .plist button:hover, .wlist button:hover { color: var(--red-ink); }
 .plist button[aria-selected="true"], .wlist button[aria-selected="true"] { color: var(--ink); font-weight: 600; }
 .plist button[aria-selected="true"]::before, .wlist button[aria-selected="true"]::before { opacity: 1; }
@@ -527,7 +588,7 @@ i, .it { font-style: italic; }
    one role at a time, picked from the index, is the same measure as a project. */
 .work {
   display: grid; grid-template-columns: repeat(12, minmax(0,1fr));
-  column-gap: var(--gutter); height: 100%;
+  column-gap: var(--gutter); flex: 1 0 auto;
 }
 /* the bullets take the whole detail, not six tenths of it: projects holds the
    rest back for a screenshot and work has none, and a role read at half the
@@ -566,20 +627,9 @@ i, .it { font-style: italic; }
 .wdetail .ruled > li { break-inside: avoid; }
 .wdetail .ruled > li.opens-column { border-top: 0; padding-top: 0; }
 
-/* shown only when the window is too short to hold the whole entry — work and
-   projects are cut by one routine, so they say what was cut in one voice */
-.more { margin-top: 7px; font-style: italic; font-size: var(--t-small); color: var(--ink-3); }
-
-/* held for the length of one measurement, never across a paint */
-.band.is-measuring .inner,
-.band.is-measuring .work,
-.band.is-measuring .wdetail,
-.band.is-measuring .projects,
-.band.is-measuring .pdetail { height: auto; }
-
 /* ── 03 projects ───────────────────────────────────────────── */
 
-.projects { display: grid; grid-template-columns: repeat(12, minmax(0,1fr)); column-gap: var(--gutter); height: 100%; }
+.projects { display: grid; grid-template-columns: repeat(12, minmax(0,1fr)); column-gap: var(--gutter); flex: 1 0 auto; }
 
 .pdetail { grid-column: span 10; display: flex; flex-direction: column; min-width: 0; height: 100%; }
 /* ten tracks of the parent width, restated at the same gutter — the nesting
@@ -679,11 +729,11 @@ i, .it { font-style: italic; }
 
 /* ── 04 stack ──────────────────────────────────────────────── */
 
-.stack { display: flex; flex-direction: column; height: 100%; }
+.stack { display: flex; flex-direction: column; flex: 1 0 auto; }
 /* five is the one count that cannot land on twelve; the band keeps its own
    five-column measure, and everything inside it — including the credentials
    row — is held to that same measure and the shared gutter */
-.groups { flex: 1 1 auto; display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); column-gap: var(--gutter); }
+.groups { flex: 1 0 auto; display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); column-gap: var(--gutter); }
 /* the columns had rules between them, and those rules were the full height of
    the band: they ran the length of the longest list and then kept going through
    the empty half below it, ending on nothing. the heading rules mark where each
@@ -737,7 +787,12 @@ i, .it { font-style: italic; }
 }
 @media (max-width: 720px) {
   :root { --pad-x: 20px; }
+  /* the links move under the name here, and the gap is measured from the name's
+     box — which at .92 stops above the tail of its g, so the tail was hanging
+     into the row below it with a pixel to spare. the box is given the overhang
+     back, and the gap is then the gap you can see. */
   .head { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .head h1 { margin-bottom: .13em; }
   .band::before { --bw: 11px; }   /* the rail is at its 14px floor from here down */
   .about__top { padding-bottom: 0; }
   /* only here do the two blocks stack; the notes keep their own rhythm */
@@ -785,8 +840,12 @@ i, .it { font-style: italic; }
     width: auto; height: 7px;
     background-position: left bottom 1px;
   }
-  /* names are chips in a row here, so the rail's fixed break has to go */
-  .plist br, .wlist br { display: none; }
+  /* the rail is a row of chips at this width, and one long name takes a whole
+     line of the band with it. where a project carries a short form, that is
+     what the chip is set in; the caption under the entry still names it in
+     full, and the bold width reserved above is measured from the same form. */
+  .plist .full { display: none; }
+  .plist .abbr { display: inline; }
   .ptop { grid-template-columns: 1fr; row-gap: 14px; }
   .pmain { grid-column: auto; }
   /* the stack line is pinned to the foot of the band on the sheet, where the
@@ -814,7 +873,10 @@ i, .it { font-style: italic; }
 /* shorter windows: tighten the rhythm */
 @media (max-height: 830px) {
   .strip { padding: 8px 0; }
-  .head { padding-bottom: 9px; }
+  /* everything here gives up a few pixels, but not the ones under the name's
+     tail — nine left it sitting on the rule. it tightens by the same third as
+     the rest of the block, measured from the foot the tail actually needs. */
+  .head { padding-bottom: 13px; }
   .inner { padding-bottom: 10px; }
   .ruled > li { padding-top: 5px; margin-bottom: 5px; line-height: 1.4; }
   .pnote { margin-top: 8px; }
@@ -863,16 +925,13 @@ i, .it { font-style: italic; }
 /* touch and the stacked layout used to have the accordion taken off them: the
    heavier registers could not keep up, so the band crept part of the way and
    then jumped the rest, and an instant open was the better of two bad reads.
-   the creep was never the transition's fault. opening a register toggles the
-   classes and so dirties the layout, and the fit that ran on the same tap then
-   read the stack's height and the window's width straight back out of the
-   document — two reads that can only be answered by laying the page out again,
-   there and then, on the one frame the band had to start moving on. the band
-   stood still through it and arrived late. both numbers change with the window
-   and with nothing else, so they are taken when the window changes and read
-   from a variable in between (see measureRoom), and the tap now costs a class
-   toggle. all four registers open on the same curve, at the same length, on a
-   phone as on the sheet. */
+   the creep was never the transition's fault. opening a register dirtied the
+   layout, and the fit that ran on the same tap read the stack's height back
+   out of the document — a question the browser can only answer by laying the
+   page out again, there and then, on the one frame the band had to start
+   moving on. there is no fit left to run: a tap costs a class toggle and the
+   band's own height is the browser's to settle. all four registers open on the
+   same curve, at the same length, on a phone as on the sheet. */
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
@@ -884,10 +943,7 @@ i, .it { font-style: italic; }
 <div class="sheet">
 
   <header class="head">
-    <div>
-      <h1>Aaron Altergott</h1>
-      <p class="sub"><em>operations engineer</em> in SoCal</p>
-    </div>
+    <h1>Aaron Altergott</h1>
     <nav class="contact" aria-label="Contact">
       <button class="a copy" id="copy" type="button" data-address="adaltergott@gmail.com"
               title="adaltergott@gmail.com" aria-label="Copy email address adaltergott@gmail.com"><span class="cface"><span class="cw rest">email</span><span class="cw done" aria-hidden="true"><svg class="ck" viewBox="0 0 12 12"><path d="M.9 6.4 4.4 10.2 11.1 1.9"/></svg>copied</span></span></button><span>·</span>
@@ -992,7 +1048,7 @@ const projects = [
     status: 'active'
   },
   {
-    name: 'AWS Docs RAG',
+    name: 'AWS RAG',
     tagline: 'Answers AWS questions from the current documentation, with source URLs attached.',
     note: "Built while studying for the AWS Cloud Practitioner exam. AI can and will hallucinate from training data or from expired documentation it finds on the internet. This retrieves the relevant docs at query time and builds the prompt around them, so answers come back with relevant sources.",
     bullets: [
@@ -1008,8 +1064,7 @@ const projects = [
     status: 'complete'
   },
   {
-    name: 'Narrative Intelligence Engine',
-    railName: 'Narrative\nIntelligence Engine',
+    name: 'NIE',
     tagline: 'Tracks financial narratives across news and filings, scores their momentum, and maps them to S&P 500 tickers and overall trends.',
     note: 'Built to increase my situational awareness in the stock market. Financial stories surface as RSS headlines or SEC filings all the time. NIE pulls those fragments together every four hours, clusters them into tracked narratives, and watches how they evolve.',
     bullets: [
@@ -1042,6 +1097,9 @@ const projects = [
   },
   {
     name: 'Claude Chaperone',
+    /* what the rail sets it in where the rail is a row of chips and a name this
+       long costs a line of the band. the caption still names it in full. */
+    short: 'CC',
     tagline: 'Installs a plan-build-audit-commit workflow into any project with a single command.',
     note: 'Claude accumulates problems in long sessions: carried-over assumptions, gaps it guessed at, scope drift. A hook injects the previous state right after each plan-build-audit step so the user does not have to waste time explaining the current stage.',
     bullets: [
@@ -1073,10 +1131,6 @@ const el = (h) => { const t = document.createElement('template'); t.innerHTML = 
 const ruled = (arr) => '<ul class="ruled">' + arr.map((b) => '<li>' + esc(b) + '</li>').join('') + '</ul>';
 
 const bandsEl = document.getElementById('bands');
-
-/* the room an open band gets, and the width its entry is set at. both are
-   settled by the window and read from here in between — see measureRoom. */
-let room = 0, span = 0;
 
 const REGISTERS = [
   { id: 'about', word: 'about' },
@@ -1171,29 +1225,19 @@ const pdetail = document.getElementById('pdetail');
 const projBand = bandsEl.querySelector('.band[data-id="projects"]');
 let projIdx = 0;
 
-/* the first fit reads both, so they have to be standing before it runs */
-measureRoom();
-
-const fitProjects = fitter({
-  band: projBand,
-  inner: projBand.querySelector('.inner'),
-  detail: pdetail,
-  index: () => projIdx,
-  floor: 0
-});
-
-/* the rail sets the chosen name in 600, and that extra width is enough to pull a
-   word down a line the moment it is picked. a name long enough to move carries
-   its own break in railName, so the rail reads the same before and after; the
-   break is dropped where the rail runs as a row of chips (see .plist br). */
+/* both forms of the name are set into the chip and the stylesheet picks one:
+   the full name in the column, the short one in the row of chips a phone gets.
+   the hidden half is display:none, so it is out of the accessible name too. */
 projects.forEach((p, i) => {
   const b = el(
     '<button type="button" role="tab" id="ptab-' + i + '" aria-controls="pdetail"' +
-    /* the width the name takes in 600 is reserved from this, so it is the name
-       on one line — the rail's own break is not in it (see .plist button::after) */
-    ' data-name="' + esc(p.name) + '"' +
+    /* the width the name takes in 600 is reserved from this, and only where the
+       rail is a row (see .plist button::after) — so it is the form shown there */
+    ' data-name="' + esc(p.short || p.name) + '"' +
     ' aria-selected="' + (i === 0) + '" tabindex="' + (i === 0 ? '0' : '-1') + '">' +
-    esc(p.railName || p.name).replace(/\n/g, '<br> ') + '</button>'
+    (p.short
+      ? '<span class="full">' + esc(p.name) + '</span><span class="abbr">' + esc(p.short) + '</span>'
+      : esc(p.name)) + '</button>'
   );
   b.addEventListener('click', () => selectProject(i));
   b.addEventListener('keydown', railKeys(plist, selectProject, () => projIdx));
@@ -1230,7 +1274,6 @@ function selectProject(i) {
         '<p class="pnote">' + esc(p.note) + '</p>' +
         '<p class="pflow">' + p.flow.map(esc).join('<b>&rarr;</b>') + '</p>' +
         ruled(p.bullets) +
-        '<p class="more" hidden></p>' +
       '</div>' +
       /* the plate is a button: the shot is legible at this size but not readable,
          and the expanded one is the same picture, not a second page */
@@ -1247,10 +1290,9 @@ function selectProject(i) {
       (p.shot ? '' : '<span class="pmeta">' + meta + '</span>') +
     '</div>';
 
-  /* the detail this was measured from has just been rewritten, so the key
-     cannot be allowed to recognise the entry that replaced it */
-  fitProjects.clear();
-  fitProjects();
+  /* the entry underneath has been replaced, and a band left part-scrolled would
+     open the next one halfway down it */
+  toTop(projBand);
 }
 selectProject(0);
 
@@ -1296,16 +1338,7 @@ plate.addEventListener('close', () => {
 const wlist = bandsEl.querySelector('.wlist');
 const wdetail = document.getElementById('wdetail');
 const workBand = bandsEl.querySelector('.band[data-id="work"]');
-const workInner = workBand.querySelector('.inner');
 let roleIdx = 0;
-
-const fitWork = fitter({
-  band: workBand,
-  inner: workInner,
-  detail: wdetail,
-  index: () => roleIdx,
-  after: () => markColumnOpeners()
-});
 
 experience.forEach((j, i) => {
   const b = el(
@@ -1338,117 +1371,90 @@ function selectRole(i) {
         '<p class="wwhere">' + esc(j.company) + ' <span>&middot; ' + esc(j.location) + '</span></p>' +
       '</div>' +
     '</div>' +
-    ruled(j.bullets) +
-    '<p class="more" hidden></p>';
+    ruled(j.bullets);
 
-  /* the detail this was measured from no longer exists — re-selecting the
-     role that is already up rebuilds it too, so the key cannot see it */
-  fitWork.clear();
-  fitWork();
+  /* the bullets run in two columns, and which one opens the second is settled
+     by measuring what has just been written — so it is settled here */
+  markColumnOpeners();
+  toTop(workBand);
 }
 
-/* the band is one screen and never scrolls, so on a window too short to hold
-   the whole entry the last bullets are dropped rather than cropped, and a
-   count of what was dropped stands in for them.
+/* the sheet is one screen and the page never scrolls. the entries are a fixed
+   length and the window is not, so where the two disagree it is the open band
+   that gives — it takes the scroll, and everything the entry says stays on the
+   page. nothing is measured to decide this: the browser scrolls the box when
+   the content is taller than the box and leaves it alone when it is not.
 
-   the room a band gets when open is the stack less every strip, and the width
-   the entry is set at is the window's. neither answer can change without the
-   window changing, and both are questions the browser can only settle by
-   laying the page out — so they are asked here, when the window settles, and
-   never again during a gesture. asked inside the tap that opens a band, they
-   forced that layout on the frame the band was meant to start moving on. */
-function measureRoom() {
-  let strips = 3;   /* the 1px rules between the four bands */
-  bandsEl.querySelectorAll('.strip-h').forEach((h) => { strips += h.getBoundingClientRect().height; });
-  /* scrollHeight is a rounded integer, so floor this rather than compare a
-     fraction against it and lose a bullet to a rounding error */
-  room = Math.floor(bandsEl.clientHeight - strips);
-  span = innerWidth;
-  return room;
+   what it replaces was a routine that binary-searched the number of bullets
+   that would fit and hid the rest behind a "+N more" that could not be reached
+   from anywhere. the about band had no such routine at all and simply lost its
+   last line. both are now the same rule: the band scrolls, or it does not. */
+
+/* an entry the reader has not seen should open at its first line */
+function toTop(band) {
+  const body = band.querySelector('.body');
+  if (body) body.scrollTop = 0;
+  markScroll(band);
 }
 
-/* work and projects are the same shape — a rail, a detail, and a list of
-   bullets that is the only part of either one that can be given up — so both
-   are cut to fit by one routine, and the register that was silently losing
-   its last bullets and its source link on a short phone now says so the way
-   the other one always has.
+/* the mark in the right rail: whether this band runs deeper than the room it
+   has, how much of it is on the screen, and where in it the reader is. the
+   thumb is placed from the band's own top, since that is what it is drawn on —
+   the body sits below the strip, and the strip's height moves with the window.
 
-   the answer depends on three things and nothing else: which entry is up, how
-   much room the stack has, and how wide the window is. open() calls this on
-   every click into the register, where all three are usually the same as they
-   were the last time — and re-running the search then spends a forced layout
-   per probe to arrive back at what is already on the screen. that was the one
-   stall left on a phone, so identical inputs now do no work at all. each
-   register keeps its own key, because each is measured on its own selection.
-
-   the key is only ever as good as its invalidation: selecting rewrites the
-   detail under it and clears the key by hand, and the fonts clear it when they
-   land, because every measurement taken before them was taken in a fallback
-   face. a throw leaves it null rather than recording a fit that never ran. */
-function fitter(cfg) {
-  let key = null;
-  const fit = () => {
-    const k = cfg.index() + '|' + room + '|' + span;
-    if (k === key) return;
-    key = null;
-    runFit(cfg, room);
-    key = k;
-  };
-  fit.clear = () => { key = null; };
-  return fit;
+   it is not measured on any schedule: a scroll, a tap on the rail, the window
+   settling, and the band arriving at its full height are the only four moments
+   any of these numbers can have changed. */
+function markScroll(band) {
+  const body = band.querySelector('.body');
+  if (!body) return;
+  const over = body.scrollHeight - body.clientHeight;
+  const on = band.classList.contains('is-open') && over > 1;
+  band.classList.toggle('is-scrollable', on);
+  if (!on) return;
+  /* the thumb is the visible share of the entry, floored so it stays a mark
+     rather than a dot on a band that runs very deep */
+  const h = Math.max(28, body.clientHeight * body.clientHeight / body.scrollHeight);
+  const y = body.offsetTop + (body.clientHeight - h) * (body.scrollTop / over);
+  band.style.setProperty('--thumb-h', h + 'px');
+  band.style.setProperty('--thumb-y', Math.round(y) + 'px');
 }
 
-function runFit(cfg, room) {
-  const lis = [...cfg.detail.querySelectorAll('.ruled > li')];
-  const more = cfg.detail.querySelector('.more');
-  const fits = () => cfg.inner.scrollHeight <= room;
+const still = matchMedia('(prefers-reduced-motion: reduce)');
 
-  /* a cut of c hides the last c bullets and puts the count in their place */
-  let applied = -1;
-  const apply = (c) => {
-    applied = c;
-    lis.forEach((li, n) => { li.hidden = n >= lis.length - c; });
-    more.hidden = c === 0;
-    if (c > 0) more.textContent = '+' + c + ' more';
-    /* work runs its bullets in two columns and has to re-mark the one that
-       opens the second; projects runs one column and has nothing to settle */
-    if (cfg.after) cfg.after();
-  };
-
-  /* the band's height is mid-transition whenever this runs on a click, and
-     the whole detail hangs off it at height:100% — measured then, the content
-     reads as nothing. the class drops that chain so the band reports what it
-     actually needs; nothing paints before it comes back off. */
-  cfg.band.classList.add('is-measuring');
-  try {
-    apply(0);
-    if (fits()) return;
-    /* how few bullets may stand. a role stripped of them says nothing it did,
-       so work keeps one; a project is already carried by its tagline and its
-       note, so on a window that can hold neither it gives up all three and
-       says so. with nothing left to cut there is nothing to search. */
-    const floor = cfg.floor === undefined ? 1 : cfg.floor;
-    if (lis.length <= floor) return;
-
-    /* hiding one more bullet can only make the list shorter — a cut that fits
-       still fits with another taken off it — so the smallest cut that fits is
-       found by halving the range rather than walking it: one layout pass per
-       doubling instead of one per bullet. at five bullets that saves little;
-       it is here so the cost stops tracking the length of the role. */
-    let lo = 1, hi = lis.length - floor, best = -1;
-    while (lo <= hi) {
-      const mid = (lo + hi) >> 1;
-      apply(mid);
-      if (fits()) { best = mid; hi = mid - 1; } else { lo = mid + 1; }
-    }
-    /* if nothing fits, the deepest cut stands. the search does not always end
-       on its own answer, so settle it explicitly. */
-    const settle = best === -1 ? lis.length - floor : best;
-    if (applied !== settle) apply(settle);
-  } finally {
-    cfg.band.classList.remove('is-measuring');
-  }
+/* the arrows walk the register stack, and a band deep enough to scroll sits in
+   their way: they move through what it is still holding below the fold first,
+   and step to the next register once it has nothing left to show in that
+   direction. j and k stay the direct jump for anyone who wants past it, and
+   1-4 skip the stack outright. returns whether the key was spent here. */
+function scrolled(step) {
+  const body = bandsEl.querySelector('.band.is-open .body');
+  if (!body) return false;
+  const end = body.scrollHeight - body.clientHeight;
+  if (end < 2) return false;
+  const at = body.scrollTop;
+  /* a pixel of tolerance at each end: a scroll box rounds, and a band a
+     fraction from its own floor should read as being on it */
+  if (step > 0 ? at >= end - 1 : at <= 1) return false;
+  body.scrollBy({
+    top: step * Math.max(90, body.clientHeight * 0.62),
+    behavior: still.matches ? 'auto' : 'smooth'
+  });
+  return true;
 }
+
+/* one listener for all four, on the way up: a scroll event does not bubble,
+   but it does capture, and only one band is ever open to send one */
+bandsEl.addEventListener('scroll', (e) => {
+  const band = e.target.closest && e.target.closest('.band');
+  if (band) markScroll(band);
+}, true);
+
+/* the band opens over .36s and only knows its height at the end of it, so the
+   mark is struck when the movement stops rather than when it starts */
+bandsEl.addEventListener('transitionend', (e) => {
+  if (e.propertyName === 'flex-grow') markScroll(e.target);
+});
 
 /* when the bullets run in two columns, the item that starts the second one
    must not draw a rule above it — there is nothing above it. the balancer
@@ -1457,7 +1463,7 @@ function runFit(cfg, room) {
    pixel, so measure once more and settle. */
 function markColumnOpeners() {
   for (let pass = 0; pass < 2; pass++) {
-    const lis = [...wdetail.querySelectorAll('.ruled > li')].filter((li) => !li.hidden);
+    const lis = [...wdetail.querySelectorAll('.ruled > li')];
     const opens = [];
     let left = null;
     lis.forEach((li) => {
@@ -1477,21 +1483,18 @@ function markColumnOpeners() {
 
 selectRole(0);
 
-/* only the register on the screen is worth measuring; the other one is fitted
-   when it is opened, off a key that already carries the width and the room */
-function refitOpen() {
-  if (current === 'work') fitWork();
-  if (current === 'projects') fitProjects();
-}
-
-let refit;
+let resettle;
 addEventListener('resize', () => {
-  clearTimeout(refit);
-  /* both keys are stale the moment the window moves, and whichever register
-     is not on the screen is the one the next tap is most likely to open — so
-     both are re-fitted here, where nothing is animating, rather than on the
-     tap that would have had to wait for it */
-  refit = setTimeout(() => { measureRoom(); fitWork(); fitProjects(); measureCopy(); }, 120);
+  clearTimeout(resettle);
+  /* the two columns rebalance with the width, so which bullet opens the second
+     one moves with it; the copy button's two widths are set in container units
+     and move with it too. whether a band still overflows is the window's answer
+     as much as the entry's, so the mark on the rail is struck again here. */
+  resettle = setTimeout(() => {
+    markColumnOpeners();
+    measureCopy();
+    bandsEl.querySelectorAll('.band').forEach(markScroll);
+  }, 120);
 });
 
 /* ── opening and closing ─────────────────────────────────────── */
@@ -1510,9 +1513,13 @@ function open(id) {
     b.classList.toggle('is-open', on);
     b.querySelector('.strip').setAttribute('aria-expanded', String(on));
   });
-  /* the room a band gets depends on nothing but the strips, so this settles
-     before the opening transition rather than after it */
-  refitOpen();
+  /* a band left part-scrolled would open there the next time it is asked for.
+     the mark comes off every band with it: the one opening does not know its
+     own height yet, and will strike its own when it gets there. */
+  bandsEl.querySelectorAll('.band').forEach((b) => {
+    b.querySelector('.body').scrollTop = 0;
+    b.classList.remove('is-scrollable');
+  });
   const sideways = id === 'projects' || id === 'work';
   keysEl.innerHTML = sideways
     ? '&uarr; &darr; registers &nbsp;&middot;&nbsp; &larr; &rarr; ' + id
@@ -1536,8 +1543,14 @@ document.addEventListener('keydown', (e) => {
   }
   const i = REGISTERS.findIndex((r) => r.id === current);
   if (e.key >= '1' && e.key <= String(REGISTERS.length)) { open(REGISTERS[Number(e.key) - 1].id); return; }
-  if (e.key === 'ArrowDown' || e.key === 'j') { e.preventDefault(); open(REGISTERS[(i + 1) % REGISTERS.length].id); }
-  if (e.key === 'ArrowUp' || e.key === 'k') { e.preventDefault(); open(REGISTERS[(i - 1 + REGISTERS.length) % REGISTERS.length].id); }
+  const next = () => open(REGISTERS[(i + 1) % REGISTERS.length].id);
+  const prev = () => open(REGISTERS[(i - 1 + REGISTERS.length) % REGISTERS.length].id);
+  /* the arrows read the open band to its end before they leave it; j and k
+     leave it whatever it is still holding */
+  if (e.key === 'ArrowDown') { e.preventDefault(); if (!scrolled(1)) next(); }
+  if (e.key === 'ArrowUp') { e.preventDefault(); if (!scrolled(-1)) prev(); }
+  if (e.key === 'j') { e.preventDefault(); next(); }
+  if (e.key === 'k') { e.preventDefault(); prev(); }
   const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
   if (!step) return;
   if (current === 'projects') selectProject(projIdx + step);
@@ -1567,15 +1580,16 @@ function measureCopy() {
   });
 }
 measureCopy();
-/* Fraunces arrives after first paint and is wider than the fallback. the copy
-   cell is not the only thing measured in the fallback face: the first fit of
-   the work register is too, and every bullet in it is a line whose height just
-   changed. so it re-fits here as well, from a cleared key. */
+/* Fraunces arrives after first paint and is wider than the fallback, so both
+   things measured off the face are measured again once it lands: the copy
+   cell's two widths, and which bullet opens the work register's second column
+   — a balance struck in the fallback is struck on the wrong line heights. */
 if (document.fonts) document.fonts.ready.then(() => {
   measureCopy();
-  measureRoom();
-  fitWork.clear(); fitProjects.clear();
-  fitWork(); fitProjects();
+  markColumnOpeners();
+  /* the entry is set in a wider face than it was measured in, so a band that
+     did not overflow in the fallback may well overflow now */
+  bandsEl.querySelectorAll('.band').forEach(markScroll);
 });
 
 /* the clipboard API needs a secure context and a live user gesture; when it
@@ -1634,6 +1648,9 @@ setInterval(tick, 30000);
 open('about');
 void document.body.offsetHeight;
 document.body.classList.add('ready');
+/* the first band opens before the transition is armed, so it arrives at its
+   full height without ever ending a transition — its mark is struck by hand */
+bandsEl.querySelectorAll('.band').forEach(markScroll);
 </script>
 </body>
 </html>
