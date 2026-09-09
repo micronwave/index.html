@@ -35,9 +35,9 @@ body {
 
 .body {
   flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 400px;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 72px;
   padding: 54px 0;
 }
@@ -56,30 +56,13 @@ h1 {
 }
 .sub em { font-style: italic; color: var(--ink); }
 
-/* the contents list, as the page sets it: word, dot leader, folio */
-.toc { display: flex; flex-direction: column; }
-.toc li {
-  list-style: none;
-  display: flex; align-items: baseline; gap: 14px;
-  padding: 13px 0;
-  border-top: 1px solid var(--rule-hair);
-  font-size: 27px;
-  color: var(--ink-2);
+/* the favicon's mark, at the same proportions: a red bar 6 units wide and
+   24 tall, sitting just right of centre on the paper. */
+.mark {
+  width: 48px; height: 192px;
+  background: var(--red);
+  flex: 0 0 auto;
 }
-.toc li:first-child { border-top: 0; }
-.toc li.open { color: var(--ink); }
-.leader {
-  flex: 1 1 auto; height: 1em; align-self: baseline; min-width: 24px;
-  background-image: radial-gradient(circle, var(--ink-4) 1.3px, transparent 1.4px);
-  background-size: 8px 8px;
-  background-position: left bottom 5px;
-  background-repeat: repeat-x;
-}
-.toc li.open .leader {
-  background-image: radial-gradient(circle, var(--red) 1.3px, transparent 1.4px);
-}
-.folio { font-size: 21px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-.toc li.open .folio { color: var(--red-ink); }
 
 .foot {
   display: flex; align-items: baseline; justify-content: space-between;
@@ -99,12 +82,7 @@ h1 {
       <p class="sub"><em>operations engineer</em> in SoCal</p>
     </div>
 
-    <ul class="toc">
-      <li class="open"><span>about</span><span class="leader"></span><span class="folio">01</span></li>
-      <li><span>work</span><span class="leader"></span><span class="folio">02</span></li>
-      <li><span>projects</span><span class="leader"></span><span class="folio">03</span></li>
-      <li><span>stack</span><span class="leader"></span><span class="folio">04</span></li>
-    </ul>
+    <div class="mark" aria-hidden="true"></div>
   </div>
 
   <div class="rule-bottom"></div>
