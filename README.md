@@ -28,3 +28,16 @@ python -m http.server -d site 5173
 
 Push to `main`. `.github/workflows/deploy.yml` uploads `site/` straight to
 GitHub Pages — no install, no build.
+
+## Social card
+
+`site/og-image.png` (1200×630) is rendered from `tools/og-card.html`:
+
+```
+chrome --headless=new --disable-gpu --hide-scrollbars \
+  --force-device-scale-factor=2 --window-size=1200,630 \
+  --virtual-time-budget=6000 --screenshot=card@2x.png tools/og-card.html
+```
+
+Then downscale the 2400×1260 capture to 1200×630 (Lanczos) and save over
+`site/og-image.png`.
