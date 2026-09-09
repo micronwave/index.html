@@ -28,7 +28,15 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23e9e9e3'/%3E%3Crect x='13' y='4' width='6' height='24' fill='%23dd2f19'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..800,0..100,0..1;1,9..144,300..800,0..100,0..1&display=swap" rel="stylesheet" />
+<!-- Fraunces has five axes and the page moves along two of them: weight, and
+     optical size, which font-optical-sizing drives off the type scale. SOFT and
+     WONK are set once and never again (see font-variation-settings below), so
+     asking for their whole ranges bought two axes of variation the page has no
+     way to use and paid for them in the file: WONK pinned at the 1 the page
+     wants and SOFT left at its own default of 0, the two latin faces come to
+     146KB rather than 264KB. The @font-face rules Google serves are otherwise
+     identical — same family, same weight range, same unicode-ranges. -->
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,WONK@0,9..144,300..800,1;1,9..144,300..800,1&display=swap" rel="stylesheet" />
 <style>
 /* ═══════════════════════════════════════════════════════════════
    A contents page that opens in place.
@@ -335,7 +343,14 @@ i, .it { font-style: italic; }
   color: var(--ink-3);
   transition: color .1s linear;
 }
-.strip:hover .word { color: var(--red-ink); }
+/* a finger leaves :hover on whatever it last touched, and the register stack
+   is the one thing on this page that is tapped over and over — the strip you
+   opened two registers ago would still be sitting in the accent, and its ten
+   hover dots with it, as though it were still being pointed at. the copy link
+   has had this taken back since it was written (see the block above it); the
+   stack is the same argument, and it also spares the phone a second animation
+   on the frame the band has to start moving on. */
+@media (hover: hover) { .strip:hover .word { color: var(--red-ink); } }
 .band.is-open .word { color: var(--ink); font-weight: 600; letter-spacing: -.032em; }
 .band.is-open .strip:hover .word { color: var(--ink); }
 
@@ -379,8 +394,11 @@ i, .it { font-style: italic; }
   mask-image: linear-gradient(90deg, #000 var(--run), transparent var(--run));
   transition: --run .16s steps(10, end);
 }
-/* hover: ten dots. 70px is exactly ten 7px cells, so it ends between dots */
-.strip:hover .leader::before { --run: 70px; }
+/* hover: ten dots. 70px is exactly ten 7px cells, so it ends between dots.
+   pointers only, for the reason given at .strip:hover .word — and on a phone
+   this is also a mask repainted across the full width of the strip on the one
+   frame the band has to start moving on. */
+@media (hover: hover) { .strip:hover .leader::before { --run: 70px; } }
 /* open: the same run, all the way. smooth here rather than stepped, and timed
    to the band's own .36s, so the rule fills as the band opens */
 .band.is-open .leader::before,
@@ -413,23 +431,29 @@ i, .it { font-style: italic; }
 /* how deep the open band runs and where in it you are: one mark on the rail
    the brace does not use, set from the band's own scroll (see markScroll).
    --ink-4, the grey that is only ever decoration — this is a position, not a
-   thing to read, and never a thing to drag. */
-.band::after {
-  content: '';
+   thing to read, and never a thing to drag.
+
+   it is an element rather than the band's ::after, and it is one pixel tall
+   and stretched rather than sized. a pseudo-element can only be reached from
+   the band, so its length and its position had to be handed down as custom
+   properties set on the band — and a custom property set on an element is
+   re-resolved on everything under it, which is the whole open register, on
+   every frame of a scroll. an element of its own takes the two numbers on its
+   own style attribute. both of them ride the same transform: a solid fill has
+   nothing in it that stretching can distort, so the mark's length costs the
+   compositor a matrix and the page no layout at all. */
+.mark {
   position: absolute;
   right: calc(var(--rail) * -1 + 4px);
-  top: 0; width: 2px;
-  /* the height is the class's, not the variable's: a mark left at its last
-     length on a band that has since closed is an invisible four-hundred-pixel
-     box hanging off a thirty-pixel strip, and the page counts it */
-  height: 0;
-  transform: translateY(var(--thumb-y, 0px));
+  top: 0; width: 2px; height: 1px;
+  transform-origin: 0 0;
+  transform: translateY(0) scaleY(0);
   background: var(--ink-4);
   opacity: 0; transition: opacity .12s linear;
   pointer-events: none;
 }
 /* it arrives once the band has finished opening and knows its own height */
-.band.is-scrollable::after { height: var(--thumb-h, 0px); opacity: 1; }
+.band.is-scrollable > .mark { opacity: 1; }
 
 /* min-height, not height: the inner fills the band when the entry is short and
    runs past it when the entry is long, which is the only way the band above it
@@ -566,8 +590,12 @@ i, .it { font-style: italic; }
 }
 /* the short form is a phone's business only — see the narrow block, where the
    rail stops being a column and becomes a row of chips */
-.plist .abbr { display: none; }
-.plist button:hover, .wlist button:hover { color: var(--red-ink); }
+.plist .abbr, .wlist .abbr { display: none; }
+/* the same as the stack: a chip tapped on a phone would keep the accent, and
+   the accent is how this rail says which chip is not the selected one */
+@media (hover: hover) {
+  .plist button:hover, .wlist button:hover { color: var(--red-ink); }
+}
 .plist button[aria-selected="true"], .wlist button[aria-selected="true"] { color: var(--ink); font-weight: 600; }
 .plist button[aria-selected="true"]::before, .wlist button[aria-selected="true"]::before { opacity: 1; }
 
@@ -841,11 +869,11 @@ i, .it { font-style: italic; }
     background-position: left bottom 1px;
   }
   /* the rail is a row of chips at this width, and one long name takes a whole
-     line of the band with it. where a project carries a short form, that is
-     what the chip is set in; the caption under the entry still names it in
-     full, and the bold width reserved above is measured from the same form. */
-  .plist .full { display: none; }
-  .plist .abbr { display: inline; }
+     line of the band with it. where a project or a role carries a short form,
+     that is what the chip is set in; the entry itself still names it in full,
+     and the bold width reserved above is measured from the same form. */
+  .plist .full, .wlist .full { display: none; }
+  .plist .abbr, .wlist .abbr { display: inline; }
   .ptop { grid-template-columns: 1fr; row-gap: 14px; }
   .pmain { grid-column: auto; }
   /* the stack line is pinned to the foot of the band on the sheet, where the
@@ -1016,6 +1044,10 @@ const experience = [
   },
   {
     company: 'The Advance Group',
+    /* what the rail sets it in where the rail is a row of chips and a name this
+       long costs a line of the band. the entry's own header still names it in
+       full, as does the second line of every other chip's detail. */
+    short: 'TAG',
     role: 'Intern',
     location: 'Remote',
     dates: 'May 2023–Aug 2023',
@@ -1199,6 +1231,7 @@ REGISTERS.forEach((r) => {
       '<div class="body" id="body-' + r.id + '" role="region" aria-labelledby="strip-' + r.id + '">' +
         '<div class="inner">' + views[r.id] + '</div>' +
       '</div>' +
+      '<i class="mark" aria-hidden="true"></i>' +
     '</section>'
   );
   band.querySelector('.strip').addEventListener('click', () => open(r.id));
@@ -1340,12 +1373,20 @@ const wdetail = document.getElementById('wdetail');
 const workBand = bandsEl.querySelector('.band[data-id="work"]');
 let roleIdx = 0;
 
+/* both forms of the name are set into the chip and the stylesheet picks one,
+   as it does in the project rail: the full name in the column, the short one
+   in the row of chips a phone gets. only a name long enough to take a line of
+   its own carries a short form — the rest are set once and shown everywhere. */
 experience.forEach((j, i) => {
   const b = el(
     '<button type="button" role="tab" id="rtab-' + i + '" aria-controls="wdetail"' +
-    ' data-name="' + esc(j.company) + '"' +
+    /* the width the name takes in 600 is reserved from this, and only where the
+       rail is a row (see .wlist button::after) — so it is the form shown there */
+    ' data-name="' + esc(j.short || j.company) + '"' +
     ' aria-selected="' + (i === 0) + '" tabindex="' + (i === 0 ? '0' : '-1') + '">' +
-    esc(j.company) + '</button>'
+    (j.short
+      ? '<span class="full">' + esc(j.company) + '</span><span class="abbr">' + esc(j.short) + '</span>'
+      : esc(j.company)) + '</button>'
   );
   b.addEventListener('click', () => selectRole(i));
   b.addEventListener('keydown', railKeys(wlist, selectRole, () => roleIdx));
@@ -1407,7 +1448,8 @@ function toTop(band) {
    any of these numbers can have changed. */
 function markScroll(band) {
   const body = band.querySelector('.body');
-  if (!body) return;
+  const mark = band.querySelector('.mark');
+  if (!body || !mark) return;
   const over = body.scrollHeight - body.clientHeight;
   const on = band.classList.contains('is-open') && over > 1;
   band.classList.toggle('is-scrollable', on);
@@ -1416,8 +1458,20 @@ function markScroll(band) {
      rather than a dot on a band that runs very deep */
   const h = Math.max(28, body.clientHeight * body.clientHeight / body.scrollHeight);
   const y = body.offsetTop + (body.clientHeight - h) * (body.scrollTop / over);
-  band.style.setProperty('--thumb-h', h + 'px');
-  band.style.setProperty('--thumb-y', Math.round(y) + 'px');
+  mark.style.transform = 'translateY(' + Math.round(y) + 'px) scaleY(' + h + ')';
+}
+
+/* a scroll event arrives on every frame the finger is moving, and the four
+   numbers above are all questions about layout — asked in the handler itself,
+   each one lands on a document the handler before it has just written to, and
+   the browser has to lay the page out again before it can answer. asked in the
+   frame instead, the reads and the write happen once, together, after the
+   scroll has already been taken into account; a second event in the same frame
+   has nothing new to say and is dropped. */
+let marking = 0;
+function markSoon(band) {
+  if (marking) return;
+  marking = requestAnimationFrame(() => { marking = 0; markScroll(band); });
 }
 
 const still = matchMedia('(prefers-reduced-motion: reduce)');
@@ -1447,7 +1501,7 @@ function scrolled(step) {
    but it does capture, and only one band is ever open to send one */
 bandsEl.addEventListener('scroll', (e) => {
   const band = e.target.closest && e.target.closest('.band');
-  if (band) markScroll(band);
+  if (band) markSoon(band);
 }, true);
 
 /* the band opens over .36s and only knows its height at the end of it, so the
