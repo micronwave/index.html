@@ -31,13 +31,13 @@ GitHub Pages — no install, no build.
 
 ## Social card
 
-`site/og-image.png` (1200×630) is rendered from `tools/og-card.html`:
+`site/og-image.png` (1200x630) is rendered from `tools/og-card.html`:
 
 ```
-chrome --headless=new --disable-gpu --hide-scrollbars \
-  --force-device-scale-factor=2 --window-size=1200,630 \
-  --virtual-time-budget=6000 --screenshot=card@2x.png tools/og-card.html
+python tools/render-og.py
 ```
 
-Then downscale the 2400×1260 capture to 1200×630 (Lanczos) and save over
-`site/og-image.png`.
+Headless Chrome draws the card at 2x and it is downsampled to 1200x630. The
+red bar is laid in afterwards, against ink measured off the raster, so it
+starts on the cap of "Aaron" and ends on the last of "altergott.dev" no matter
+what the type is set at. Pillow is the only dependency.

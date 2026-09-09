@@ -9,16 +9,18 @@
 :root {
   --paper:   #e9e9e3;
   --ink:     #15171a;
-  --ink-2:   #52565c;
-  --ink-3:   #656870;
-  --ink-4:   #9a9da3;
   --red:     #dd2f19;
   --red-ink: #c22a16;
-  --rule-hair: rgba(21,23,26,.11);
+
+  --margin-x: 88px;
+  /* the two rules sit this far from the top and bottom edges — the same
+     number on both, so the card is bracketed evenly */
+  --margin-y: 78px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { width: 1200px; height: 630px; }
 body {
+  position: relative;
   background: var(--paper);
   color: var(--ink);
   font-family: 'Fraunces', 'Iowan Old Style', Georgia, serif;
@@ -26,69 +28,48 @@ body {
   font-variation-settings: 'SOFT' 0, 'WONK' 1;
   -webkit-font-smoothing: antialiased;
   display: flex; flex-direction: column;
-  padding: 74px 88px;
+  padding: var(--margin-y) var(--margin-x);
 }
 
 /* the two heavy rules that bracket the register stack on the page */
-.rule-top    { border-top: 3px solid var(--ink); }
-.rule-bottom { border-top: 3px solid var(--ink); }
+.rule { border-top: 3px solid var(--ink); flex: 0 0 auto; }
 
-.body {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 72px;
-  padding: 54px 0;
-}
+.body { flex: 1; display: flex; align-items: center; }
 
 h1 {
-  font-size: 104px;
+  font-size: 144px;
   font-weight: 600;
   letter-spacing: -.032em;
   line-height: .9;
 }
-.sub {
-  margin-top: 26px;
-  font-size: 27px;
-  line-height: 1.35;
-  color: var(--ink-2);
-}
-.sub em { font-style: italic; color: var(--ink); }
-
-/* the favicon's mark, at the same proportions: a red bar 6 units wide and
-   24 tall, sitting just right of centre on the paper. */
-.mark {
-  width: 48px; height: 192px;
-  background: var(--red);
-  flex: 0 0 auto;
+.dom {
+  margin-top: 24px;
+  font-size: 52px;
+  font-weight: 400;
+  letter-spacing: -.014em;
+  line-height: 1.1;
+  color: var(--red-ink);
 }
 
-.foot {
-  display: flex; align-items: baseline; justify-content: space-between;
-  padding-top: 22px;
-  font-size: 23px;
-  color: var(--ink-3);
-}
-.foot .dom { color: var(--red-ink); }
+/* the favicon's mark is not set here. it has to start on the cap of "Aaron"
+   and stop on the last of "altergott.dev", and only the rendered page knows
+   where those are — canvas metrics cannot apply font-variation-settings, so
+   they measure a different cut of Fraunces than this page draws. render-og.py
+   reads the ink off the raster and lays the bar in at --margin-x from the
+   right edge, 48px wide. */
 </style>
 </head>
 <body>
-  <div class="rule-top"></div>
+  <div class="rule"></div>
 
   <div class="body">
-    <div>
+    <div class="lockup" id="lockup">
       <h1>Aaron<br />Altergott</h1>
-      <p class="sub"><em>operations engineer</em> in SoCal</p>
+      <p class="dom">altergott.dev</p>
     </div>
-
-    <div class="mark" aria-hidden="true"></div>
   </div>
 
-  <div class="rule-bottom"></div>
-  <div class="foot">
-    <span class="dom">altergott.dev</span>
-    <span>automation · cloud infrastructure</span>
-  </div>
+  <div class="rule"></div>
+
 </body>
 </html>
