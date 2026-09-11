@@ -36,7 +36,18 @@
      wants and SOFT left at its own default of 0, the two latin faces come to
      146KB rather than 264KB. The @font-face rules Google serves are otherwise
      identical — same family, same weight range, same unicode-ranges. -->
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,WONK@0,9..144,300..800,1;1,9..144,300..800,1&display=swap" rel="stylesheet" />
+<!-- and it is fetched without holding the page back. a stylesheet blocks the
+     first paint until it lands, and this one is on another origin: a phone on
+     a cell connection spent a third of a second looking at nothing while a
+     file arrived that only tells it where the font is. display=swap means the
+     first paint was always going to be in the fallback face anyway, so waiting
+     for this bought nothing that could be seen. media="print" is the old trick
+     for saying "fetch it, do not wait for it": it matches no screen, so it is
+     not render-blocking, and onload hands it back to every medium the moment
+     it is here. the preload above keeps it at the priority it had. -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,WONK@0,9..144,300..800,1;1,9..144,300..800,1&amp;display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,WONK@0,9..144,300..800,1;1,9..144,300..800,1&amp;display=swap" media="print" onload="this.media='all'" />
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,WONK@0,9..144,300..800,1;1,9..144,300..800,1&amp;display=swap" /></noscript>
 <style>
 /* ═══════════════════════════════════════════════════════════════
    A contents page that opens in place.
@@ -75,20 +86,42 @@
   --rule-hair:   rgba(21,23,26,.11);  /* between list items               */
 
   /* type — seven steps, and nothing in between */
-  --t-display: clamp(34px,   4.9cqi,  62px);
-  --t-lede:    clamp(18px,   2.4cqi,  32px);
-  --t-word:    clamp(19px,   2.15cqi, 27px);
-  --t-title:   clamp(15px,   1.7cqi,  22px);
-  --t-sub:     clamp(14px,   1.36cqi, 17px);
-  --t-body:    clamp(13px,   1.19cqi, 15px);
-  --t-small:   clamp(12.6px, 1.14cqi, 14.2px);
+  --t-display: clamp(34px,   calc(4.90 * var(--cq)), 62px);
+  --t-lede:    clamp(18px,   calc(2.40 * var(--cq)), 32px);
+  --t-word:    clamp(19px,   calc(2.15 * var(--cq)), 27px);
+  --t-title:   clamp(15px,   calc(1.70 * var(--cq)), 22px);
+  --t-sub:     clamp(14px,   calc(1.36 * var(--cq)), 17px);
+  --t-body:    clamp(13px,   calc(1.19 * var(--cq)), 15px);
+  --t-small:   clamp(12.6px, calc(1.14 * var(--cq)), 14.2px);
 
   /* one grid: twelve columns, one gutter, every band */
-  --gutter: clamp(18px, 2.4cqi, 42px);
+  --gutter: clamp(18px, calc(2.4 * var(--cq)), 42px);
   --rail:   clamp(14px, 1.9vw, 30px);   /* where the revision bar sits */
 
   --pad-x: clamp(30px, 4vw, 62px);
   --pad-y: clamp(15px, 2.1vh, 25px);
+
+  /* one percent of the sheet's measure: what the container unit 1cqi gave,
+     written out. the type scale is cut from the sheet's width and not the
+     window's, because past 1360px the window goes on growing and the sheet
+     does not — type set in vw would go on growing with it.
+
+     a query container was the obvious way to say that, and it was the wrong
+     one. a container makes its whole subtree depend on its own layout, and a
+     band opening is a layout on every one of its frames: each of them dirtied
+     the style of everything under the sheet and resolved all seven steps again
+     for every element that reads one. on a phone that was four fifths of the
+     frame the accordion had to move in, spent re-deriving numbers that had
+     not changed.
+
+     this is exact rather than close. the sheet is the only thing in the body,
+     the body carries no margin or padding of its own, and the page never
+     scrolls, so the sheet's border box is min(100vw, its own cap) and its
+     measure is that less --pad-x on either side — checked against the
+     container it replaces at every width from 320 to 2560, to the pixel. a
+     viewport length is resolved once and then only when the window itself
+     changes. */
+  --cq: calc((min(100vw, 1360px) - 2 * var(--pad-x)) / 100);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -114,7 +147,13 @@ body {
   display: grid;
 }
 
-button, a { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; text-decoration: none; }
+/* touch-action: a tap on a phone is held back until the browser knows a
+   second one is not coming to zoom the page with it. nothing here is zoomed by
+   being tapped twice, so that wait buys nothing and is felt on every tap of
+   the register stack — which is the one thing on this page you do over and
+   over. pinch still zooms; only the double tap is given up, and only on the
+   things that answer a tap. */
+button, a { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; text-decoration: none; touch-action: manipulation; }
 li { list-style: none; }
 [hidden] { display: none !important; }
 ::selection { background: var(--red); color: var(--paper); }
@@ -125,7 +164,7 @@ i, .it { font-style: italic; }
 /* ── sheet ─────────────────────────────────────────────────── */
 
 .sheet {
-  container-type: inline-size;
+  /* not a query container — the reason is written out at --cq */
   width: 100%; max-width: 1360px;
   height: 100%; max-height: 900px;
   margin: auto;
@@ -163,7 +202,7 @@ i, .it { font-style: italic; }
 
 /* the interpuncts are flex items too, so the gap has to stay small enough
    that "email · github" reads as one run, not three */
-.contact { display: flex; align-items: baseline; gap: clamp(7px, .85cqi, 11px); font-size: var(--t-body); }
+.contact { display: flex; align-items: baseline; gap: clamp(7px, calc(0.85 * var(--cq)), 11px); font-size: var(--t-body); }
 /* the interpuncts only — the copy button carries spans of its own, and they
    set their own ink */
 .contact > span { color: var(--ink-4); }
@@ -448,6 +487,10 @@ i, .it { font-style: italic; }
   top: 0; width: 2px; height: 1px;
   transform-origin: 0 0;
   transform: translateY(0) scaleY(0);
+  /* the sentence above is only true if the mark is on a layer of its own: a
+     transform on an ordinary box is a repaint, not a matrix, and this one is
+     rewritten on every frame of a scroll. */
+  will-change: transform;
   background: var(--ink-4);
   opacity: 0; transition: opacity .12s linear;
   pointer-events: none;
@@ -510,7 +553,7 @@ i, .it { font-style: italic; }
    the about band never scrolls. it is fitted to the window instead, and it is
    the type that gives — three steps of its own, overriding the page's.
 
-   the page's steps are all cqi, which is the sheet's width: they answer a wide
+   the page's steps are all cut from the sheet's width: they answer a wide
    window and know nothing about a short one. a 1600x500 window and a 1600x900
    window were handed the same 17px note, and only one of them had the room to
    put it on the screen. each step here is the smaller of two — a width step
@@ -537,9 +580,9 @@ i, .it { font-style: italic; }
    ones the layout already keeps. */
 .about {
   display: flex; flex-direction: column; flex: 1 0 auto;
-  --t-lede: min(clamp(18px, 3.2cqi,  42px), clamp(11px, min(5vh,    45px)   - 4px,   42px));
-  --t-sub:  min(clamp(14px, 1.85cqi, 22px), clamp(9px,  min(2.85vh, 25.65px) - 2.6px, 22px));
-  --t-body: min(clamp(13px, 1.55cqi, 18px), clamp(9px,  min(2.55vh, 22.95px) - 2.3px, 18px));
+  --t-lede: min(clamp(18px, calc(3.2 * var(--cq)),  42px), clamp(11px, min(5vh,    45px)   - 4px,   42px));
+  --t-sub:  min(clamp(14px, calc(1.85 * var(--cq)), 22px), clamp(9px,  min(2.85vh, 25.65px) - 2.6px, 22px));
+  --t-body: min(clamp(13px, calc(1.55 * var(--cq)), 18px), clamp(9px,  min(2.55vh, 22.95px) - 2.3px, 18px));
 }
 .about__top {
   flex: 1 0 auto;
@@ -583,7 +626,7 @@ i, .it { font-style: italic; }
    lines below it, and a second one this close made a box of the last two lines */
 .now {
   margin-top: auto; padding-top: clamp(8px, 2.2vh, 22px);
-  display: flex; flex-wrap: wrap; gap: 6px clamp(24px, 3.4cqi, 60px);
+  display: flex; flex-wrap: wrap; gap: 6px clamp(24px, calc(3.4 * var(--cq)), 60px);
   font-size: var(--t-body);
 }
 /* the same accent the dates and the tags carry — --red-ink, the readable one */
@@ -670,7 +713,7 @@ i, .it { font-style: italic; }
 }
 .wline {
   display: flex; align-items: baseline; justify-content: space-between;
-  flex-wrap: wrap; gap: 0 clamp(14px, 1.8cqi, 28px);
+  flex-wrap: wrap; gap: 0 clamp(14px, calc(1.8 * var(--cq)), 28px);
 }
 .wline + .wline { margin-top: 2px; }
 .wrole { font-size: var(--t-title); font-weight: 600; letter-spacing: -.02em; line-height: 1.15; }
@@ -705,16 +748,16 @@ i, .it { font-style: italic; }
 .pflow { margin-top: 12px; font-style: italic; font-size: var(--t-small); color: var(--ink-2); }
 .pflow b { font-weight: 400; font-style: normal; color: var(--red-ink); padding: 0 5px; }
 .pmain ul { margin-top: clamp(10px, 1.6vh, 16px); }
-.plinks { display: flex; align-items: baseline; gap: clamp(12px, 1.4cqi, 20px); font-size: var(--t-body); }
+.plinks { display: flex; align-items: baseline; gap: clamp(12px, calc(1.4 * var(--cq)), 20px); font-size: var(--t-body); }
 /* the caption line: name, where to read it, and whether it is still moving.
    it sits under the plate when there is one and at the foot when there is not,
    so it carries its own type and does not inherit the plinks body size */
 .pmeta {
   display: flex; align-items: baseline; flex-wrap: wrap;
-  gap: 2px clamp(10px, 1.2cqi, 18px);
+  gap: 2px clamp(10px, calc(1.2 * var(--cq)), 18px);
   font-style: italic; font-size: var(--t-small); color: var(--ink-3);
 }
-.pmeta .plinks { font-size: inherit; gap: clamp(10px, 1.2cqi, 18px); }
+.pmeta .plinks { font-size: inherit; gap: clamp(10px, calc(1.2 * var(--cq)), 18px); }
 .pmeta .pname { color: var(--ink); }
 .plinks .st { font-style: italic; color: var(--ink-3); }
 .plinks .st.is-active { color: var(--red-ink); }
@@ -762,6 +805,22 @@ i, .it { font-style: italic; }
    width of its own, so the caps below can only ever shrink it: a 624px capture
    is shown at 624px rather than blown up into mush. */
 .plate {
+  /* the dialog belongs to the viewport and not to the sheet — it says so
+     itself, below the markup — so the sheet's measure is not the measure its
+     caption is cut from. under the container this was free: a container unit
+     outside every container falls back to the small viewport, and the small
+     viewport is what this subtree was always set in.
+
+     both lines are needed, and the second is the one that does the work. a
+     var() inside a custom property is substituted where that property is
+     declared, not where it is read: --t-small is declared on :root, so it has
+     the root's --cq baked into it before it ever reaches here, and handing the
+     dialog a --cq of its own cannot reach back into it. a container unit was
+     never baked, which is exactly why it used to answer to whatever container
+     it found itself in — or to none. so the step is restated in full. --cq is
+     set as well, for anything declared inside this subtree that reads it. */
+  --cq: 1svw;
+  --t-small: clamp(12.6px, 1.14svw, 14.2px);
   width: 100%; height: 100%; max-width: none; max-height: none;
   padding: clamp(14px, 4vh, 44px);
   border: 0; background: none; color: var(--ink);
@@ -845,7 +904,7 @@ i, .it { font-style: italic; }
   .lede { grid-column: 1 / 7; }
   .about__two { grid-column: 7 / 13; }
   /* six columns, not seven: the deck needs its height step to fall with it */
-  .about { --t-lede: min(clamp(18px, 2.4cqi, 32px), clamp(11px, min(3.6vh, 32.4px) - 3px, 32px)); }
+  .about { --t-lede: min(clamp(18px, calc(2.4 * var(--cq)), 32px), clamp(11px, min(3.6vh, 32.4px) - 3px, 32px)); }
   .groups { grid-template-columns: repeat(3, minmax(0,1fr)); row-gap: 14px; }
   .creds { grid-template-columns: repeat(3, minmax(0,1fr)); }
   .creds > div:first-child { grid-column: 1 / 2; }
@@ -867,9 +926,9 @@ i, .it { font-style: italic; }
   /* stacked, the three blocks add up rather than sitting level, so the whole
      band answers to the window's height at about half the rate it does above */
   .about {
-    --t-lede: min(clamp(18px, 2.4cqi, 32px),  clamp(11px, 2.75vh - 2.4px, 32px));
-    --t-sub:  min(clamp(14px, 1.36cqi, 17px), clamp(9px,  2.2vh  - 1.8px, 17px));
-    --t-body: min(clamp(13px, 1.19cqi, 15px), clamp(9px,  2.0vh  - 1.6px, 15px));
+    --t-lede: min(clamp(18px, calc(2.4 * var(--cq)), 32px),  clamp(11px, 2.75vh - 2.4px, 32px));
+    --t-sub:  min(clamp(14px, calc(1.36 * var(--cq)), 17px), clamp(9px,  2.2vh  - 1.8px, 17px));
+    --t-body: min(clamp(13px, calc(1.19 * var(--cq)), 15px), clamp(9px,  2.0vh  - 1.6px, 15px));
   }
 
   .projects, .work {
@@ -1005,9 +1064,9 @@ i, .it { font-style: italic; }
    scroll to reach. */
 @media (max-width: 720px) and (max-height: 460px) {
   .about {
-    --t-lede: min(clamp(18px, 2.4cqi, 32px),  clamp(9px, 2.75vh - 2.4px, 32px));
-    --t-sub:  min(clamp(14px, 1.36cqi, 17px), clamp(8px, 2.2vh  - 1.8px, 17px));
-    --t-body: min(clamp(13px, 1.19cqi, 15px), clamp(8px, 2.0vh  - 1.6px, 15px));
+    --t-lede: min(clamp(18px, calc(2.4 * var(--cq)), 32px),  clamp(9px, 2.75vh - 2.4px, 32px));
+    --t-sub:  min(clamp(14px, calc(1.36 * var(--cq)), 17px), clamp(8px, 2.2vh  - 1.8px, 17px));
+    --t-body: min(clamp(13px, calc(1.19 * var(--cq)), 15px), clamp(8px, 2.0vh  - 1.6px, 15px));
   }
 }
 
@@ -1018,9 +1077,9 @@ i, .it { font-style: italic; }
    the window's height faster here to pay for the measure it has lost. */
 @media (max-width: 340px) {
   .about {
-    --t-lede: min(clamp(18px, 2.4cqi, 32px),  clamp(11px, 2.3vh - 2.2px, 32px));
-    --t-sub:  min(clamp(14px, 1.36cqi, 17px), clamp(9px,  1.8vh - 1.6px, 17px));
-    --t-body: min(clamp(13px, 1.19cqi, 15px), clamp(9px,  1.7vh - 1.5px, 15px));
+    --t-lede: min(clamp(18px, calc(2.4 * var(--cq)), 32px),  clamp(11px, 2.3vh - 2.2px, 32px));
+    --t-sub:  min(clamp(14px, calc(1.36 * var(--cq)), 17px), clamp(9px,  1.8vh - 1.6px, 17px));
+    --t-body: min(clamp(13px, calc(1.19 * var(--cq)), 15px), clamp(9px,  1.7vh - 1.5px, 15px));
   }
 }
 
@@ -1145,7 +1204,7 @@ const projects = [
     stack: 'Go, TypeScript, Claude API, Codex, GitHub API',
     flow: ['goal', 'plan', 'capsule', 'verify', 'merge'],
     githubUrl: 'https://github.com/micronwave/orca',
-    shot: 'img/screenshot-orca.png',
+    shot: 'img/screenshot-orca.webp',
     /* the colour this shot's own edge already is. the plate is a fixed 3:2 and
        the shots are not, so whichever way a shot falls short it is met by more
        of itself instead of by paper. sampled from the border pixels; a shot cut
@@ -1166,7 +1225,7 @@ const projects = [
     flow: ['docs', 'chunks', 'embed', 'retrieve', 'answer'],
     githubUrl: 'https://github.com/micronwave/aws-docs-rag',
     liveUrl: 'https://d3d0zch3u8ca61.cloudfront.net',
-    shot: 'img/screenshot-rag.png',
+    shot: 'img/screenshot-rag.webp',
     status: 'complete'
   },
   {
@@ -1181,7 +1240,7 @@ const projects = [
     stack: 'Python, FastAPI, Claude API, HDBSCAN, FAISS, Sentence Transformers, SQLite, Next.js',
     flow: ['sources', 'cluster', 'score', 'map'],
     githubUrl: 'https://github.com/micronwave/market-narrative-engine',
-    shot: 'img/screenshot-nie.png',
+    shot: 'img/screenshot-nie.webp',
     plate: '#111418',
     status: 'complete'
   },
@@ -1216,7 +1275,7 @@ const projects = [
     stack: 'Python, Claude Code, Slash Commands, Python Hooks',
     flow: ['plan', 'build', 'audit', 'commit'],
     githubUrl: 'https://github.com/micronwave/claude-chaperone',
-    shot: 'img/screenshot-chaperone.png',
+    shot: 'img/screenshot-chaperone.webp',
     plate: '#0c0c0c',
     status: 'complete'
   }
@@ -1350,8 +1409,48 @@ projects.forEach((p, i) => {
   plist.appendChild(b);
 });
 
-/* keep the screenshots warm so switching never flashes an empty box */
-projects.filter((p) => p.shot).forEach((p) => { new Image().src = p.shot; });
+/* the plate is a wide window's business only. under 720px the shot is taken
+   off the page and the words carry the entry alone (see .shot .zoom in the
+   narrow block) — but a picture that is never drawn is still fetched and still
+   decoded, and five of them came to 135KB down the phone's connection and some
+   twenty megabytes of bitmap held in its memory, none of which ever reached
+   the glass. so the breakpoint is asked rather than assumed, and it is the
+   stylesheet's own: a window dragged across it, or a tablet turned, writes the
+   entry again with the plate in or out of it.
+
+   the query is the negation of the stylesheet's rather than the number one
+   above it. a viewport is not always a whole number of pixels — a Windows
+   display at 125%, a phone reporting 412.5 — and between 720 and 721 the two
+   forms disagree: the narrow block would have let go of the layout while this
+   still called the window narrow, leaving three columns set aside for a
+   picture that was never written. `not all and (max-width: 720px)` is exactly
+   "the narrow block does not apply", at every width there is. */
+const wide = matchMedia('not all and (max-width: 720px)');
+
+/* keep the screenshots warm so switching never flashes an empty box — once the
+   page is up, and never in front of the type they are sitting beside */
+let warm = false;
+function warmShots() {
+  if (warm || !wide.matches) return;
+  warm = true;
+  /* the entry on screen has already asked for its own shot, and this runs
+     after it: warming that one again is a second request for a picture the
+     page is holding. the other four are the ones a tap on the rail needs. */
+  const here = pdetail.querySelector('img');
+  const shown = here && here.getAttribute('src');
+  projects.filter((p) => p.shot && p.shot !== shown)
+          .forEach((p) => { new Image().src = p.shot; });
+}
+addEventListener('load', () => {
+  if (window.requestIdleCallback) requestIdleCallback(warmShots, { timeout: 2000 });
+  else setTimeout(warmShots, 200);
+}, { once: true });
+/* the entry first and the warming after, in that order: crossing into a wide
+   window writes a plate that was not there a moment ago, and the guard below
+   reads the entry to find out which shot it is already holding. warmed first,
+   it would find no picture there at all and ask for the one on screen a second
+   time, alongside the four that are not. */
+wide.addEventListener('change', () => { selectProject(projIdx); warmShots(); });
 
 function selectProject(i) {
   projIdx = (i + projects.length) % projects.length;
@@ -1382,12 +1481,16 @@ function selectProject(i) {
         ruled(p.bullets) +
       '</div>' +
       /* the plate is a button: the shot is legible at this size but not readable,
-         and the expanded one is the same picture, not a second page */
+         and the expanded one is the same picture, not a second page. the caption
+         stays at every width — it carries the source link and the status — and
+         the picture is only set where there is a window wide enough to show it. */
       (p.shot
         ? '<figure class="shot"' + (p.plate ? ' style="--plate:' + p.plate + '"' : '') + '>' +
-          '<button type="button" class="zoom" aria-label="Expand the ' + esc(p.name) + ' screenshot">' +
-          '<img src="' + p.shot + '" alt="' + esc(p.name) + ' screenshot" decoding="async" />' +
-          '</button>' +
+          (wide.matches
+            ? '<button type="button" class="zoom" aria-label="Expand the ' + esc(p.name) + ' screenshot">' +
+              '<img src="' + p.shot + '" alt="' + esc(p.name) + ' screenshot" decoding="async" />' +
+              '</button>'
+            : '') +
           '<figcaption class="pmeta">' + meta + '</figcaption></figure>'
         : '') +
     '</div>' +
@@ -1523,14 +1626,21 @@ function markScroll(band) {
   const body = band.querySelector('.body');
   const mark = band.querySelector('.mark');
   if (!body || !mark) return;
-  const over = body.scrollHeight - body.clientHeight;
+  /* all four questions are asked before the class is written. a class set
+     between two reads makes the browser lay the page out again to answer the
+     second, on a frame that is already carrying a scroll. */
+  const view = body.clientHeight;
+  const full = body.scrollHeight;
+  const at = body.scrollTop;
+  const from = body.offsetTop;
+  const over = full - view;
   const on = band.classList.contains('is-open') && over > 1;
   band.classList.toggle('is-scrollable', on);
   if (!on) return;
   /* the thumb is the visible share of the entry, floored so it stays a mark
      rather than a dot on a band that runs very deep */
-  const h = Math.max(28, body.clientHeight * body.clientHeight / body.scrollHeight);
-  const y = body.offsetTop + (body.clientHeight - h) * (body.scrollTop / over);
+  const h = Math.max(28, view * view / full);
+  const y = from + (view - h) * (at / over);
   mark.style.transform = 'translateY(' + Math.round(y) + 'px) scaleY(' + h + ')';
 }
 
@@ -1591,17 +1701,25 @@ bandsEl.addEventListener('transitionend', (e) => {
 function markColumnOpeners() {
   for (let pass = 0; pass < 2; pass++) {
     const lis = [...wdetail.querySelectorAll('.ruled > li')];
-    const opens = [];
-    let left = null;
-    lis.forEach((li) => {
-      const x = Math.round(li.getBoundingClientRect().left);
-      opens.push(x !== left);
-      left = x;
-    });
+    /* every edge is read first and the classes are written after, for the
+       reason given in markScroll: a write in the middle of a run of reads is
+       a page laid out again to answer the rest of them. */
+    const x = lis.map((li) => Math.round(li.getBoundingClientRect().left));
     let moved = false;
     lis.forEach((li, n) => {
-      if (li.classList.contains('opens-column') === opens[n]) return;
-      li.classList.toggle('opens-column', opens[n]);
+      /* the first bullet is marked too, and it has to be. it looks as though
+         .ruled > li:first-child has already taken its rule off and this is
+         saying the same thing twice — but under 560px the narrow block sets
+         .wdetail .ruled > li, which carries two classes and one element to
+         first-child's one class, one pseudo-class and one element. the two
+         weigh the same, and the later of them wins: on a phone the first
+         bullet of a role gets its top padding back from that rule, and this
+         class, which outweighs both, is the only thing that takes it off
+         again. taking the mark off the first item cost four pixels at the top
+         of every role on every phone. */
+      const opens = n === 0 || x[n] !== x[n - 1];
+      if (li.classList.contains('opens-column') === opens) return;
+      li.classList.toggle('opens-column', opens);
       moved = true;
     });
     if (!moved) return;
@@ -1610,14 +1728,32 @@ function markColumnOpeners() {
 
 selectRole(0);
 
+/* a phone's address bar sliding in and out is a resize on every frame of the
+   slide, and the page is set in svh so not one of those frames moves anything
+   on it. so the box is asked whether it actually moved, and the whole slide
+   costs one measurement instead of thirty rounds of measuring the bullets.
+
+   the box asked is the register stack and not the sheet, because the sheet's
+   own clientWidth is its padding box and the padding is not fixed: between
+   1360px of window and about 1550px the sheet is already at its cap while
+   --pad-x is still climbing with 4vw, so the sheet measures 1360 throughout
+   and the measure inside it loses fifteen pixels. the stack sits in the
+   sheet's content box — its width is the measure the type is cut from and
+   its height is the room the bands divide — so it moves exactly when there is
+   something here to redo, and at no other time. */
+let lastW = bandsEl.clientWidth, lastH = bandsEl.clientHeight;
 let resettle;
 addEventListener('resize', () => {
   clearTimeout(resettle);
   /* the two columns rebalance with the width, so which bullet opens the second
-     one moves with it; the copy button's two widths are set in container units
-     and move with it too. whether a band still overflows is the window's answer
-     as much as the entry's, so the mark on the rail is struck again here. */
+     one moves with it; the copy button's two widths are set from the sheet's
+     measure and move with it too. whether a band still overflows is the
+     window's answer as much as the entry's, so the mark on the rail is struck
+     again here. */
   resettle = setTimeout(() => {
+    const w = bandsEl.clientWidth, h = bandsEl.clientHeight;
+    if (w === lastW && h === lastH) return;
+    lastW = w; lastH = h;
     markColumnOpeners();
     measureCopy();
     bandsEl.querySelectorAll('.band').forEach(markScroll);
@@ -1707,17 +1843,28 @@ function measureCopy() {
   });
 }
 measureCopy();
-/* Fraunces arrives after first paint and is wider than the fallback, so both
-   things measured off the face are measured again once it lands: the copy
+
+/* Fraunces arrives after first paint and is wider than the fallback, so
+   everything measured off the face is measured again once it lands: the copy
    cell's two widths, and which bullet opens the work register's second column
-   — a balance struck in the fallback is struck on the wrong line heights. */
-if (document.fonts) document.fonts.ready.then(() => {
+   — a balance struck in the fallback is struck on the wrong line heights. the
+   entry is set in that wider face too, so a band that did not overflow in the
+   fallback may well overflow now. */
+function settle() {
   measureCopy();
   markColumnOpeners();
-  /* the entry is set in a wider face than it was measured in, so a band that
-     did not overflow in the fallback may well overflow now */
   bandsEl.querySelectorAll('.band').forEach(markScroll);
-});
+}
+if (document.fonts) {
+  document.fonts.ready.then(settle);
+  /* and again on the event itself. the stylesheet that names Fraunces is no
+     longer fetched in the render path (see the head), so at the moment this
+     runs there may be no face in play at all — and fonts.ready answers at once
+     when there is nothing to wait for, which would leave every measurement
+     above struck in Georgia and never struck again. loadingdone fires when a
+     face has actually arrived, whenever that turns out to be. */
+  document.fonts.addEventListener('loadingdone', settle);
+}
 
 /* the clipboard API needs a secure context and a live user gesture; when it
    is refused, the old selection trick still works, and if that goes too the
@@ -1758,14 +1905,23 @@ copyBtn.addEventListener('click', () => {
 
 const clock = document.getElementById('clock');
 
+/* both formatters are built once and then asked. an Intl.DateTimeFormat is
+   expensive to construct and cheap to call, and toLocaleTimeString constructs
+   one on every call — this clock was building two of them, twice a minute,
+   for the whole time the page is open. the zone is still read off the date
+   rather than remembered, since it is the one part of this that changes on
+   its own, twice a year. */
+const ZONE = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'America/Los_Angeles', timeZoneName: 'short'
+});
+const TIME = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'America/Los_Angeles', hour: 'numeric', minute: '2-digit', hour12: true
+});
+
 function tick() {
   const now = new Date();
-  const zone = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Los_Angeles', timeZoneName: 'short'
-  }).formatToParts(now).find((p) => p.type === 'timeZoneName').value;
-  clock.textContent = zone + ' ' + now.toLocaleTimeString('en-US', {
-    timeZone: 'America/Los_Angeles', hour: 'numeric', minute: '2-digit', hour12: true
-  }).toLowerCase();
+  const zone = ZONE.formatToParts(now).find((p) => p.type === 'timeZoneName').value;
+  clock.textContent = zone + ' ' + TIME.format(now).toLowerCase();
 }
 tick();
 setInterval(tick, 30000);
