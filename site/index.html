@@ -48,6 +48,15 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,WONK@0,9..144,300..800,1;1,9..144,300..800,1&amp;display=swap" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,WONK@0,9..144,300..800,1;1,9..144,300..800,1&amp;display=swap" media="print" onload="this.media='all'" />
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,WONK@0,9..144,300..800,1;1,9..144,300..800,1&amp;display=swap" /></noscript>
+<!-- the second material. Space Mono carries everything the page says about
+     itself; the figures beside the sheet are set in a system mono instead,
+     because Space Mono has no block elements and a substituted glyph at a
+     different advance width shears the grid they are built on. fetched the
+     same way as Fraunces above: preloaded, then handed back to every medium
+     once it lands, so it never holds the first paint. -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&amp;display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&amp;display=swap" media="print" onload="this.media='all'" />
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&amp;display=swap" /></noscript>
 <style>
 /* ═══════════════════════════════════════════════════════════════
    A contents page that opens in place.
@@ -70,15 +79,15 @@
   --red-ink: #c22a16;   /*  4.7:1 — the same accent when it has to be read */
 
   /* the red's opposite number, for the one thing that is finished rather than
-     moving. green carries more luminance than red at the same saturation, so
-     the readable one has to sit darker than --red-ink to clear the same bar. */
-  --green:     #1f8f57;   /*  3.2:1 — the tick, a mark and never text        */
-  --green-ink: #1c7046;   /*  5.0:1 — the accent when it has to be read      */
-
-  /* the tick, as a shape to mask --green through. it runs to the edges of its
-     viewBox so `contain` fills the dot's box, and the stroke is heavy because
-     the box is five pixels across at the size this sits in. */
-  --tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M.9 6.4 4.4 10.2 11.1 1.9' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+     moving. it is the terminal's green — the sixteen-colour one, pure hue, no
+     blue in it — and not the print green it replaced: the marks it colours
+     are drawn in character cells now, and a cell wants the colour a cell has
+     always had. VGA's own #00aa00 is 2.5:1 on this paper, so both are pulled
+     down the hue until they clear the bars the reds clear. green carries more
+     luminance than red at the same saturation, which is why the readable one
+     has to sit so much darker than --red-ink. */
+  --green:     #009400;   /*  3.3:1 — the tick, a mark and never text        */
+  --green-ink: #007200;   /*  5.1:1 — the accent when it has to be read      */
 
   /* rules — four weights, so structure always outranks subdivision */
   --rule-strong: rgba(21,23,26,.45);  /* closes a block inside a band     */
@@ -98,8 +107,15 @@
   --gutter: clamp(18px, calc(2.4 * var(--cq)), 42px);
   --rail:   clamp(14px, 1.9vw, 30px);   /* where the revision bar sits */
 
-  --pad-x: clamp(30px, 4vw, 62px);
-  --pad-y: clamp(15px, 2.1vh, 25px);
+  /* viewport-fit=cover hands the page the whole glass, notch and home
+     indicator included, and it is the page's job to keep off them. the two
+     side insets are taken as one number — the larger — so the sheet stays
+     centred and --cq below, which is cut from --pad-x, stays exact: a phone
+     on its side has a notch on one edge only, and a margin that answered it
+     on that edge alone would have put the type off centre by half of it. */
+  --safe-x: max(env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+  --pad-x: max(clamp(30px, 4vw, 62px), var(--safe-x));
+  --pad-y: clamp(15px, 2.1svh, 25px);
 
   /* one percent of the sheet's measure: what the container unit 1cqi gave,
      written out. the type scale is cut from the sheet's width and not the
@@ -134,7 +150,15 @@
    it. svh, not dvh: dvh tracks the toolbar as it moves, and every one of those
    frames is a resize, a new room, and a fresh bullet count in the work
    register. the small viewport is the one height that never moves.
-   the plain 100% stays underneath it for anything that has no svh. */
+   the plain 100% stays underneath it for anything that has no svh.
+
+   and every other vertical length on the page is cut from the same unit. the
+   about band's type steps, the strip padding, the row gaps — all of them were
+   in vh, which on a phone is the *large* viewport: the room the page would
+   have if the toolbar were gone. so the type was fitted to a band some fifty
+   to a hundred pixels taller than the one it was set in, and the last line of
+   the about note fell under the rule on exactly the phones the fitting was
+   for. on a desktop the two units are the same number and nothing changes. */
 html, body { height: 100%; height: 100svh; }
 body {
   overflow: hidden;
@@ -152,11 +176,22 @@ body {
    being tapped twice, so that wait buys nothing and is felt on every tap of
    the register stack — which is the one thing on this page you do over and
    over. pinch still zooms; only the double tap is given up, and only on the
-   things that answer a tap. */
-button, a { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; text-decoration: none; touch-action: manipulation; }
+   things that answer a tap.
+   the tap highlight is the platform's grey flashed over the whole box of
+   whatever was touched, and the strips are boxes the full width of the sheet.
+   the page marks a tap itself — the word to ink, the leader filling, the
+   brace — so the flash was a second answer on top of the first. */
+button, a { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; text-decoration: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 li { list-style: none; }
 [hidden] { display: none !important; }
-::selection { background: var(--red); color: var(--paper); }
+/* reverse video. a terminal has one way of saying "this, here": it swaps
+   the ink and the paper under the run, and this page borrows it for both
+   of the things a reader can point at without a pointer. a selection is
+   paper on ink rather than paper on the accent — the accent is for what
+   the page marks, not for what the reader does — and a keyboard focus is
+   the same swap on the word alone, below. */
+::selection { background: var(--ink); color: var(--paper); }
+/* the ring is the last resort, for anything the rules below do not name */
 :focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
 
 i, .it { font-style: italic; }
@@ -169,8 +204,13 @@ i, .it { font-style: italic; }
   height: 100%; max-height: 900px;
   margin: auto;
   padding: var(--pad-y) var(--pad-x);
+  /* the home indicator lies over the foot of the glass on a phone on its
+     side, and the last strip's rule was under it. only the foot: the top
+     inset is the status bar's, and the browser's own chrome already sits
+     there. --cq reads nothing vertical, so this can be asymmetric. */
+  padding-bottom: max(var(--pad-y), env(safe-area-inset-bottom, 0px));
   display: grid;
-  grid-template-rows: auto minmax(0,1fr) auto;
+  grid-template-rows: auto minmax(0,1fr);
 }
 
 /* ── head ──────────────────────────────────────────────────── */
@@ -187,7 +227,7 @@ i, .it { font-style: italic; }
      box .92 gives it, so a ten pixel foot left two between the tail and the
      rule on a short window and thirteen on a tall one. fourteen is the one
      number that clears it by the same margin either way. */
-  padding-bottom: clamp(14px, 1.5vh, 16px);
+  padding-bottom: clamp(14px, 1.5svh, 16px);
 }
 /* the name carries the masthead alone now — the line that sat under it is gone
    — so it is set at the step the two of them used to occupy between them, and
@@ -207,10 +247,17 @@ i, .it { font-style: italic; }
    set their own ink */
 .contact > span { color: var(--ink-4); }
 .a { color: var(--ink-2); transition: color .1s linear; }
-.a:hover {
-  color: var(--red-ink);
-  text-decoration: underline; text-decoration-thickness: 1.5px;
-  text-underline-offset: 3px; text-decoration-color: currentColor;
+/* pointers only, here and at every other hover on the page. a finger leaves
+   :hover on whatever it last touched, and nothing takes it back: github,
+   tapped, opens a tab, and the word sits in the accent for as long as this one
+   is left open behind it. the strips and the rail had this argument made for
+   them one at a time; it is the same argument for every link. */
+@media (hover: hover) {
+  .a:hover {
+    color: var(--red-ink);
+    text-decoration: underline; text-decoration-thickness: 1.5px;
+    text-underline-offset: 3px; text-decoration-color: currentColor;
+  }
 }
 
 /* the two places that link off the page carry a resting underline, so they
@@ -221,7 +268,9 @@ i, .it { font-style: italic; }
   text-underline-offset: 3px;
   text-decoration-color: var(--rule-soft);
 }
-.contact .a:hover, .plinks .a:hover, .creds .a:hover { text-decoration-thickness: 1.5px; }
+@media (hover: hover) {
+  .contact .a:hover, .plinks .a:hover, .creds .a:hover { text-decoration-thickness: 1.5px; }
+}
 
 /* the address copies rather than handing you off to a mail client, so the
    link has to say so afterwards. both words sit in one grid cell and the cell
@@ -267,40 +316,75 @@ i, .it { font-style: italic; }
 }
 /* the resting underline takes the accent on hover exactly as the two real
    links beside it do — the rule lives on the word, so the override has to too */
-.copy:hover .cw.rest { text-decoration-thickness: 1.5px; text-decoration-color: currentColor; }
-/* a touch device leaves :hover on whatever was tapped last, and this is the one
-   link in the row that is still on screen afterwards — it would sit there in the
-   accent long after the copy, as though it were still being pointed at. where
-   there is no pointer there is nothing to answer, so the hover is taken back. */
-@media (hover: none) {
-  .contact .copy:hover { color: var(--ink-2); }
-  .copy:hover .cw.rest { text-decoration-thickness: 1px; text-decoration-color: var(--rule-soft); }
+@media (hover: hover) {
+  .copy:hover .cw.rest { text-decoration-thickness: 1.5px; text-decoration-color: currentColor; }
 }
 /* the confirmation is the register's finished state, in its colour: green,
    marked with a tick, and never underlined — nothing is left to click */
 .cw.done {
   transition-delay: 0s;     /* in this state it is the one leaving */
-  display: inline-flex; align-items: center; gap: .36em;
+  /* inline, not a flex row: a flex item is seated on its first row's text
+     baseline, and the marks beside the word are two rows that stand on
+     their bottom edge (see .ck) */
+  display: inline-block;
   color: var(--green-ink);
   transform: translateX(.85em); opacity: 0;
 }
 .copy.is-copied .cw.rest { transition-delay: 0s;   transform: translateX(-.85em); opacity: 0; }
 .copy.is-copied .cw.done { transition-delay: .13s; transform: none; opacity: 1; }
 
-/* the same tick the projects register uses, drawn rather than masked: a
-   stroke can be dashed off and let back on, so the mark writes itself in
-   behind the word instead of appearing whole */
-.ck { width: .6em; height: .6em; flex: none; overflow: visible; }
-.ck path {
-  fill: none; stroke: var(--green); stroke-width: 2.6;
-  stroke-linecap: round; stroke-linejoin: round;
-  stroke-dasharray: 16; stroke-dashoffset: 16;
-  /* on the way back the delay outlasts the word's fade, so the mark leaves
-     whole with it and unwrites itself in an empty cell */
-  transition: stroke-dashoffset .3s var(--snap) .15s;
+/* ── the cell marks ──
+   the tick, the cursor and the two status marks in the projects register
+   are the same material as the columns beside the sheet: character cells,
+   set in the face that has block elements at the cell they claim (see
+   --cells). each is two rows of cells at .345em of its word, which stands
+   a capital high — the box a mark beside a word should fill and not
+   exceed. two rows and not three: three put the cell under three and a
+   half pixels, and below about four and a half the face stops tiling —
+   the solid block is drawn a hair short of its advance and a run of them
+   comes out striped. the columns have the same floor.
+
+   the tick is built from quadrant blocks, so every cell carries four
+   pixels of the drawing and the mark is eight by four rather than four by
+   two; that is the least resolution a tick has at, and the stroke comes
+   out two pixels wide at every size the type takes. the cursor is the
+   plain solid cell, three across, standing after the word the way a
+   prompt stands after what it has just written. it does not blink:
+   nothing on this page moves that is not being moved. */
+.ck, .cur, .plinks .st::before {
+  display: inline-block;
+  font-family: var(--cells);
+  font-size: .345em;
+  /* a hair under zero: at this size the solid block is drawn a fraction of
+     a pixel short of its advance, and a run of them shows the seams. pulled
+     in by that fraction, the cells touch. */
+  line-height: 1; letter-spacing: -.06em; white-space: pre;
+  font-weight: 400; font-style: normal;
+  flex: none;
+  /* on the line, exactly: a clipped inline box takes its baseline from its
+     bottom edge, so the last row of cells stands where the word's letters
+     stand rather than hanging its descender's worth below them */
+  overflow: hidden; vertical-align: baseline;
 }
-/* last: the word has to be standing still before the mark is made on it */
-.copy.is-copied .ck path { stroke-dashoffset: 0; transition-delay: .24s; }
+.ck, .cur { color: var(--green); }
+/* the marks' em is .345 of the word's, so a gap stated in it has to be
+   stated at 1/.345 of what the word would call it: this is .36em of the word */
+.ck  { margin-right: 1.05em; }
+.cur { margin-left: 1.05em; }
+
+/* the tick is not drawn in, it is *set* in — a cell at a time, left to
+   right, the way the leader fills. the mask runs over the four columns in
+   four steps, so the mark arrives as four cells and never as a fade. */
+.ck {
+  --run: 0px;
+  -webkit-mask-image: linear-gradient(90deg, #000 var(--run), transparent var(--run));
+  mask-image: linear-gradient(90deg, #000 var(--run), transparent var(--run));
+  /* on the way back the delay outlasts the word's fade, so the mark leaves
+     whole with it and is unset in an empty cell */
+  transition: --run .16s steps(4, end) .15s;
+}
+/* last: the word has to be standing still before the mark is set beside it */
+.copy.is-copied .ck { --run: 100%; transition-delay: .24s; }
 
 /* for the announcement only: present to a reader, absent from the page */
 .vh {
@@ -372,7 +456,7 @@ i, .it { font-style: italic; }
 .strip {
   display: flex; align-items: baseline; gap: 12px;
   width: 100%; text-align: left;
-  padding: clamp(9px, 1.35vh, 15px) 0;
+  padding: clamp(9px, 1.35svh, 15px) 0;
 }
 .word {
   font-size: var(--t-word);
@@ -401,6 +485,37 @@ i, .it { font-style: italic; }
 .strip:focus-visible, .pdetail:focus-visible, .wdetail:focus-visible { outline: none; }
 .strip:focus-visible .word { color: var(--red-ink); }
 .band.is-open .strip:focus-visible .word { color: var(--ink); }
+/* the index rails are rows and columns of names, each name a button the
+   width of its column, so a box here is a box around a whole row too. the
+   name takes the accent, as it does under a pointer; the selected one is
+   already in ink and stays there. */
+.plist button:focus-visible, .wlist button:focus-visible { outline: none; color: var(--red-ink); }
+.plist button[aria-selected="true"]:focus-visible,
+.wlist button[aria-selected="true"]:focus-visible { color: var(--ink); }
+
+/* the links are the one thing on the page short enough to be reversed
+   whole: the word goes to paper on a run of ink, padded out by a fifth of
+   an em so the block clears the ascenders, and the underline comes off —
+   there is nothing to underline on a cell that is already all ink. it takes
+   no room, so tabbing along the contact row moves nothing in it. the
+   selector is spelled out per row rather than written once as .a, because
+   the credentials link restates its hover at a weight a single class cannot
+   outrank, and a focused link under a pointer would have taken that colour
+   on this ground. */
+.contact .a:focus-visible, .plinks .a:focus-visible, .creds .a:focus-visible,
+.plate-meta .close:focus-visible {
+  outline: none;
+  background: var(--ink); color: var(--paper);
+  box-shadow: 0 0 0 .2em var(--ink);
+  text-decoration: none;
+}
+.copy:focus-visible .cw.rest { text-decoration: none; }
+/* the key is set a grey down from its word, and a grey on ink is nothing */
+.plate-meta .close:focus-visible b { color: var(--paper); }
+/* the plate is a picture, and a picture reversed is a negative. its border
+   takes the accent instead, exactly as it does under a pointer. */
+.shot .zoom:focus-visible { outline: none; }
+.shot .zoom:focus-visible img { border-color: var(--red-ink); }
 
 /* an empty flex item takes its baseline from its bottom margin edge, so
    `baseline` is what actually seats the dots on the line the words sit on */
@@ -481,10 +596,27 @@ i, .it { font-style: italic; }
    own style attribute. both of them ride the same transform: a solid fill has
    nothing in it that stretching can distort, so the mark's length costs the
    compositor a matrix and the page no layout at all. */
-.mark {
+.mark, .track {
   position: absolute;
   right: calc(var(--rail) * -1 + 4px);
-  top: 0; width: 2px; height: 1px;
+  /* one cell wide, and the cell is the rail's: seven pixels high, set in the
+     cell face so 1ch is the cell's own advance and not the serif's */
+  font-family: var(--cells); font-size: 7px; line-height: 1;
+  width: 1ch;
+  color: var(--ink-4);
+  opacity: 0; transition: opacity .12s linear;
+  pointer-events: none;
+}
+/* the terminal's scrollbar: a track of half-shade cells the length of the
+   entry's box, and a solid run on it where the reader is. the track is text
+   — ▒ once per row, written when the box is measured and not again until it
+   changes — and the run is the box below, which is what a column of █ is
+   once it has been painted. it stays a box because it is the one thing here
+   rewritten on every frame of a scroll, and a solid fill has nothing in it
+   that stretching can distort. */
+.track { margin: 0; white-space: pre; overflow: hidden; user-select: none; }
+.mark {
+  top: 0; height: 1px;
   transform-origin: 0 0;
   transform: translateY(0) scaleY(0);
   /* the sentence above is only true if the mark is on a layer of its own: a
@@ -492,11 +624,9 @@ i, .it { font-style: italic; }
      rewritten on every frame of a scroll. */
   will-change: transform;
   background: var(--ink-4);
-  opacity: 0; transition: opacity .12s linear;
-  pointer-events: none;
 }
-/* it arrives once the band has finished opening and knows its own height */
-.band.is-scrollable > .mark { opacity: 1; }
+/* both arrive once the band has finished opening and knows its own height */
+.band.is-scrollable > .mark, .band.is-scrollable > .track { opacity: 1; }
 
 /* min-height, not height: the inner fills the band when the entry is short and
    runs past it when the entry is long, which is the only way the band above it
@@ -506,28 +636,11 @@ i, .it { font-style: italic; }
 .inner {
   min-height: 100%;
   display: flex; flex-direction: column;
-  padding-bottom: clamp(12px, 2vh, 22px);
+  padding-bottom: clamp(12px, 2svh, 22px);
 }
 .inner { transition: visibility 0s 0s; }
 /* stays visible while the band clips it away, then drops out of the tab order */
 .band:not(.is-open) .inner { visibility: hidden; transition: visibility 0s .36s; }
-
-/* ── foot ──────────────────────────────────────────────────── */
-
-/* space-between only centres the middle item when the outer two match; they
-   never do, so the hint drifts. a 1fr auto 1fr grid pins it to the page axis. */
-.foot {
-  display: grid; grid-template-columns: 1fr auto 1fr; align-items: baseline; gap: 18px;
-  padding-top: clamp(8px, 1.2vh, 13px);
-  font-size: var(--t-small);
-  font-style: italic;
-  color: var(--ink-2);
-}
-.foot > :last-child { text-align: right; }
-.foot b { font-weight: 500; font-style: normal; color: var(--ink); font-variant-numeric: tabular-nums; }
-#pos { grid-column: 1; }
-.keys { grid-column: 2; color: var(--ink-3); font-style: normal; text-align: center; }
-#clock { grid-column: 3; }
 
 /* ── shared text ───────────────────────────────────────────── */
 
@@ -580,9 +693,9 @@ i, .it { font-style: italic; }
    ones the layout already keeps. */
 .about {
   display: flex; flex-direction: column; flex: 1 0 auto;
-  --t-lede: min(clamp(18px, calc(3.2 * var(--cq)),  42px), clamp(11px, min(5vh,    45px)   - 4px,   42px));
-  --t-sub:  min(clamp(14px, calc(1.85 * var(--cq)), 22px), clamp(9px,  min(2.85vh, 25.65px) - 2.6px, 22px));
-  --t-body: min(clamp(13px, calc(1.55 * var(--cq)), 18px), clamp(9px,  min(2.55vh, 22.95px) - 2.3px, 18px));
+  --t-lede: min(clamp(18px, calc(3.2 * var(--cq)),  42px), clamp(11px, min(5svh,    45px)   - 4px,   42px));
+  --t-sub:  min(clamp(14px, calc(1.85 * var(--cq)), 22px), clamp(9px,  min(2.85svh, 25.65px) - 2.6px, 22px));
+  --t-body: min(clamp(13px, calc(1.55 * var(--cq)), 18px), clamp(9px,  min(2.55svh, 22.95px) - 2.3px, 18px));
 }
 .about__top {
   flex: 1 0 auto;
@@ -590,13 +703,13 @@ i, .it { font-style: italic; }
   column-gap: var(--gutter);
   /* vh, not a share of the band: the band's height animates and this must not.
      only in play once the two blocks stack, under 1000px */
-  row-gap: clamp(13px, 2.4vh, 28px);
+  row-gap: clamp(13px, 2.4svh, 28px);
   align-items: baseline;     /* the notes seat on the deck's first baseline */
   /* start, not centre: the band grows over .36s, and centred rows re-centre on
      every frame of it, so the text slid down as the band opened. every other
      band anchors its content to the top and is simply revealed — this matches. */
   align-content: start;
-  padding-bottom: clamp(6px, 3.2vh - 2px, 38px);
+  padding-bottom: clamp(6px, 3.2svh - 2px, 38px);
 }
 /* seven and five, not six and six: at this size the deck wants the longer
    measure, and five columns is still ~60 characters for the notes beside it */
@@ -615,7 +728,7 @@ i, .it { font-style: italic; }
 .about__two {
   grid-column: 8 / 13;
   display: grid;
-  row-gap: clamp(6px, 1.4vh, 15px);
+  row-gap: clamp(6px, 1.4svh, 15px);
   align-content: start;   /* the row is as tall as the deck; the notes are not */
 }
 .about__two p {
@@ -625,7 +738,7 @@ i, .it { font-style: italic; }
 /* it sits at the foot of the band on space alone: the band's own rule is a few
    lines below it, and a second one this close made a box of the last two lines */
 .now {
-  margin-top: auto; padding-top: clamp(8px, 2.2vh, 22px);
+  margin-top: auto; padding-top: clamp(8px, 2.2svh, 22px);
   display: flex; flex-wrap: wrap; gap: 6px clamp(24px, calc(3.4 * var(--cq)), 60px);
   font-size: var(--t-body);
 }
@@ -682,7 +795,7 @@ i, .it { font-style: italic; }
    screenshot, where they caption the thing they describe, so what is left here
    is the stack alone — one line of keywords needs no rule to hold it off. */
 .pbar {
-  margin-top: auto; padding-top: clamp(9px, 1.4vh, 14px);
+  margin-top: auto; padding-top: clamp(9px, 1.4svh, 14px);
   display: flex; align-items: baseline; justify-content: space-between;
   flex-wrap: wrap; gap: 6px 20px;
 }
@@ -707,8 +820,8 @@ i, .it { font-style: italic; }
    bar across the foot before, which cost a rule, a gap and a line of height
    the longest role could not spare. */
 .whead {
-  padding-bottom: clamp(6px, .95vh, 10px);
-  margin-bottom: clamp(8px, 1.3vh, 13px);
+  padding-bottom: clamp(6px, .95svh, 10px);
+  margin-bottom: clamp(8px, 1.3svh, 13px);
   border-bottom: 1px solid var(--rule-strong);
 }
 .wline {
@@ -747,7 +860,7 @@ i, .it { font-style: italic; }
 .pnote { margin-top: 10px; font-size: var(--t-body); line-height: 1.55; color: var(--ink-2); text-wrap: pretty; }
 .pflow { margin-top: 12px; font-style: italic; font-size: var(--t-small); color: var(--ink-2); }
 .pflow b { font-weight: 400; font-style: normal; color: var(--red-ink); padding: 0 5px; }
-.pmain ul { margin-top: clamp(10px, 1.6vh, 16px); }
+.pmain ul { margin-top: clamp(10px, 1.6svh, 16px); }
 .plinks { display: flex; align-items: baseline; gap: clamp(12px, calc(1.4 * var(--cq)), 20px); font-size: var(--t-body); }
 /* the caption line: name, where to read it, and whether it is still moving.
    it sits under the plate when there is one and at the foot when there is not,
@@ -763,26 +876,21 @@ i, .it { font-style: italic; }
 .plinks .st.is-active { color: var(--red-ink); }
 .plinks .st.is-complete { color: var(--green-ink); }
 /* both states carry a mark in the same box at the same remove from the word,
-   so switching projects moves the colour and the shape, never the setting */
+   so switching projects moves the colour and the shape, never the setting.
+   the box is the cell grid described at .ck, and the two marks are the two
+   things a cell can be: complete is the tick the address confirmation sets,
+   in the same four cells, and active is the block that has not gone solid
+   yet — the three-quarter shade, in the accent, still filling in. */
 .plinks .st.is-active::before,
-.plinks .st.is-complete::before {
-  content: ''; display: inline-block; width: .4em; height: .4em;
-  margin-right: .45em;
-}
-.plinks .st.is-active::before { border-radius: 50%; background: var(--red); }
-/* drawn rather than set: a tick glyph would take its width from whichever
-   fallback font owns U+2713, and the box has to stay the dot's box exactly */
-.plinks .st.is-complete::before {
-  background: var(--green);
-  -webkit-mask: var(--tick) center / contain no-repeat;
-          mask: var(--tick) center / contain no-repeat;
-}
+.plinks .st.is-complete::before { margin-right: 1.3em; }   /* .45em of the word — see .ck */
+.plinks .st.is-active::before   { content: '▓▓▓\A▓▓▓'; color: var(--red); }
+.plinks .st.is-complete::before { content: '▄ ▗▛\A▝▙▛ '; color: var(--green); }
 
 /* the height cap belongs to the figure, not the image: capping the image while
    its width is held at 100% stretches the plate wider than 3:2, and every shot
    then floats inside a box it does not fill. capping the width keeps the plate
    at its ratio and lets it shrink whole. */
-.shot { grid-column: span 4; align-self: start; max-width: calc(34vh * 1.5); }
+.shot { grid-column: span 4; align-self: start; max-width: calc(34svh * 1.5); }
 .shot img {
   width: 100%; display: block; border: 1px solid var(--ink);
   /* shots run 1.40-1.61; a 3:2 plate holds all of them without cropping */
@@ -797,13 +905,16 @@ i, .it { font-style: italic; }
 /* the plate answers before it is clicked: the cursor says what it does and the
    border takes the accent every other actionable thing here takes on hover */
 .shot .zoom { display: block; width: 100%; cursor: zoom-in; }
-.shot .zoom:hover img { border-color: var(--red-ink); }
+@media (hover: hover) { .shot .zoom:hover img { border-color: var(--red-ink); } }
 
 /* ── the expanded plate ────────────────────────────────────── */
 
-/* a shot opens at its own resolution and no further. the image is given no
-   width of its own, so the caps below can only ever shrink it: a 624px capture
-   is shown at 624px rather than blown up into mush. */
+/* every shot opens into the same plate. the shots run from 624px to 1920px
+   across, and opened each at its own resolution the plate grew as you walked
+   the rail — Orca a small card, Chaperone the whole window. so the box is the
+   thumbnail's, scaled up: 3:2, as wide as the window allows and no taller
+   than it, and each shot sits in it the way it sits in the small one, on the
+   colour its own edge already is. */
 .plate {
   /* the dialog belongs to the viewport and not to the sheet — it says so
      itself, below the markup — so the sheet's measure is not the measure its
@@ -822,7 +933,7 @@ i, .it { font-style: italic; }
   --cq: 1svw;
   --t-small: clamp(12.6px, 1.14svw, 14.2px);
   width: 100%; height: 100%; max-width: none; max-height: none;
-  padding: clamp(14px, 4vh, 44px);
+  padding: clamp(14px, 4svh, 44px);
   border: 0; background: none; color: var(--ink);
   /* the whole field outside the picture is a way out, so it has to be the
      dialog itself that fills the viewport, not a box centred inside one */
@@ -841,13 +952,15 @@ i, .it { font-style: italic; }
 .plate-inner { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
 .plate-inner:focus { outline: none; }
 .plate img {
-  display: block; max-width: 90vw; max-height: 82vh;
+  display: block;
+  width: min(90svw, calc(82svh * 1.5));
+  aspect-ratio: 3 / 2; object-fit: contain;
   border: 1px solid var(--ink); background: var(--plate, var(--paper));
   cursor: zoom-out;
 }
 .plate-meta { justify-content: space-between; gap: 18px; }
 .plate-meta .close { font-style: italic; color: var(--ink-3); transition: color .1s linear; }
-.plate-meta .close:hover { color: var(--red-ink); }
+@media (hover: hover) { .plate-meta .close:hover { color: var(--red-ink); } }
 .plate-meta .close b { font-style: normal; font-weight: 500; color: var(--ink-2); }
 
 /* ── 04 stack ──────────────────────────────────────────────── */
@@ -870,7 +983,7 @@ i, .it { font-style: italic; }
 }
 .group li { font-size: var(--t-small); line-height: 1.52; color: var(--ink-2); }
 .creds {
-  margin-top: auto; padding-top: clamp(14px, 2.2vh, 22px);
+  margin-top: auto; padding-top: clamp(14px, 2.2svh, 22px);
   display: grid; grid-template-columns: repeat(5, minmax(0,1fr));
   column-gap: var(--gutter); row-gap: 8px;
   font-size: var(--t-body);
@@ -883,7 +996,7 @@ i, .it { font-style: italic; }
    underline. the hover has to be restated: `.a:hover` matches at the same
    weight and is declared earlier, so it would lose to the colour above it. */
 .creds .a { font-style: italic; color: var(--ink); }
-.creds .a:hover { color: var(--red-ink); }
+@media (hover: hover) { .creds .a:hover { color: var(--red-ink); } }
 
 /* ── narrow ────────────────────────────────────────────────── */
 
@@ -904,14 +1017,14 @@ i, .it { font-style: italic; }
   .lede { grid-column: 1 / 7; }
   .about__two { grid-column: 7 / 13; }
   /* six columns, not seven: the deck needs its height step to fall with it */
-  .about { --t-lede: min(clamp(18px, calc(2.4 * var(--cq)), 32px), clamp(11px, min(3.6vh, 32.4px) - 3px, 32px)); }
+  .about { --t-lede: min(clamp(18px, calc(2.4 * var(--cq)), 32px), clamp(11px, min(3.6svh, 32.4px) - 3px, 32px)); }
   .groups { grid-template-columns: repeat(3, minmax(0,1fr)); row-gap: 14px; }
   .creds { grid-template-columns: repeat(3, minmax(0,1fr)); }
   .creds > div:first-child { grid-column: 1 / 2; }
   .creds > div:last-child  { grid-column: 2 / 4; }
 }
 @media (max-width: 720px) {
-  :root { --pad-x: 20px; }
+  :root { --pad-x: max(20px, var(--safe-x)); }
   /* the links move under the name here, and the gap is measured from the name's
      box — which at .92 stops above the tail of its g, so the tail was hanging
      into the row below it with a pixel to spare. the box is given the overhang
@@ -919,16 +1032,16 @@ i, .it { font-style: italic; }
   .head { flex-direction: column; align-items: flex-start; gap: 10px; }
   .head h1 { margin-bottom: .13em; }
   .band::before { --bw: 11px; }   /* the rail is at its 14px floor from here down */
-  .about__top { padding-bottom: 0; row-gap: clamp(10px, 2.4vh, 28px); }
+  .about__top { padding-bottom: 0; row-gap: clamp(10px, 2.4svh, 28px); }
   /* only here do the two blocks stack; the notes keep their own rhythm */
   .lede, .about__two { grid-column: 1 / -1; }
-  .about__two { row-gap: clamp(7px, 1.3vh, 12px); }
+  .about__two { row-gap: clamp(7px, 1.3svh, 12px); }
   /* stacked, the three blocks add up rather than sitting level, so the whole
      band answers to the window's height at about half the rate it does above */
   .about {
-    --t-lede: min(clamp(18px, calc(2.4 * var(--cq)), 32px),  clamp(11px, 2.75vh - 2.4px, 32px));
-    --t-sub:  min(clamp(14px, calc(1.36 * var(--cq)), 17px), clamp(9px,  2.2vh  - 1.8px, 17px));
-    --t-body: min(clamp(13px, calc(1.19 * var(--cq)), 15px), clamp(9px,  2.0vh  - 1.6px, 15px));
+    --t-lede: min(clamp(18px, calc(2.4 * var(--cq)), 32px),  clamp(11px, 2.75svh - 2.4px, 32px));
+    --t-sub:  min(clamp(14px, calc(1.36 * var(--cq)), 17px), clamp(9px,  2.2svh  - 1.8px, 17px));
+    --t-body: min(clamp(13px, calc(1.19 * var(--cq)), 15px), clamp(9px,  2.0svh  - 1.6px, 15px));
   }
 
   .projects, .work {
@@ -998,9 +1111,6 @@ i, .it { font-style: italic; }
   .creds { grid-template-columns: 1fr; gap: 8px; }
   /* has to match the specificity of the spans it undoes, or they win anyway */
   .creds > div:first-child, .creds > div:last-child { grid-column: auto; }
-  .keys { display: none; }
-  .foot { grid-template-columns: 1fr auto; }   /* the hint is gone; don't leave its track */
-  #clock { grid-column: 2; }
 }
 /* shorter windows: tighten the rhythm */
 @media (max-height: 830px) {
@@ -1038,7 +1148,6 @@ i, .it { font-style: italic; }
      fighting for the same pixels, so the chrome gives them up first */
   .head { padding-bottom: 8px; gap: 6px; }
   .inner { padding-bottom: 6px; }
-  .foot { padding-top: 6px; }
   /* both rails are the same row of names now, so they give back the same
      couple of pixels — the work rail alone would sit a line off the other */
   .plist button, .wlist button { padding-top: 5px; padding-bottom: 5px; }
@@ -1054,7 +1163,7 @@ i, .it { font-style: italic; }
   .group li { line-height: 1.5; }
 }
 
-/* a phone on its side. the four strips, the name and the foot are the page's
+/* a phone on its side. the four strips and the name are the page's
    fixed overhead, and at 400px of glass they take three quarters of it before
    the band has said anything — which leaves the register about a hundred
    pixels for six hundred characters. the floors the steps above keep for
@@ -1064,9 +1173,9 @@ i, .it { font-style: italic; }
    scroll to reach. */
 @media (max-width: 720px) and (max-height: 460px) {
   .about {
-    --t-lede: min(clamp(18px, calc(2.4 * var(--cq)), 32px),  clamp(9px, 2.75vh - 2.4px, 32px));
-    --t-sub:  min(clamp(14px, calc(1.36 * var(--cq)), 17px), clamp(8px, 2.2vh  - 1.8px, 17px));
-    --t-body: min(clamp(13px, calc(1.19 * var(--cq)), 15px), clamp(8px, 2.0vh  - 1.6px, 15px));
+    --t-lede: min(clamp(18px, calc(2.4 * var(--cq)), 32px),  clamp(9px, 2.75svh - 2.4px, 32px));
+    --t-sub:  min(clamp(14px, calc(1.36 * var(--cq)), 17px), clamp(8px, 2.2svh  - 1.8px, 17px));
+    --t-body: min(clamp(13px, calc(1.19 * var(--cq)), 15px), clamp(8px, 2.0svh  - 1.6px, 15px));
   }
 }
 
@@ -1077,9 +1186,9 @@ i, .it { font-style: italic; }
    the window's height faster here to pay for the measure it has lost. */
 @media (max-width: 340px) {
   .about {
-    --t-lede: min(clamp(18px, calc(2.4 * var(--cq)), 32px),  clamp(11px, 2.3vh - 2.2px, 32px));
-    --t-sub:  min(clamp(14px, calc(1.36 * var(--cq)), 17px), clamp(9px,  1.8vh - 1.6px, 17px));
-    --t-body: min(clamp(13px, calc(1.19 * var(--cq)), 15px), clamp(9px,  1.7vh - 1.5px, 15px));
+    --t-lede: min(clamp(18px, calc(2.4 * var(--cq)), 32px),  clamp(11px, 2.3svh - 2.2px, 32px));
+    --t-sub:  min(clamp(14px, calc(1.36 * var(--cq)), 17px), clamp(9px,  1.8svh - 1.6px, 17px));
+    --t-body: min(clamp(13px, calc(1.19 * var(--cq)), 15px), clamp(9px,  1.7svh - 1.5px, 15px));
   }
 }
 
@@ -1094,12 +1203,220 @@ i, .it { font-style: italic; }
    band's own height is the browser's to settle. all four registers open on the
    same curve, at the same length, on a phone as on the sheet. */
 
+/* a finger, not a pointer. the links are the smallest things on the page
+   that answer a tap — the contact row is set at the body step, and at 13px
+   the box a finger has to land on was sixteen pixels tall. the box is opened
+   out to about twice that and the type is not moved: the padding and the
+   margin cancel, so the row is laid out exactly as it was and only the hit
+   area grows. the reverse-video focus paints the padding too, and that is
+   fine — a keyboard on a touch device is the rare case, not this one. */
+@media (pointer: coarse) {
+  .contact .a, .plinks .a, .creds .a, .plate-meta .close { padding: .5em 0; margin: -.5em 0; }
+  /* a key hint is a hint about a key. there is nothing here to press it on;
+     the word alone says what the button does, and the field around the
+     picture says it too. */
+  .plate-meta .close b { display: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   THE MACHINE REGISTER AND THE ORDER
+   Laid over the sheet above, never into it. Two things happen here.
+   Prose stays Fraunces and everything the page says *about itself* —
+   indices, counts, dates, states, keys — moves to mono. And a
+   classical column stands the full height of the glass, with the
+   sheet beside it. Rules, greys, grid and accent are the ones
+   already declared above; nothing here redefines them.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════
+   MACHINE REGISTER — override layer, laid over the paper.
+   Nothing here is a new system. It splits the page into two
+   materials: prose stays Fraunces, and everything the page says
+   *about itself* — indices, counts, dates, states, units, keys —
+   moves to mono. Rules, greys, grid and accents are untouched.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* mono sits wider than the serif at the same px; every run that shares a
+     line with prose is trimmed by this rather than by a hand-set size */
+  --mono-trim: .93;
+}
+
+/* ── the system voice ──────────────────────────────────────── */
+
+/* one declaration, every machine run. italic is dropped: the serif used
+   italic to mark an aside, and a second material marks it better. */
+.wdates, .tags, .pflow, .pmeta, .plinks .st,
+.group li, .creds p i {
+  font-family: var(--mono);
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .015em;
+}
+.wdates, .tags, .pflow, .pmeta, .group li, .creds p i { font-size: calc(var(--t-small) * var(--mono-trim)); }
+.pflow b { font-family: var(--mono); }
+
+/* states read as states: two words the machine sets, not two words written */
+.plinks .st { text-transform: uppercase; letter-spacing: .09em; font-size: calc(var(--t-small) * .86); }
+
+/* the stack band is a list of proper nouns a machine would print */
+.group li { letter-spacing: .01em; }
+/* the heading stays serif italic — the contrast is the point of the band */
+.group h3 { font-family: 'Fraunces', Georgia, serif; }
+
+/* ── the register strip ────────────────────────────────────── */
+
+/* ABOUT ··················
+   label, then leader: the dots run from the word to the edge of the strip.
+
+   there is no accent bar here on purpose. the active-item bar is the
+   most generated-looking component on the web, and the open register is
+   already marked three times over: the brace in the rail, the leader
+   filling red, the word going to ink. */
+.strip { gap: 0; }
+
+.word {
+  font-family: var(--mono);
+  text-transform: uppercase;
+  font-size: calc(var(--t-word) * .8);
+  font-weight: 400;
+  letter-spacing: .085em;
+}
+.band.is-open .word { font-weight: 600; letter-spacing: .085em; }
+
+.leader { margin: 0 0 0 .9em; }
+
+/* the same treatment the plate's caption asks for */
+.plate-meta .close { font-family: var(--mono); font-style: normal; font-size: calc(var(--t-small) * var(--mono-trim)); text-transform: uppercase; letter-spacing: .055em; }
+.plate-meta .close b { font-weight: 400; }
+
+/* ── texture, over everything, under nothing ───────────────── */
+
+/* one fixed layer, painted once and composited thereafter: it does not move,
+   does not resize with the bands, and takes no pointer. the page's own rule
+   was "no grain"; this is the line being crossed on purpose, and it is worth
+   knowing it costs one layer and no layout. */
+.grain {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 8;
+}
+
+/* ── SPACE MONO / SCANLINE ─────────────────────────────────────
+   The face has an opinion: Space Mono's slab terminals and that
+   splayed capital M read as a machine with a maker. The texture is
+   a 3px line screen — a scan, not a grain — and the accent is given
+   a bloom so the red reads as lit rather than printed.
+   ────────────────────────────────────────────────────────────── */
+:root {
+  --mono: 'Space Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  /* the cell face, for everything drawn in block elements — the columns,
+     the marks, the scroll track. not the page's mono: Space Mono has no
+     block elements, and a missing glyph is substituted from some other
+     face at some other advance width, which shears the grid every one of
+     these is built on. all of these carry U+2580-259F at the cell they
+     claim. */
+  --cells: 'Cascadia Mono', Consolas, 'DejaVu Sans Mono', 'Liberation Mono',
+           'Courier New', ui-monospace, monospace;
+}
+
+.grain {
+  opacity: 1;
+  background-image: repeating-linear-gradient(to bottom,
+    rgba(21,23,26,.055) 0 1px, transparent 1px 3px);
+}
+
+/* Space Mono runs wide and tall; the label gives back what the face takes */
+.word { font-size: calc(var(--t-word) * .72); letter-spacing: .07em; }
+.band.is-open .word { letter-spacing: .07em; }
+
+/* lit, not printed: the accent picks up a halo of its own ink. */
+.plinks .st.is-active::before { text-shadow: 0 0 5px rgba(221,47,25,.6); }
+
+/* ── THE ORDER ─────────────────────────────────────────────────
+   Two shafts, the full height of the glass, at full strength — one at
+   either edge, the same strip wide, so the sheet stands centred
+   between them. The same order on every register.
+   ────────────────────────────────────────────────────────────── */
+
+:root {
+  /* the strip each figure stands in, and the page's measure restated
+     around them. --cq is declared upstream as one percent of the sheet's
+     width, and it was exact only while the sheet had the whole window
+     to sit in. it does not any more, so the number is given both strips
+     back — otherwise every one of the seven type steps is cut from a
+     measure the sheet no longer has. */
+  --strip: clamp(118px, 13vw, 208px);
+  --cq: calc((min(100vw - 2 * var(--strip), 1360px) - 2 * var(--pad-x)) / 100);
+}
+
+/* the same strip on both sides: the sheet's margin: auto has the same room
+   left and right, so it lands dead centre between the two columns */
+body { padding-left: var(--strip); padding-right: var(--strip); }
+
+.order {
+  position: fixed;
+  top: 0; bottom: 0;
+  width: var(--strip);
+  margin: 0;
+  /* not the page's face — the cell face, for the reason given at --cells */
+  font-family: var(--cells);
+  /* small, and deliberately so. the flutes are the whole figure, and a
+     flute needs four or five cells to be a flute rather than an edge --
+     at nine pixels the shaft was twenty-four cells across and seven
+     flutes came back as a barcode. here it is nearer fifty, the grain
+     goes below what you read as individual glyphs, and the shaft reads
+     as stone that happens to be made of characters. */
+  font-size: clamp(4.6px, 0.68svh, 8px);
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: pre;
+  color: var(--ink);
+  background: none;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  /* the figure is redrawn in place a few times a minute; its own layer
+     keeps that off the sheet's. */
+  will-change: contents;
+  z-index: 1;
+}
+#order   { left: 0; }
+#order-r { right: 0; }
+
+/* the shaft runs the whole height of the glass whatever the glass is: the
+   cell is cut from vh, the row count from the strip's own height, and the
+   last row is drawn past the bottom edge and clipped rather than left
+   short of it. it is a column, not a picture of one. */
+
+@media (max-width: 980px) {
+  /* below this the two strips are taking measure the register stack
+     cannot spare, and a shaft eight characters wide is no longer a shaft.
+     phones never see the columns. */
+  :root { --cq: calc((min(100vw, 1360px) - 2 * var(--pad-x)) / 100); }
+  body { padding-left: 0; padding-right: 0; }
+  .order { display: none; }
+}
+
+/* paper is the one medium the column was never for. it and the scanlines
+   are fixed to the glass, so on a printer they would land on every sheet,
+   over the type. the sheet gets the whole page back. */
+@media print {
+  .order, .grain { display: none !important; }
+  body { padding-left: 0; padding-right: 0; }
 }
 </style>
 </head>
 <body>
+<!-- the columns. they belong to the viewport rather than to the sheet, they
+     are drawn into by the script at the foot of this file, and they are empty
+     until then: there is nothing here for a reader, and nothing to read. -->
+<pre class="order" id="order" aria-hidden="true"></pre>
+<pre class="order" id="order-r" aria-hidden="true"></pre>
 
 <div class="sheet">
 
@@ -1107,7 +1424,9 @@ i, .it { font-style: italic; }
     <h1>Aaron Altergott</h1>
     <nav class="contact" aria-label="Contact">
       <button class="a copy" id="copy" type="button" data-address="adaltergott@gmail.com"
-              title="adaltergott@gmail.com" aria-label="Copy email address adaltergott@gmail.com"><span class="cface"><span class="cw rest">email</span><span class="cw done" aria-hidden="true"><svg class="ck" viewBox="0 0 12 12"><path d="M.9 6.4 4.4 10.2 11.1 1.9"/></svg>copied</span></span></button><span>·</span>
+              title="adaltergott@gmail.com" aria-label="Copy email address adaltergott@gmail.com"><span class="cface"><span class="cw rest">email</span><span class="cw done" aria-hidden="true"><span class="ck">▄ ▗▛
+▝▙▛ </span>copied<span class="cur">███
+███</span></span></span></button><span>·</span>
       <a class="a" href="https://github.com/micronwave" target="_blank" rel="noopener">github</a><span>·</span>
       <a class="a" href="https://www.linkedin.com/in/aaronaltergott/" target="_blank" rel="noopener">linkedin</a>
     </nav>
@@ -1115,12 +1434,6 @@ i, .it { font-style: italic; }
   </header>
 
   <main class="bands" id="bands"></main>
-
-  <footer class="foot">
-    <span id="pos"></span>
-    <span class="keys"></span>
-    <span id="clock"></span>
-  </footer>
 
 </div>
 
@@ -1150,10 +1463,17 @@ const about = [
 
 const experience = [
   {
+    company: 'Pence Contractors',
+    role: 'Application Support Specialist',
+    location: 'Lake Oswego, OR',
+    dates: 'Oct 2026–Present',
+    bullets: []
+  },
+  {
     company: 'Southwest Self Storage',
     role: 'Operations Specialist',
     location: 'Redlands, CA',
-    dates: 'Nov 2024–Present',
+    dates: 'Nov 2024–Sept 2026',
     bullets: [
       'Recovered $85K in monthly revenue by tracing an ERP billing config error that was declining autopay accounts with AMEX and Discover credit cards',
       'Reduced past due balances 13% by automating collections across SiteLink and CallPotential, using system events to trigger SMS payment reminders and autopay enrollment campaigns',
@@ -1312,8 +1632,7 @@ const views = {
         '<div class="about__two"><p>' + esc(about[1]) + '</p><p>' + esc(about[2]) + '</p></div>' +
       '</div>' +
       '<ul class="now">' +
-        '<li><i>currently</i> <b>Operations Specialist</b>, Southwest Self Storage</li>' +
-        '<li><i>also</i> <b>Partnerships Lead</b>, Null404</li>' +
+        '<li><i>currently</i> <b>Application Support Specialist</b> @ Pence Contractors</li>' +
       '</ul>' +
     '</div>',
 
@@ -1363,6 +1682,7 @@ REGISTERS.forEach((r) => {
       '<div class="body" id="body-' + r.id + '" role="region" aria-labelledby="strip-' + r.id + '">' +
         '<div class="inner">' + views[r.id] + '</div>' +
       '</div>' +
+      '<pre class="track" aria-hidden="true"></pre>' +
       '<i class="mark" aria-hidden="true"></i>' +
     '</section>'
   );
@@ -1625,7 +1945,8 @@ function toTop(band) {
 function markScroll(band) {
   const body = band.querySelector('.body');
   const mark = band.querySelector('.mark');
-  if (!body || !mark) return;
+  const track = band.querySelector('.track');
+  if (!body || !mark || !track) return;
   /* all four questions are asked before the class is written. a class set
      between two reads makes the browser lay the page out again to answer the
      second, on a frame that is already carrying a scroll. */
@@ -1642,6 +1963,17 @@ function markScroll(band) {
   const h = Math.max(28, view * view / full);
   const y = from + (view - h) * (at / over);
   mark.style.transform = 'translateY(' + Math.round(y) + 'px) scaleY(' + h + ')';
+  /* the track runs the entry's box, a cell per row of it. it is set only
+     when the count moves — a tap on the rail or the window settling — and a
+     scroll, which lands here on every frame, finds the same count and
+     writes nothing. */
+  const rows = Math.floor(view / 7);
+  const key = rows + '@' + from;
+  if (track.dataset.key !== key) {
+    track.dataset.key = key;
+    track.style.top = from + 'px';
+    track.textContent = '▒\n'.repeat(rows);
+  }
 }
 
 /* a scroll event arrives on every frame the finger is moving, and the four
@@ -1764,9 +2096,6 @@ addEventListener('resize', () => {
 
 let current = null;
 
-const keysEl = document.querySelector('.keys');
-const posEl = document.getElementById('pos');
-const pad = (n) => String(n).padStart(2, '0');
 
 function open(id) {
   if (id === current) return;
@@ -1782,17 +2111,7 @@ function open(id) {
   bandsEl.querySelectorAll('.band').forEach((b) => {
     b.querySelector('.body').scrollTop = 0;
     b.classList.remove('is-scrollable');
-  });
-  const sideways = id === 'projects' || id === 'work';
-  keysEl.innerHTML = sideways
-    ? '&uarr; &darr; registers &nbsp;&middot;&nbsp; &larr; &rarr; ' + id
-    : '1&ndash;4, or &uarr; &darr;';
-
-  /* where you are in the stack, in the same shape the clock uses opposite it:
-     the figures carry the weight, the word stays in the running italic */
-  const at = REGISTERS.findIndex((r) => r.id === id);
-  posEl.innerHTML = '<b>' + pad(at + 1) + ' / ' + pad(REGISTERS.length) + '</b> ' + id;
-}
+  });}
 
 document.addEventListener('keydown', (e) => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -1901,31 +2220,6 @@ copyBtn.addEventListener('click', () => {
   });
 });
 
-/* ── the live bits ───────────────────────────────────────────── */
-
-const clock = document.getElementById('clock');
-
-/* both formatters are built once and then asked. an Intl.DateTimeFormat is
-   expensive to construct and cheap to call, and toLocaleTimeString constructs
-   one on every call — this clock was building two of them, twice a minute,
-   for the whole time the page is open. the zone is still read off the date
-   rather than remembered, since it is the one part of this that changes on
-   its own, twice a year. */
-const ZONE = new Intl.DateTimeFormat('en-US', {
-  timeZone: 'America/Los_Angeles', timeZoneName: 'short'
-});
-const TIME = new Intl.DateTimeFormat('en-US', {
-  timeZone: 'America/Los_Angeles', hour: 'numeric', minute: '2-digit', hour12: true
-});
-
-function tick() {
-  const now = new Date();
-  const zone = ZONE.formatToParts(now).find((p) => p.type === 'timeZoneName').value;
-  clock.textContent = zone + ' ' + TIME.format(now).toLowerCase();
-}
-tick();
-setInterval(tick, 30000);
-
 /* ── go ──────────────────────────────────────────────────────── */
 
 open('about');
@@ -1935,5 +2229,321 @@ document.body.classList.add('ready');
    full height without ever ending a transition — its mark is struck by hand */
 bandsEl.querySelectorAll('.band').forEach(markScroll);
 </script>
+<script>
+/* ── the order ────────────────────────────────────────────────
+   A classical column, a lit solid quantised into block glyphs.
+
+   Everything here is modelled rather than stored. One order at thirty
+   light angles and every height of glass would be a good deal of text
+   to ship, and the whole reason for modelling the thing is that the
+   light, the flute count and the crop are all just numbers. The shaft is about 7,500 cells at nine
+   samples each — some 67,000 evaluations of the field stack, which
+   measures at eight to twelve milliseconds of main thread per
+   redraw on a desktop. It is not free, which is why it runs on a
+   timer a few times a minute and not on the frame, and why it does
+   not run at all when the strip is hidden or the tab is.
+
+   This runs after the script above it and only ever adds: it reads
+   nothing the contents page owns and touches nothing it owns either.
+   ──────────────────────────────────────────────────────────── */
+(function () {
+  'use strict';
+
+  var RAMP = ' ░▒▓█';   /* paper first, solid last */
+  var SS = 3;                               /* samples per axis, per cell */
+
+  /* the constants below were tuned against the figure rather than reasoned
+     out, so they are left reachable: ?az=0&amb=0.05&tilt=1 and so on. they
+     change nothing unless asked for. */
+  var Q = new URLSearchParams(location.search);
+  function num(k, d) { var v = parseFloat(Q.get(k)); return isFinite(v) ? v : d; }
+
+  /* ambient. marble in daylight is never a silhouette — the side turned away
+     from the sun is still lit by the sky. without this every surface past
+     ninety degrees fell to the solid glyph and the shaft read as a black bar
+     with two grey channels in it. */
+  var AMB   = num('amb', 0.16);
+  var GAIN  = num('gain', 1.55);
+  var PIVOT = num('pivot', 0.52);
+  var TILT  = num('tilt', 0.78);
+  var AZMAX = num('azmax', 0.34);
+
+  function lift(v) { return AMB + (1 - AMB) * v; }
+  function clamp01(v) { return v < 0 ? 0 : (v > 1 ? 1 : v); }
+
+  /* ── the grid ─────────────────────────────────────────────────
+     One measurement, one rasteriser, for every figure on the page.
+     The cell is measured rather than assumed: the usual half-width
+     is only true of some faces, and every proportion below is
+     stated in character columns and converted through this ratio. */
+
+  function measure(el) {
+    var probe = document.createElement('span');
+    probe.textContent = new Array(41).join('█');
+    probe.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;font:inherit';
+    el.appendChild(probe);
+    var r = probe.getBoundingClientRect();
+    probe.remove();
+    return { w: r.width / 40, h: r.height };
+  }
+
+  function fit(el) {
+    var m = measure(el), box = el.getBoundingClientRect();
+    if (!m.w || !m.h || !box.width || !box.height) return null;
+    return {
+      cols: Math.floor(box.width / m.w),
+      /* up, not down: a row short leaves a sliver of paper under the base
+         on most heights. the extra row runs past the glass and is clipped. */
+      rows: Math.ceil(box.height / m.h),
+      cell: m.w / m.h
+    };
+  }
+
+  /* fields return shadow in [0,1] for a point, or null for "not on me".
+     Coverage rides with the shading, so a silhouette edge lands as a lighter
+     glyph rather than a hard jump — which is the only reason a shaft this
+     narrow can still show its flutes. */
+  /* returns the figure as text rather than setting it: both strips are the
+     same size and take the same light, so it is drawn once and set twice */
+  function raster(f, fields, gain, pivot) {
+    var w = f.cols, h = f.rows, n = SS * SS;
+    var g = new Array(w * h);
+    for (var i = 0; i < g.length; i++) g[i] = ' ';
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++) {
+        var acc = 0, cov = 0;
+        for (var sy = 0; sy < SS; sy++) {
+          var py = y + (sy + 0.5) / SS;
+          for (var sx = 0; sx < SS; sx++) {
+            var px = x + (sx + 0.5) / SS, s = null;
+            for (var k = 0; k < fields.length; k++) {
+              s = fields[k](px, py);
+              if (s !== null) break;
+            }
+            if (s === null) continue;
+            acc += s; cov++;
+          }
+        }
+        if (!cov) continue;
+        var v = (acc / cov) * (cov / n);
+        v = 0.5 + (v - pivot) * gain;
+        var q = Math.round(clamp01(v) * (RAMP.length - 1));
+        if (q > 0) g[y * w + x] = RAMP[q];
+      }
+    }
+    var out = [];
+    for (var r = 0; r < h; r++) {
+      out.push(g.slice(r * w, r * w + w).join('').replace(/\s+$/, ''));
+    }
+    return out.join('\n');
+  }
+
+  /* ── light ────────────────────────────────────────────────────
+     The angle is the sun's, and the sun is the one the reader is
+     under: the figure is lit from
+     the east in the morning and the west in the evening. On top of
+     that the source rakes — a couple of degrees over two minutes,
+     meant to be noticed on the second visit rather than the first. */
+
+  function solar(now) {
+    var mins = now.getHours() * 60 + now.getMinutes();
+    var day = (mins - 360) / 720;              /* 0 at 06:00, 1 at 18:00 */
+    if (day < 0 || day > 1) return { az: day < 0 ? -0.9 : 0.9, elev: 0.42 };
+    return { az: -0.95 + 1.9 * day, elev: 0.28 + 0.72 * Math.sin(Math.PI * day) };
+  }
+
+  /* the sun's own range is the whole sky; the figure's is not. past about
+     half a radian off axis the lit side saturates — every flute on it
+     returns the same lambert and comes back as one flat glyph — and all the
+     modelling collapses onto the shadow side. the hour still says where the
+     light comes from; it does it inside the arc five glyphs can resolve. */
+  function lightAt(t) {
+    var s = solar(new Date());
+    var base = Q.has('az') ? num('az', 0) : s.az * AZMAX;
+    var az = Math.max(-AZMAX, Math.min(AZMAX, base + Math.sin(t / 19000) * 0.055));
+    var z = Math.sqrt(Math.max(0.04, 1 - az * az)) * (0.55 + 0.45 * s.elev);
+    return { x: az, z: z };
+  }
+
+  /* ── surfaces ─────────────────────────────────────────────── */
+
+  function fluteShadow(u, flutes, L, arrisGain) {
+    if (u < -1 || u > 1) return null;
+    var theta = Math.asin(u);
+    var curve = 0.30 + 0.70 * Math.pow(Math.cos(theta), 0.55);
+
+    /* One flute is ONE sweep of the local normal, not one sine wave: the
+       surface between two arrises is a single concave arc, so the tilt runs
+       from -T at one edge, through zero at the deepest point, to +T at the
+       next. Modelled with a full sine per flute, every flute gets two
+       grooves, the count comes out doubled, and the shaft reads as a
+       barcode instead of as stone. */
+    var half = flutes / 2;
+    var f = (theta + Math.PI / 2) / Math.PI * half;
+    var edge = Math.cos(Math.PI * (f - Math.floor(f)));
+    var tilt = -TILT * edge;
+
+    /* the tilted normal carries the cylinder's own turn as well as the
+       groove's, so one lambert does both and the form cannot drift out of
+       step with the flutes cut into it */
+    var cut = Math.max(0, Math.sin(theta + tilt) * L.x + Math.cos(theta + tilt) * L.z);
+    var lit = lift(cut * curve) + Math.pow(Math.abs(edge), 10) * arrisGain;
+    return 1 - clamp01(lit);
+  }
+
+  function smoothDrum(u, L) {
+    if (u < -1 || u > 1) return null;
+    var theta = Math.asin(u);
+    var lam = Math.max(0, Math.sin(theta) * L.x + Math.cos(theta) * L.z);
+    return 1 - lift(lam * (0.35 + 0.65 * Math.pow(Math.cos(theta), 0.4)));
+  }
+
+  /* the shaft: tapered, fluted, and — when drums is set — cut into the drums
+     it was built from — a course line every so often, catching light on its
+     upper edge and holding shade under it. a column is a stack. */
+  function shaftField(cx, top, bot, rad, o, L) {
+    var h = Math.max(1, bot - top);
+    return function (px, py) {
+      if (py < top || py >= bot) return null;
+      var v = (py - top) / h;
+      var r = 1 - o.entasis * Math.pow(1 - v, 1.6);
+      if (r <= 0.02) return null;
+      var u = (px - cx) / (rad * r);
+      var s = o.flutes ? fluteShadow(u, o.flutes, L, 0.2) : smoothDrum(u, L);
+      if (s === null) return null;
+      if (o.drums) {
+        var d = v * o.drums - Math.floor(v * o.drums);
+        if (d < 0.055) s = Math.min(1, s + 0.42 * (1 - d / 0.055));
+        else if (d > 0.965) s = Math.max(0, s - 0.3);
+      }
+      return s;
+    };
+  }
+
+  function slabField(x0, x1, top, bot, face, bevel) {
+    return function (px, py) {
+      if (py < top || py >= bot || px < x0 || px >= x1) return null;
+      var t = (py - top) / Math.max(1, bot - top);
+      var u = Math.abs((px - (x0 + x1) / 2) / Math.max(1, (x1 - x0) / 2));
+      return 1 - (face - bevel * Math.pow(u, 4) - 0.2 * t);
+    };
+  }
+
+  function echinusField(cx, top, bot, neckR, outR, L) {
+    var h = Math.max(1, bot - top);
+    return function (px, py) {
+      if (py < top || py >= bot) return null;
+      var t = (py - top) / h;
+      var w = neckR + (outR - neckR) * Math.pow(t, 0.58);
+      var u = (px - cx) / w;
+      if (u < -1 || u > 1) return null;
+      var theta = Math.asin(u);
+      var lam = Math.max(0, Math.sin(theta) * L.x + Math.cos(theta) * L.z);
+      return 1 - lift(lam * (0.55 + 0.45 * t));
+    };
+  }
+
+  /* ── the order ────────────────────────────────────────────────
+     One order, on every register: the doric of the about band, which
+     is the one that reads at this width. Fourteen flutes, not the
+     twenty a Doric shaft actually carries: at two and a bit cells each
+     they antialias into mush, and a shaft that reads as fluted beats
+     one that is accurately fluted. */
+  var ORDER = { flutes: 14, entasis: 0.13, drums: 0 };
+
+  function columnFields(f, L) {
+    var o = ORDER;
+    var w = f.cols, h = f.rows;
+    var cx = w / 2, rad = w * 0.315, fields = [];
+
+    var abH = Math.max(2, Math.round(h * 0.022));
+    var capH = Math.max(3, Math.round(h * 0.045));
+    var baseH = Math.max(3, Math.round(h * 0.045));
+
+    var aw = rad * 1.5;
+    fields.push(slabField(cx - aw, cx + aw, 0, abH, 0.74, 0.22));
+
+    var capTop = abH, capBot = abH + capH;
+    fields.push(echinusField(cx, capTop, capBot, rad * 1.5, rad * 0.99, L));
+
+    var shBot = h - baseH;
+    fields.push(shaftField(cx, capBot, shBot, rad, o, L));
+    fields.push(slabField(cx - rad * 1.4, cx + rad * 1.4, shBot, shBot + baseH * 0.6, 0.66, 0.12));
+    fields.push(slabField(0, w, shBot + baseH * 0.6, h, 0.5, 0));
+    return fields;
+  }
+
+  /* ── the machine register ───────────────────────────────────── */
+
+  function machine() {
+    /* the texture layer belongs to the viewport and nothing else: a fixed
+       pseudo-element on the body is one more thing for the sheet's grid to
+       carry. */
+    var grain = document.createElement('div');
+    grain.className = 'grain';
+    grain.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(grain);
+  }
+
+  /* ── running it ───────────────────────────────────────────── */
+
+  machine();
+
+  var orders = [document.getElementById('order'), document.getElementById('order-r')]
+    .filter(Boolean);
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  /* the same line the stylesheet draws at .order. below it the strip is
+     display:none, and a measurement taken inside a box that has no layout
+     still costs one: the probe is appended, the style is resolved, and the
+     answer is zero. so the question is asked of the query instead, and the
+     timer is not started for a column nobody can see. */
+  var narrow = window.matchMedia('(max-width: 980px)');
+
+  function paintColumn(t) {
+    if (!orders.length || narrow.matches) return;
+    var f = fit(orders[0]);
+    if (!f || f.cols < 8 || f.rows < 8) return;
+    var text = raster(f, columnFields(f, lightAt(t)), GAIN, PIVOT);
+    for (var i = 0; i < orders.length; i++) orders[i].textContent = text;
+  }
+
+  /* the light moves slowly and on purpose, so this is a timer rather than an
+     animation frame: a rAF loop that spends every frame deciding not to draw
+     still keeps the compositor awake for as long as the tab is open, which is
+     a poor trade on a page whose whole argument is that it does nothing. */
+  var timer = 0;
+  function tick() {
+    if (document.hidden) return;
+    paintColumn(performance.now());
+  }
+  function run() {
+    clearInterval(timer);
+    paintColumn(performance.now());
+    if (!reduced.matches && !narrow.matches) timer = setInterval(tick, 1100);
+  }
+  /* either preference can change under a live page — a window dragged past
+     the line, a system setting flipped — and the timer has to follow */
+  [narrow, reduced].forEach(function (mq) {
+    if (mq.addEventListener) mq.addEventListener('change', run);
+  });
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) return;
+    tick();
+  });
+
+  var rt;
+  window.addEventListener('resize', function () {
+    clearTimeout(rt);
+    rt = setTimeout(function () {
+      run();
+    }, 200);
+  });
+
+  /* the face has to be here before anything is measured against it */
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(run);
+  run();
+})();
+</script>
+
 </body>
 </html>

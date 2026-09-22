@@ -12,7 +12,11 @@
   --red:     #dd2f19;
   --red-ink: #c22a16;
 
-  --margin-x: 88px;
+  /* the strip each column stands in — thirteen per cent of the card, the
+     share the page gives them at this width */
+  --strip: 156px;
+  /* the sheet's own margin inside the strips */
+  --margin-x: 62px;
   /* the two rules sit this far from the top and bottom edges — the same
      number on both, so the card is bracketed evenly */
   --margin-y: 78px;
@@ -28,8 +32,34 @@ body {
   font-variation-settings: 'SOFT' 0, 'WONK' 1;
   -webkit-font-smoothing: antialiased;
   display: flex; flex-direction: column;
-  padding: var(--margin-y) var(--margin-x);
+  padding: var(--margin-y) calc(var(--strip) + var(--margin-x));
 }
+
+/* the columns, exactly as the page stands them: one at either edge, the
+   full height of the card, drawn by the page's own renderer — render-og.py
+   lifts that script out of site/index.html and sets it at the foot of this
+   file, so the card cannot drift from the page. the cell is coarser than
+   the page's floor of 4.6px because a social card is seen at half its size
+   or less, and a flute needs cells the eye can find at that remove. */
+.order {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: var(--strip);
+  margin: 0;
+  font-family: 'Cascadia Mono', Consolas, 'DejaVu Sans Mono',
+               'Liberation Mono', 'Courier New', ui-monospace, monospace;
+  font-size: 6px;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: pre;
+  color: var(--ink);
+  overflow: hidden;
+}
+#order   { left: 0; }
+#order-r { right: 0; }
+/* the renderer lays its scanline layer over the page too; a 3px screen
+   drawn at 2x and downsampled is a moiré, so the card goes without */
+.grain { display: none; }
 
 /* the two heavy rules that bracket the register stack on the page */
 .rule { border-top: 3px solid var(--ink); flex: 0 0 auto; }
@@ -50,16 +80,12 @@ h1 {
   line-height: 1.1;
   color: var(--red-ink);
 }
-
-/* the favicon's mark is not set here. it has to start on the cap of "Aaron"
-   and stop on the last of "altergott.dev", and only the rendered page knows
-   where those are — canvas metrics cannot apply font-variation-settings, so
-   they measure a different cut of Fraunces than this page draws. render-og.py
-   reads the ink off the raster and lays the bar in at --margin-x from the
-   right edge, 48px wide. */
 </style>
 </head>
 <body>
+  <pre class="order" id="order" aria-hidden="true"></pre>
+  <pre class="order" id="order-r" aria-hidden="true"></pre>
+
   <div class="rule"></div>
 
   <div class="body">
@@ -71,5 +97,6 @@ h1 {
 
   <div class="rule"></div>
 
+<!-- ORDER -->
 </body>
 </html>

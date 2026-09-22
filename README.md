@@ -38,6 +38,7 @@ python tools/render-og.py
 ```
 
 Headless Chrome draws the card at 2x and it is downsampled to 1200x630. The
-red bar is laid in afterwards, against ink measured off the raster, so it
-starts on the cap of "Aaron" and ends on the last of "altergott.dev" no matter
-what the type is set at. Pillow is the only dependency.
+two columns are the page's own: the renderer that draws them is lifted out of
+`site/index.html` and set at the foot of the card before it is shot, with the
+light pinned so the card does not depend on the hour it was rendered at.
+Pillow is the only dependency.

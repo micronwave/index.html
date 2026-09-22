@@ -27,6 +27,10 @@
   --red:   #dd2f19;
   --red-ink: #c22a16;
   --rule-strong: rgba(21,23,26,.45);
+  /* the cell face, as the contents page has it: the one with block
+     elements at the cell they claim */
+  --cells: 'Cascadia Mono', Consolas, 'DejaVu Sans Mono', 'Liberation Mono',
+           'Courier New', ui-monospace, monospace;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; height: 100svh; }
@@ -41,7 +45,8 @@ body {
   place-content: center;
   padding: clamp(30px, 4vw, 62px);
 }
-::selection { background: var(--red); color: var(--paper); }
+/* reverse video, as on the contents page: paper on ink, not on the accent */
+::selection { background: var(--ink); color: var(--paper); }
 :focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
 
 main { max-width: 42ch; }
@@ -79,9 +84,52 @@ a.home {
   padding-bottom: 2px;
 }
 a.home:hover { color: var(--ink); }
+/* the link is the one thing here to focus, and it takes the contents
+   page's reverse video rather than a ring */
+a.home:focus-visible {
+  outline: none;
+  background: var(--ink); color: var(--paper);
+  box-shadow: 0 0 0 .2em var(--ink);
+  border-bottom-color: transparent;
+}
+
+/* the ruin sits under everything and takes no pointer. the type keeps a
+   paper ground of its own so the four lines in the middle are read off
+   the page rather than off the stones. */
+#ruin {
+  position: fixed;
+  inset: 0;
+  margin: 0;
+  z-index: 0;
+  font-family: var(--cells);
+  font-size: clamp(5px, 0.85vh, 10px);
+  line-height: 1;
+  white-space: pre;
+  overflow: hidden;
+  color: var(--ink);
+  opacity: .42;
+  pointer-events: none;
+  user-select: none;
+}
+main {
+  position: relative;
+  z-index: 1;
+  background: var(--paper);
+  padding: clamp(18px, 3vh, 34px) clamp(20px, 3vw, 40px);
+  /* the paper under the type is the page's own, faded just enough at its
+     edge that the stones are not cut off by a hard rectangle */
+  box-shadow: 0 0 clamp(26px, 5vw, 70px) clamp(18px, 3.5vw, 48px) var(--paper);
+}
+@media (max-width: 560px) { #ruin { opacity: .2; } }
+/* paper is the one medium the ruin was never for */
+@media print { #ruin { display: none !important; } main { box-shadow: none; } }
 </style>
 </head>
 <body>
+<!-- the ruin. it belongs to the viewport, it is drawn into by the script at
+     the foot of this file, and it is empty until then: there is nothing here
+     for a reader, and nothing to read. -->
+<pre id="ruin" aria-hidden="true"></pre>
 <main>
   <span class="label">404</span>
   <h1>Page <i>not found</i></h1>
@@ -89,5 +137,192 @@ a.home:hover { color: var(--ink); }
   <p>Nothing lives at this address. The portfolio is one page, and this isn&rsquo;t it.</p>
   <a class="home" href="/">Back to the contents page</a>
 </main>
+<script>
+/* ── the ruin ─────────────────────────────────────────────────
+   Nothing lives at this address, so the address is a ruin.
+
+   This is the one page that can be loud: nobody arrives here on
+   purpose, and there is no register stack to compete with. So the
+   figure runs full bleed, and the only restraint is that the four
+   lines of type in the middle have to stay readable.
+
+   Same machinery as the shaft on the contents page -- a lit solid
+   quantised into block glyphs -- with two things the standing order
+   never needed: a break, and a cylinder lying on its side.
+   ──────────────────────────────────────────────────────────── */
+(function () {
+  'use strict';
+  var RAMP = ' ░▒▓█';
+  var SS = 3;
+  var AMB = 0.18;
+  var host = document.getElementById('ruin');
+  if (!host) return;
+
+  var L = { x: -0.34, z: 0.78 };
+  function lift(v) { return AMB + (1 - AMB) * v; }
+
+  /* a fixed, seeded hash. the break has to be the same break on every
+     repaint and on every visit -- a ruin that reshuffles itself when the
+     window is dragged is an animation, not a ruin. */
+  function hash(n) {
+    var x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+    return x - Math.floor(x);
+  }
+  function noise(t) {
+    var i = Math.floor(t), f = t - i;
+    var a = hash(i), b = hash(i + 1);
+    f = f * f * (3 - 2 * f);
+    return a + (b - a) * f;
+  }
+
+  function flute(u, flutes) {
+    if (u < -1 || u > 1) return null;
+    var th = Math.asin(u);
+    var curve = 0.30 + 0.70 * Math.pow(Math.cos(th), 0.55);
+    var f = (th + Math.PI / 2) / Math.PI * (flutes / 2);
+    var edge = Math.cos(Math.PI * (f - Math.floor(f)));
+    var tilt = -0.78 * edge;
+    var cut = Math.max(0, Math.sin(th + tilt) * L.x + Math.cos(th + tilt) * L.z);
+    return 1 - Math.max(0, Math.min(1, lift(cut * curve) + Math.pow(Math.abs(edge), 10) * 0.2));
+  }
+
+  /* the standing stump: a shaft that stops where it was broken. the break
+     is a ragged line across the top, deeper on one side, and the stone
+     under it is left rough rather than shaded as a face. */
+  function stump(cx, rad, top, bot, seed) {
+    return function (px, py) {
+      var u = (px - cx) / rad;
+      if (u < -1 || u > 1) return null;
+      var brk = top + noise((px + seed) * 0.34) * 7 + Math.abs(u) * 3.5;
+      if (py < brk) return null;
+      var s = flute(u, 20);
+      if (s === null) return null;
+      if (py < brk + 1.6) s = Math.min(1, s + 0.45);   /* the raw edge */
+      if (py > bot) return null;
+      return s;
+    };
+  }
+
+  /* a drum on its side. the axis is horizontal, so the shading runs down
+     the height of it rather than across the width -- and one end shows the
+     circular face, with the ring courses the drum was turned on. */
+  function drum(x0, x1, cy, r, cell, face, seed) {
+    var h = r * cell;
+    return function (px, py) {
+      if (px < x0 || px > x1) return null;
+      var v = (py - cy) / h;
+      if (v < -1 || v > 1) return null;
+      var th = Math.asin(v);
+      /* 0.72, not 1: at full strength the lit crown of the barrel came out
+         brighter than the tone map's floor and was quantised straight back
+         to paper, so every drum read as an empty box with a dark underside.
+         a stone lying in its own shadow never reaches the paper. */
+      var lam = Math.max(0, -Math.sin(th) * 0.42 + Math.cos(th) * L.z) * 0.72;
+      /* and it is darker underneath, where the ground is close */
+      var occ = 1 - 0.46 * Math.max(0, v);
+      /* the barrel has to lose its light faster than a standing shaft does:
+         lying down it is seen end on, so most of its height is surface that
+         has already turned away, and a gentle curve left the whole crown on
+         one glyph -- a slab with a dark underside rather than a cylinder. */
+      var s = 1 - lift(lam * (0.10 + 0.90 * Math.pow(Math.cos(th), 1.15)) * occ);
+
+      /* the end face, an ellipse standing on the end of the barrel */
+      var fx = face > 0 ? x1 : x0;
+      var du = (px - fx) / (r * 0.52);
+      var d = Math.hypot(du, v);
+      if (d <= 1) {
+        var ring = Math.abs(Math.sin(d * Math.PI * 3.2));
+        var fl = 0.30 + 0.34 * ring + 0.18 * (1 - d);
+        return 1 - lift(fl);
+      }
+      /* the courses the drum was laid in, along its length */
+      var band = (px - x0) / (x1 - x0) * 3 + seed;
+      if (Math.abs(band - Math.round(band)) < 0.035) s = Math.min(1, s + 0.3);
+      return s;
+    };
+  }
+
+  function rubble(y0, y1, w, seed) {
+    return function (px, py) {
+      if (py < y0 || py > y1) return null;
+      var t = (py - y0) / Math.max(1, y1 - y0);
+      var n = noise(px * 0.9 + seed) * 0.8 + noise(px * 0.21 + seed * 3) * 0.5;
+      if (n < 0.34 + t * 0.5) return null;
+      return 0.30 + 0.34 * n * (1 - t * 0.6);
+    };
+  }
+
+  function measure() {
+    var p = document.createElement('span');
+    p.textContent = '█'.repeat(40);
+    p.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;font:inherit';
+    host.appendChild(p);
+    var r = p.getBoundingClientRect();
+    p.remove();
+    return { w: r.width / 40, h: r.height };
+  }
+
+  function draw() {
+    var m = measure(), box = host.getBoundingClientRect();
+    if (!m.w || !m.h) return;
+    var W = Math.floor(box.width / m.w), H = Math.floor(box.height / m.h);
+    if (W < 30 || H < 20) { host.textContent = ''; return; }
+    var cell = m.w / m.h;
+
+    var g = new Array(W * H).fill(' ');
+    var ground = Math.round(H * 0.80);
+    var fields = [];
+
+    /* what is left standing, off to one side */
+    var sr = Math.max(4, W * 0.055);
+    fields.push(stump(W * 0.17, sr, H * 0.30, ground, 11));
+    fields.push(stump(W * 0.855, sr * 0.82, H * 0.46, ground, 57));
+
+    /* and what came down, lying where it fell */
+    var dr = sr * 0.94;
+    fields.push(drum(W * 0.30, W * 0.30 + dr * 3.4, ground - dr * cell * 0.9, dr, cell, 1, 0.2));
+    fields.push(drum(W * 0.455, W * 0.455 + dr * 2.7, ground - dr * cell * 2.8, dr * 0.9, cell, -1, 0.6));
+    fields.push(drum(W * 0.62, W * 0.62 + dr * 3.9, ground - dr * cell * 0.8, dr * 0.96, cell, 1, 0.9));
+
+    fields.push(rubble(ground, Math.min(H, ground + Math.round(H * 0.09)), W, 5));
+
+    var n = SS * SS;
+    for (var y = 0; y < H; y++) {
+      for (var x = 0; x < W; x++) {
+        var acc = 0, cov = 0;
+        for (var sy = 0; sy < SS; sy++) {
+          var py = y + (sy + 0.5) / SS;
+          for (var sx = 0; sx < SS; sx++) {
+            var px = x + (sx + 0.5) / SS;
+            var best = null;
+            for (var k = 0; k < fields.length; k++) {
+              var s = fields[k](px, py);
+              if (s !== null) { best = s; break; }
+            }
+            if (best === null) continue;
+            acc += best; cov++;
+          }
+        }
+        if (!cov) continue;
+        var v = (acc / cov) * (cov / n);
+        v = 0.5 + (v - 0.44) * 1.3;
+        var i = Math.round(Math.max(0, Math.min(1, v)) * (RAMP.length - 1));
+        if (i > 0) g[y * W + x] = RAMP[i];
+      }
+    }
+
+    var out = [];
+    for (var yy = 0; yy < H; yy++) {
+      out.push(g.slice(yy * W, yy * W + W).join('').replace(/\s+$/, ''));
+    }
+    host.textContent = out.join('\n');
+  }
+
+  var t;
+  window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(draw, 200); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+  draw();
+})();
+</script>
 </body>
 </html>

@@ -19,3 +19,7 @@ poc/
 # OS
 .DS_Store
 Thumbs.db
+
+# Style prototypes (session scratch, not deployed)
+site/variant-*.html
+site/variants.html
