@@ -76,6 +76,9 @@
   --ink-4:   #9a9da3;   /*   —    — decoration only (dot leaders)          */
 
   --red:     #dd2f19;   /* marks, rules, fills                             */
+  /* the one warm note that is not the accent: it says a thing is on its way,
+     and is pulled dark enough to clear 4.8:1 on the paper since it is read   */
+  --orange-ink: #a34a09;
   --red-ink: #c22a16;   /*  4.7:1 — the same accent when it has to be read */
 
   /* the red's opposite number, for the one thing that is finished rather than
@@ -334,7 +337,7 @@ i, .it { font-style: italic; }
 .copy.is-copied .cw.done { transition-delay: .13s; transform: none; opacity: 1; }
 
 /* ── the cell marks ──
-   the tick, the cursor and the two status marks in the projects register
+   the two ticks and the two status marks in the projects register
    are the same material as the columns beside the sheet: character cells,
    set in the face that has block elements at the cell they claim (see
    --cells). each is two rows of cells at .345em of its word, which stands
@@ -347,11 +350,10 @@ i, .it { font-style: italic; }
    the tick is built from quadrant blocks, so every cell carries four
    pixels of the drawing and the mark is eight by four rather than four by
    two; that is the least resolution a tick has at, and the stroke comes
-   out two pixels wide at every size the type takes. the cursor is the
-   plain solid cell, three across, standing after the word the way a
-   prompt stands after what it has just written. it does not blink:
-   nothing on this page moves that is not being moved. */
-.ck, .cur, .plinks .st::before {
+   out two pixels wide at every size the type takes. the confirmation
+   carries one on either side of its word, the same mark at the same
+   distance, so the finished state is centred on what it says. */
+.ck, .plinks .st::before {
   display: inline-block;
   font-family: var(--cells);
   font-size: .345em;
@@ -366,11 +368,11 @@ i, .it { font-style: italic; }
      stand rather than hanging its descender's worth below them */
   overflow: hidden; vertical-align: baseline;
 }
-.ck, .cur { color: var(--green); }
+.ck { color: var(--green); }
 /* the marks' em is .345 of the word's, so a gap stated in it has to be
    stated at 1/.345 of what the word would call it: this is .36em of the word */
 .ck  { margin-right: 1.05em; }
-.cur { margin-left: 1.05em; }
+.ck.tail { margin-right: 0; margin-left: 1.05em; }
 
 /* the tick is not drawn in, it is *set* in — a cell at a time, left to
    right, the way the leader fills. the mask runs over the four columns in
@@ -628,6 +630,33 @@ i, .it { font-style: italic; }
 /* both arrive once the band has finished opening and knows its own height */
 .band.is-scrollable > .mark, .band.is-scrollable > .track { opacity: 1; }
 
+/* and the same thing said where it is felt. the mark in the margin is a
+   position, and it reads as one; what it does not say is that the line the
+   rule cuts through has more under it. on a phone in landscape half an entry
+   can be below that line — the work register gives up 190 of its 356 pixels
+   at 844x390 — and the cut lands mid-x-height on a line that looks finished.
+   so the foot of a band that runs deep goes to paper over about a line and a
+   half, and the cut reads as a continuation. it comes off at the floor, where
+   there is nothing left under it to promise.
+
+   the band's ::after and not a mask on the scrolling box: a mask makes that
+   box a layer and repaints it on every frame of the scroll, and this does not
+   move at all — it is painted once and composited from there.
+
+   #e9e9e3 is --paper written out, the way the brace above writes out the
+   accent: a gradient needs a transparent version of the same colour at the
+   far end or the fade goes through grey, and a custom property cannot be
+   given an alpha without color-mix. keep both in step with :root. */
+.band::after {
+  content: '';
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: clamp(20px, 3svh, 36px);
+  background: linear-gradient(to top, #e9e9e3 15%, rgba(233, 233, 227, 0));
+  opacity: 0; transition: opacity .12s linear;
+  pointer-events: none;
+}
+.band.is-scrollable:not(.is-at-end)::after { opacity: 1; }
+
 /* min-height, not height: the inner fills the band when the entry is short and
    runs past it when the entry is long, which is the only way the band above it
    has anything to scroll. it is a column so the four views can still stretch to
@@ -847,6 +876,16 @@ i, .it { font-style: italic; }
 .wdetail .ruled > li { break-inside: avoid; }
 .wdetail .ruled > li.opens-column { border-top: 0; padding-top: 0; }
 
+/* an entry with nothing to list yet says so on the centre line instead, one
+   step up from the bullets it stands in for */
+.wnotice {
+  margin: 16px 0 0;
+  text-align: center;
+  font-weight: 700;
+  font-size: var(--t-body);
+  color: var(--orange-ink);
+}
+
 /* ── 03 projects ───────────────────────────────────────────── */
 
 .projects { display: grid; grid-template-columns: repeat(12, minmax(0,1fr)); column-gap: var(--gutter); flex: 1 0 auto; }
@@ -951,9 +990,16 @@ i, .it { font-style: italic; }
    picture's own edges however the shot is shaped */
 .plate-inner { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
 .plate-inner:focus { outline: none; }
+/* --plate-cap is the third term and it is set per shot, at the foot of the
+   file: how wide this plate can be drawn before the shot inside it is being
+   invented rather than enlarged. the box stays one box — that is the whole
+   point of the block above — and four of the five shots never reach the cap,
+   so walking the rail still moves nothing. the one that does is Orca, which
+   was captured at 624px and was being drawn at 1502: two and a half times
+   its own resolution, and it read as mush beside the others. */
 .plate img {
   display: block;
-  width: min(90svw, calc(82svh * 1.5));
+  width: min(90svw, calc(82svh * 1.5), var(--plate-cap, 100svw));
   aspect-ratio: 3 / 2; object-fit: contain;
   border: 1px solid var(--ink); background: var(--plate, var(--paper));
   cursor: zoom-out;
@@ -1000,18 +1046,43 @@ i, .it { font-style: italic; }
 
 /* ── narrow ────────────────────────────────────────────────── */
 
+/* the rail is clamp(14px, 1.9vw, 30px) — cut from the window and not from the
+   sheet — so below about 950px a 16px brace would reach past the text's left
+   edge. the mark scales instead. this one stays on the window because the
+   length it answers to does. */
+@media (max-width: 1080px) {
+  .band::before { --bw: 12px; }
+}
+
+/* ── the sheet's own widths ──────────────────────────────────
+   Everything below this line is a rule about the measure, and the measure is
+   not the window: from 981px up the order stands in two strips of 13vw each
+   and the sheet is what is left, which is 0.74 of the window for every width
+   the strips' middle branch is live at — 908px, where the 118px floor lets
+   go, to 1600px, where the 208px cap takes over, and both bands below are
+   well inside that. so a sheet of X is a window of X / 0.74, and the two
+   numbers that used to say 1000 and 1080 say 1351 and 1459.
+
+   written against the window, these fired late by a quarter: at 1024px the
+   sheet is 758px and it was being handed the layout drawn for a sheet of
+   1024. keep them in step with --strip below; if the strip's share changes,
+   these two divisors change with it. */
+
 /* the index needs a third column before the names start breaking mid-word;
    the details restate nine tracks so the nesting stays exact */
-@media (max-width: 1080px) {
-  /* the rail is clamp(14px, 1.9vw, 30px), so below about 950px a 16px brace
-     would reach past the text's left edge. the mark scales instead. */
-  .band::before { --bw: 12px; }
+@media (max-width: 1459px) {
   .plist, .wlist { grid-column: span 3; }
   .pdetail, .wdetail { grid-column: span 9; }
   .ptop { grid-template-columns: repeat(9, minmax(0,1fr)); }
-  .shot { grid-column: span 3; }
+  /* five and four of the nine, not six and three: at three tracks the plate
+     came out 155px across on a 1024px window — a shot of a terminal, at a
+     size no terminal can be read at, with the rest of its column empty under
+     it. the bullets give up the one track, which they can afford here and
+     the plate cannot. */
+  .pmain { grid-column: span 5; }
+  .shot { grid-column: span 4; }
 }
-@media (max-width: 1000px) {
+@media (max-width: 1351px) {
   /* the deck gives a column back rather than dropping below: six and six still
      holds a real measure on both sides, and the band keeps its one-row shape */
   .lede { grid-column: 1 / 7; }
@@ -1216,6 +1287,39 @@ i, .it { font-style: italic; }
      the word alone says what the button does, and the field around the
      picture says it too. */
   .plate-meta .close b { display: none; }
+  /* the track is four pixels of --ink-4 in the margin, which is as much as a
+     pointer needs and rather less than a finger gets: on a phone it is the
+     only standing sign that the entry runs deeper than the band, and at the
+     decoration grey it is barely a sign at all. it takes the grey above it
+     here — still never text, just visible at arm's length. the cell stays at
+     seven pixels: markScroll counts the track's rows off that number, and a
+     larger cell would leave the track short of the box it measures. */
+  .mark, .track { color: var(--ink-3); }
+}
+
+/* the same argument as the contact row above, for the thing a phone is
+   actually tapping: where the rail is a row of chips, the chip's box is the
+   type's and nothing more — 27 pixels, where a finger wants better than
+   forty. the padding opens it and the negative margin gives the same number
+   back, so the row is laid out exactly as it was and only the hit area grows.
+
+   the row gap has to grow with it, and this is the one place that trick needs
+   more than itself. the rail is a *wrapped* flex row: under 330px the
+   projects register runs to two lines, and a line's hit area reaching eight
+   pixels past its own box, over a two pixel gap, would have laid sixteen
+   pixels of it across the line below — where the later chip wins the tap. at
+   18px the two hit boxes meet and do not cross. above 330px the rail is one
+   line and the gap is never in play, so it costs those widths nothing.
+
+   two blocks because the chips are set twice: the narrow layout gives them
+   6px of padding and the phone block below it 5px, and the hit box has to be
+   built on whichever is actually there or the row moves. */
+@media (pointer: coarse) and (max-width: 720px) {
+  .plist, .wlist { row-gap: 18px; }
+  .plist button, .wlist button { padding: 14px 0; margin: -8px 0; }
+}
+@media (pointer: coarse) and (max-width: 560px) {
+  .plist button, .wlist button { padding: 13px 0; margin: -8px 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1425,8 +1529,8 @@ body { padding-left: var(--strip); padding-right: var(--strip); }
     <nav class="contact" aria-label="Contact">
       <button class="a copy" id="copy" type="button" data-address="adaltergott@gmail.com"
               title="adaltergott@gmail.com" aria-label="Copy email address adaltergott@gmail.com"><span class="cface"><span class="cw rest">email</span><span class="cw done" aria-hidden="true"><span class="ck">▄ ▗▛
-▝▙▛ </span>copied<span class="cur">███
-███</span></span></span></button><span>·</span>
+▝▙▛ </span>copied<span class="ck tail">▄ ▗▛
+▝▙▛ </span></span></span></button><span>·</span>
       <a class="a" href="https://github.com/micronwave" target="_blank" rel="noopener">github</a><span>·</span>
       <a class="a" href="https://www.linkedin.com/in/aaronaltergott/" target="_blank" rel="noopener">linkedin</a>
     </nav>
@@ -1456,21 +1560,27 @@ body { padding-left: var(--strip); padding-right: var(--strip); }
 /* ── content (mirrors src/data/content.ts) ───────────────────── */
 
 const about = [
-  "I sit between business operations and the tools that run them. Close enough to the process to see what's breaking, and technical enough to implement the fix. Experience includes customer ops, revenue systems, internal tooling, and CRM integrations.",
+  "I sit between business operations and the tools that run them. Close enough to the process to see what's breaking, and technical enough to implement the fix. Experience includes internal tooling, CRM integrations, and data management.",
   "I've automated workflows, fixed recurring failures, and cleaned up processes that were costing time and money. I like working the whole arc of a problem, from figuring out why something's broken to fixing it.",
   "AWS certified and working toward Solutions Architect to have a technical footing on the infrastructure side of the business. It's also why the projects here skew toward cloud infra, data pipelines, and agent orchestration."
 ];
 
 const experience = [
   {
-    company: 'Pence Contractors',
+    company: 'Pence Companies',
+    /* the rail names it in one word at every width; the entry still carries
+       the full name under the role. */
+    rail: 'Pence',
     role: 'Application Support Specialist',
     location: 'Lake Oswego, OR',
     dates: 'Oct 2026–Present',
+    /* nothing to list yet — the entry carries a centred note in place of bullets */
+    notice: 'Coming soon!',
     bullets: []
   },
   {
     company: 'Southwest Self Storage',
+    short: 'SWSS',
     role: 'Operations Specialist',
     location: 'Redlands, CA',
     dates: 'Nov 2024–Sept 2026',
@@ -1551,7 +1661,7 @@ const projects = [
   {
     name: 'NIE',
     tagline: 'Tracks financial narratives across news and filings, scores their momentum, and maps them to S&P 500 tickers and overall trends.',
-    note: 'Built to increase my situational awareness in the stock market. Financial stories surface as RSS headlines or SEC filings all the time. NIE pulls those fragments together every four hours, clusters them into tracked narratives, and watches how they evolve.',
+    note: 'Built to increase my situational awareness in the stock market. Financial stories surface as RSS headlines or SEC filings. NIE pulls those fragments together every four hours, clusters them into tracked narratives, and watches how they evolve.',
     bullets: [
       "Deduplicates incoming documents with LSH MinHash, then clusters what's left into narratives with HDBSCAN",
       'Maps each narrative to S&P 500 tickers by comparing embeddings against a library built from SEC 10-K summaries',
@@ -1567,14 +1677,14 @@ const projects = [
   {
     name: 'Propagandle',
     tagline: 'A daily five-round trivia game about historical events and conspiracies.',
-    note: "Built because it doesn't exist yet and history is cool. Propagandle is meant to test your knowledge and media literacy. Flat earthers may not do well at this game.",
+    note: "Built because it doesn't exist yet and history is cool. Propagandle is meant to test your knowledge and media literacy, so flat earthers may not do well at this game.",
     bullets: [
       'Four round types pull from a pool of real historical events mixed with fabricated ones written to sound just as plausible',
       'One new puzzle a day, keep the streak going',
       'No account needed. No ads. No tracking. No data collection.'
     ],
     stack: 'React, Vite, TypeScript, Supabase, Vercel',
-    flow: ['issue', 'play', 'reveal', 'share'],
+    flow: ['begin', 'win', 'share with friends'],
     liveUrl: 'https://propagandle.com',
     shot: 'img/screenshot-propagandle.webp',
     plate: '#f2ead4',
@@ -1632,7 +1742,7 @@ const views = {
         '<div class="about__two"><p>' + esc(about[1]) + '</p><p>' + esc(about[2]) + '</p></div>' +
       '</div>' +
       '<ul class="now">' +
-        '<li><i>currently</i> <b>Application Support Specialist</b> @ Pence Contractors</li>' +
+        '<li><i>currently</i> <b>Application Support Specialist</b> @ Pence</li>' +
       '</ul>' +
     '</div>',
 
@@ -1831,6 +1941,21 @@ const plate = document.getElementById('plate');
 const plateImg = document.getElementById('plate-img');
 const plateName = document.getElementById('plate-name');
 
+/* how wide the plate may be drawn for the shot now in it — see --plate-cap.
+   the plate is a fixed 3:2 and the shots are not, so which of the two numbers
+   fills it is the shot's own business: a shot wider than 3:2 meets the plate's
+   sides and a narrower one meets its top and bottom. the larger of the two is
+   the width at which the shot is being drawn at its own resolution, and half
+   again past that is as far as a screenshot's type carries.
+
+   it is set from the picture rather than written beside it, so a shot
+   re-exported at another size needs nothing here changed. */
+function capPlate() {
+  const w = plateImg.naturalWidth, h = plateImg.naturalHeight;
+  if (!w || !h) { plate.style.removeProperty('--plate-cap'); return; }
+  plate.style.setProperty('--plate-cap', Math.round(Math.max(w, h * 1.5) * 1.5) + 'px');
+}
+
 /* it shows whichever project is selected rather than one it was handed, so the
    same call opens it and moves it along when the arrows walk the rail */
 function showPlate() {
@@ -1841,6 +1966,13 @@ function showPlate() {
   plateName.textContent = p.name;
   if (p.plate) plate.style.setProperty('--plate', p.plate);
   else plate.style.removeProperty('--plate');
+  /* setting src does not make the size known in the same turn, even for a
+     picture the page is already showing at thumbnail size, so the cap is
+     taken now if it can be and again when the picture says so. the handler
+     reads whatever is in the plate at the moment it runs, so one left over
+     from a shot walked past still sets the right number. */
+  capPlate();
+  if (!plateImg.complete) plateImg.addEventListener('load', capPlate, { once: true });
   /* showModal, not a div of our own: the top layer, the backdrop, esc and the
      inert page behind are all the browser's, and they behave the way the rest
      of the machine does */
@@ -1874,15 +2006,18 @@ let roleIdx = 0;
    in the row of chips a phone gets. only a name long enough to take a line of
    its own carries a short form — the rest are set once and shown everywhere. */
 experience.forEach((j, i) => {
+  /* the rail may name a place differently from the entry — see rail, which is
+     the name the column is set in at every width. */
+  const rail = j.rail || j.company;
   const b = el(
     '<button type="button" role="tab" id="rtab-' + i + '" aria-controls="wdetail"' +
     /* the width the name takes in 600 is reserved from this, and only where the
        rail is a row (see .wlist button::after) — so it is the form shown there */
-    ' data-name="' + esc(j.short || j.company) + '"' +
+    ' data-name="' + esc(j.short || rail) + '"' +
     ' aria-selected="' + (i === 0) + '" tabindex="' + (i === 0 ? '0' : '-1') + '">' +
     (j.short
-      ? '<span class="full">' + esc(j.company) + '</span><span class="abbr">' + esc(j.short) + '</span>'
-      : esc(j.company)) + '</button>'
+      ? '<span class="full">' + esc(rail) + '</span><span class="abbr">' + esc(j.short) + '</span>'
+      : esc(rail)) + '</button>'
   );
   b.addEventListener('click', () => selectRole(i));
   b.addEventListener('keydown', railKeys(wlist, selectRole, () => roleIdx));
@@ -1908,7 +2043,7 @@ function selectRole(i) {
         '<p class="wwhere">' + esc(j.company) + ' <span>&middot; ' + esc(j.location) + '</span></p>' +
       '</div>' +
     '</div>' +
-    ruled(j.bullets);
+    (j.notice ? '<p class="wnotice">' + esc(j.notice) + '</p>' : ruled(j.bullets));
 
   /* the bullets run in two columns, and which one opens the second is settled
      by measuring what has just been written — so it is settled here */
@@ -1958,6 +2093,16 @@ function markScroll(band) {
   const on = band.classList.contains('is-open') && over > 1;
   band.classList.toggle('is-scrollable', on);
   if (!on) return;
+  /* the fade at the foot says there is more under the rule, so it has to go
+     when there is not. the same pixel of tolerance the arrows keep at each
+     end, for the same reason: a scroll box rounds.
+
+     written only when it turns over. a scroll lands here on every frame, and
+     a class set on the band re-resolves the style of everything under it —
+     which is the whole open register — so the frames in the middle of a
+     scroll, where the answer has not changed, write nothing. */
+  const end = at >= over - 1;
+  if (band.classList.contains('is-at-end') !== end) band.classList.toggle('is-at-end', end);
   /* the thumb is the visible share of the entry, floored so it stays a mark
      rather than a dot on a band that runs very deep */
   const h = Math.max(28, view * view / full);
@@ -2106,11 +2251,12 @@ function open(id) {
     b.querySelector('.strip').setAttribute('aria-expanded', String(on));
   });
   /* a band left part-scrolled would open there the next time it is asked for.
-     the mark comes off every band with it: the one opening does not know its
-     own height yet, and will strike its own when it gets there. */
+     the mark comes off every band with it, and the fade at the foot with the
+     mark: the one opening does not know its own height yet, and will strike
+     its own when it gets there. */
   bandsEl.querySelectorAll('.band').forEach((b) => {
     b.querySelector('.body').scrollTop = 0;
-    b.classList.remove('is-scrollable');
+    b.classList.remove('is-scrollable', 'is-at-end');
   });}
 
 document.addEventListener('keydown', (e) => {
