@@ -1149,7 +1149,9 @@ i, .it { font-style: italic; }
        the rule under it, the detail, and everything below moved down the band
        on every tap. the rail is sized by its content now and nothing else. */
     grid-template-rows: auto minmax(0, 1fr);
-    row-gap: 12px;
+    /* no rule holds the rail off the entry here, so the gap does it alone,
+       and it opens with the window's height the way the rest of the band does */
+    row-gap: clamp(16px, 2.64svh, 25px);
   }
   .plist, .pdetail, .wlist, .wdetail { grid-column: auto; }
   .plist, .wlist {
@@ -1158,8 +1160,10 @@ i, .it { font-style: italic; }
        to fill the height it is given, and two names sat sixty pixels apart.
        the lines stack from the top, at the row gap and nothing more. */
     align-content: start;
-    border-right: 0; margin-right: 0; padding: 0 0 8px;
-    border-bottom: 1px solid var(--rule-soft);
+    /* the row of chips is set on the band's centre line, as the notice under
+       an empty entry is; a row that wraps centres each of its lines */
+    justify-content: center;
+    border-right: 0; margin-right: 0; padding: 0;
   }
   .plist button, .wlist button { width: auto; padding: 6px 0; }
   /* the selected name is set in 600, and on a row that wraps, that extra width
@@ -1187,21 +1191,23 @@ i, .it { font-style: italic; }
      and the bold width reserved above is measured from the same form. */
   .plist .full, .wlist .full { display: none; }
   .plist .abbr, .wlist .abbr { display: inline; }
-  .ptop { grid-template-columns: 1fr; row-gap: 14px; }
+  /* the caption and the stack line go to the foot of the box together, the way
+     the stack alone is pinned on the sheet. the copy takes the first row and
+     the caption's row takes the slack, set at its bottom, so the two lines
+     stay one block under whatever the window's height leaves. on an entry
+     longer than the box there is no slack, and they simply follow the copy. */
+  .ptop { grid-template-columns: 1fr; grid-template-rows: auto 1fr; row-gap: 14px; flex: 1 0 auto; }
   .pmain { grid-column: auto; }
-  /* the stack line is pinned to the foot of the band on the sheet, where the
-     band is full and the pin is what squares it off. stacked, the entries run
-     to very different lengths, and the shortest of them left the line sitting
-     alone three hundred pixels under the rest of the register. it closes up
-     behind the copy instead — which is what the work detail beside it has
-     always done, having no foot bar to pin. */
   .pbar { margin-top: 0; }
   /* the plate goes — the words carry it at this width — but its caption stays,
      because the source link and the status now live there. with no plate to
      hold, the figure gives up its width cap: the caption runs the full row. */
-  .shot { grid-column: auto; max-width: none; }
+  .shot { grid-column: auto; max-width: none; align-self: end; }
   .shot .zoom { display: none; }
   .shot figcaption { margin-top: 0; }
+  /* the chip above already names the entry, so the caption drops the name and
+     the link and the status take its place at the left edge */
+  .pdetail .pname { display: none; }
   .groups { grid-template-columns: 1fr 1fr; column-gap: 18px; row-gap: 12px; }
   .group li { line-height: 1.42; }
   .creds { grid-template-columns: 1fr; gap: 8px; }
@@ -1233,8 +1239,6 @@ i, .it { font-style: italic; }
   .ptag { line-height: 1.24; }
   .pnote { margin-top: 7px; line-height: 1.45; }
   .pbar { padding-top: 8px; }
-  .projects, .work { row-gap: 9px; }
-  .plist, .wlist { padding-bottom: 5px; }
   .pmain .ruled > li { line-height: 1.4; }
   /* the four strips are the page's fixed overhead, and at eleven pixels of
      padding each they cost more than a bullet does. 33px still clears a
@@ -1342,6 +1346,9 @@ i, .it { font-style: italic; }
 @media (pointer: coarse) and (max-width: 720px) {
   .plist, .wlist { row-gap: 18px; }
   .plist button, .wlist button { padding: 14px 0; margin: -8px 0; }
+  /* the dots hang from the foot of the padded box, so they are lifted by the
+     same eight pixels the margin gives back, or they fall onto the rule */
+  .plist button::before, .wlist button::before { bottom: 8px; }
 }
 @media (pointer: coarse) and (max-width: 560px) {
   .plist button, .wlist button { padding: 13px 0; margin: -8px 0; }
