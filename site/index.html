@@ -71,8 +71,8 @@
      so it clears 4.5:1 on paper; ink-4 is the only grey that is never text. */
   --paper:   #e9e9e3;
   --ink:     #15171a;   /* 11.4:1 — headings, structural rules, emphasis   */
-  --ink-2:   #52565c;   /*  6.1:1 — body copy                              */
-  --ink-3:   #656870;   /*  4.6:1 — captions, tags, closed register labels */
+  --ink-2:   #52565c;   /*  6.1:1 — body copy, closed register labels      */
+  --ink-3:   #656870;   /*  4.6:1 — captions, tags                         */
   --ink-4:   #9a9da3;   /*   —    — decoration only (dot leaders)          */
 
   --red:     #dd2f19;   /* marks, rules, fills                             */
@@ -182,8 +182,8 @@ body {
    things that answer a tap.
    the tap highlight is the platform's grey flashed over the whole box of
    whatever was touched, and the strips are boxes the full width of the sheet.
-   the page marks a tap itself — the word to ink, the leader filling, the
-   brace — so the flash was a second answer on top of the first. */
+   the page marks a tap itself — the word to the accent, the box round the
+   band — so the flash was a second answer on top of the first. */
 button, a { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; text-decoration: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 li { list-style: none; }
 [hidden] { display: none !important; }
@@ -406,10 +406,9 @@ i, .it { font-style: italic; }
 
 /* ── the register stack ────────────────────────────────────── */
 
+/* no rules in the stack at all: the closed registers are held apart by their
+   own padding, and the open one is the only thing framed */
 .bands {
-  /* 2px, not 2.5 — a half pixel lands differently at every scroll offset */
-  border-top: 2px solid var(--ink);
-  border-bottom: 2px solid var(--ink);
   display: flex; flex-direction: column;
   min-height: 0;
 }
@@ -420,48 +419,62 @@ i, .it { font-style: italic; }
   min-height: 0;
   flex: 0 1 auto;
   flex-grow: 0;
+  /* the brace's numbers live on the band, not its ::before, because the
+     spur is an element of its own and has to read them too */
+  --bw: 16px;                                       /* the brace's width; everything follows */
+  --bu: calc(var(--bw) / 16);                       /* one unit of its 16-unit viewBox */
+  --bs: calc(var(--bu) * 20);                       /* spur height */
+  --bt: calc(var(--bu) * 1.76);                     /* stroke weight */
+  --bi: calc(var(--rail) * -1 + var(--bu) * 8.62);  /* the box's outer edge, either side */
 }
-.band + .band { border-top: 1px solid var(--ink); }
 .ready .band { transition: flex-grow .36s var(--snap); }
 .band.is-open { flex-grow: 1; }
 
-/* a brace in the margin, like a marked-up proof: the open band is annotated
-   rather than highlighted. it sits on a rail of its own so it never moves with
-   the page padding, and it marks the open band only — hover is already carried
-   by the word and its leader.
+/* a brace in the margin, like a marked-up proof, closed into a box round the
+   open band. it marks the open band only — hover is carried by the word and
+   its leader.
 
-   built the way typesetting builds a tall brace, not by scaling a glyph: a
-   `{` stretched over a 600px band is a smear, so the two hooks and the middle
-   spur are drawn at a fixed size and only the stems between them run long. the
-   three pieces share one 16-unit viewBox, so the whole mark — stroke weight
-   included — scales from --bw alone and the narrow widths are one line each.
+   the box is one ring with one radius, so the browser draws all four corners
+   and they are the same corner every time: the rounded top-left and
+   bottom-left ARE the brace's hooks. the spur sits in a gap cut out of the
+   left side. the stroke's centre is 9.5 units in from the rail on each side,
+   the stem's line in the old glyph, so the whole mark still scales from --bw
+   alone and the narrow widths are one line each.
 
-   the accent is spelled out inside the data URIs: a URI is a document of its
-   own and --red does not cross into it. keep #dd2f19 in step with :root. */
+   an inset shadow, not a border: chrome floors a border to whole device
+   pixels, so 1.76 drew as 1 beside a spur drawn at 1.76. it sits above the
+   paper fade at the foot of a deep band (.band::after), which otherwise
+   washes out the bottom edge. */
 .band::before {
-  --bw: 16px;                      /* the brace's width; everything follows */
-  --bh: calc(var(--bw) * .625);    /* hook height   10/16 */
-  --bs: calc(var(--bw) * 1.25);    /* spur height   20/16 */
-  --bx: calc(var(--bw) * .544);    /* stem's left    8.7/16 */
-  --bt: calc(var(--bw) * .1);      /* stem's weight  1.6/16 */
   content: '';
-  position: absolute; left: calc(var(--rail) * -1); top: 0; bottom: 0;
-  width: var(--bw);
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 10'%3E%3Cpath d='M15 1.2C11.8 1.2 9.5 2.8 9.5 5.6L9.5 10' fill='none' stroke='%23dd2f19' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") left top / var(--bw) var(--bh) no-repeat,
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 20'%3E%3Cpath d='M9.5 0C9.5 4 9.5 8 1.6 10C9.5 12 9.5 16 9.5 20' fill='none' stroke='%23dd2f19' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") left center / var(--bw) var(--bs) no-repeat,
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 10'%3E%3Cpath d='M9.5 0L9.5 4.4C9.5 7.2 11.8 8.8 15 8.8' fill='none' stroke='%23dd2f19' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") left bottom / var(--bw) var(--bh) no-repeat,
-    /* each stem anchors to its own end of the box. a percentage in the
-       four-value position form resolves against (area - image), not the box,
-       so a centre-anchored stem lands hundreds of pixels short on a tall
-       band. the +1px is overlap: butted exactly, the join shows a seam. */
-    linear-gradient(var(--red), var(--red))
-      left var(--bx) top var(--bh) / var(--bt) calc(50% - var(--bs) / 2 - var(--bh) + 1px) no-repeat,
-    linear-gradient(var(--red), var(--red))
-      left var(--bx) bottom var(--bh) / var(--bt) calc(50% - var(--bs) / 2 - var(--bh) + 1px) no-repeat;
+  position: absolute; z-index: 1;
+  top: calc(var(--bu) * .32); bottom: calc(var(--bu) * .32);
+  left: var(--bi); right: var(--bi);
+  border-radius: calc(var(--bu) * 6);
+  box-shadow: inset 0 0 0 var(--bt) var(--red);
+  /* the left edge is let through above and below the spur and everything
+     right of it whole. the gap is a pixel short at each end so the stem and
+     the spur overlap: butted exactly, their antialiased ends leave a hairline */
+  -webkit-mask:
+    linear-gradient(#000 calc(50% - var(--bs) / 2 + 1px), transparent 0 calc(50% + var(--bs) / 2 - 1px), #000 0) left / var(--bw) 100% no-repeat,
+    linear-gradient(#000, #000) right / calc(100% - var(--bw)) 100% no-repeat;
+  mask:
+    linear-gradient(#000 calc(50% - var(--bs) / 2 + 1px), transparent 0 calc(50% + var(--bs) / 2 - 1px), #000 0) left / var(--bw) 100% no-repeat,
+    linear-gradient(#000, #000) right / calc(100% - var(--bw)) 100% no-repeat;
   opacity: 0; transition: opacity .12s linear;
+  pointer-events: none;
 }
-.band.is-open::before { opacity: 1; }
+/* the accent is spelled out inside the data URI: a URI is a document of its
+   own and --red does not cross into it. keep #dd2f19 in step with :root. */
+.spur {
+  position: absolute; z-index: 1;
+  left: calc(var(--rail) * -1); top: 50%;
+  width: var(--bw); height: var(--bs); margin-top: calc(var(--bs) / -2);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 20'%3E%3Cpath d='M9.5 0C9.5 4 9.5 8 1.6 10C9.5 12 9.5 16 9.5 20' fill='none' stroke='%23dd2f19' stroke-width='1.76' stroke-linecap='round'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  opacity: 0; transition: opacity .12s linear;
+  pointer-events: none;
+}
+.band.is-open::before, .band.is-open > .spur { opacity: 1; }
 
 .strip-h { font: inherit; font-weight: inherit; letter-spacing: inherit; }
 .strip {
@@ -471,10 +484,10 @@ i, .it { font-style: italic; }
 }
 .word {
   font-size: var(--t-word);
-  font-weight: 400;
+  font-weight: 600;
   letter-spacing: -.026em;
   line-height: 1;
-  color: var(--ink-3);
+  color: var(--ink-2);
   transition: color .1s linear;
 }
 /* a finger leaves :hover on whatever it last touched, and the register stack
@@ -485,8 +498,10 @@ i, .it { font-style: italic; }
    stack is the same argument, and it also spares the phone a second animation
    on the frame the band has to start moving on. */
 @media (hover: hover) { .strip:hover .word { color: var(--red-ink); } }
-.band.is-open .word { color: var(--ink); font-weight: 600; letter-spacing: -.032em; }
-.band.is-open .strip:hover .word { color: var(--ink); }
+/* bold at rest and set back to regular when open, in the box's own orange —
+   --red and not --red-ink: it is bold caps, and it has to match the ring */
+.band.is-open .word { color: var(--red); font-weight: 400; }
+.band.is-open .strip:hover .word { color: var(--red); }
 
 /* the strip runs the full width, so the default ring draws a box around the
    whole row and keeps it there while the arrows walk the registers. it marks
@@ -495,7 +510,7 @@ i, .it { font-style: italic; }
    somewhere to send you, and a ring around a whole band reads as an error. */
 .strip:focus-visible, .pdetail:focus-visible, .wdetail:focus-visible { outline: none; }
 .strip:focus-visible .word { color: var(--red-ink); }
-.band.is-open .strip:focus-visible .word { color: var(--ink); }
+.band.is-open .strip:focus-visible .word { color: var(--red); }
 /* the index rails are rows and columns of names, each name a button the
    width of its column, so a box here is a box around a whole row too. the
    name takes the accent, as it does under a pointer; the selected one is
@@ -537,9 +552,9 @@ i, .it { font-style: italic; }
   background-position: left bottom 4px;
   background-repeat: repeat-x;
 }
-/* the red dots are ONE layer, drawn once, at one colour and one size. hover
-   and open differ only in how far the run travels — never in opacity, which
-   would pale the colour and shrink the dot's antialiased edge with it. */
+/* the red dots are ONE layer, drawn once, at one colour and one size. they
+   come and go by how far the run travels — never by opacity, which would
+   pale the colour and shrink the dot's antialiased edge with it. */
 @property --run {
   syntax: '<length-percentage>';
   inherits: false;
@@ -557,20 +572,18 @@ i, .it { font-style: italic; }
   --run: 0px;
   -webkit-mask-image: linear-gradient(90deg, #000 var(--run), transparent var(--run));
   mask-image: linear-gradient(90deg, #000 var(--run), transparent var(--run));
-  transition: --run .16s steps(10, end);
-}
-/* hover: ten dots. 70px is exactly ten 7px cells, so it ends between dots.
-   pointers only, for the reason given at .strip:hover .word — and on a phone
-   this is also a mask repainted across the full width of the strip on the one
-   frame the band has to start moving on. */
-@media (hover: hover) { .strip:hover .leader::before { --run: 70px; } }
-/* open: the same run, all the way. smooth here rather than stepped, and timed
-   to the band's own .36s, so the rule fills as the band opens */
-.band.is-open .leader::before,
-.band.is-open .strip:hover .leader::before {
-  --run: 100%;
   transition: --run .34s var(--snap);
 }
+/* hover runs the red to the edge of the strip. smooth rather than stepped: a
+   full-width run in steps is a jerk. pointers only, for the reason given at
+   .strip:hover .word — and on a phone this is also a mask repainted across
+   the full width of the strip on the one frame the band has to start moving
+   on. */
+@media (hover: hover) { .strip:hover .leader::before { --run: 100%; } }
+/* open draws it back to grey on the band's own timing, so the red leaves as
+   the box arrives — the box is what marks the open band, not the leader */
+.band.is-open .leader::before,
+.band.is-open .strip:hover .leader::before { --run: 0px; }
 
 .body { flex: 1 1 0; min-height: 0; overflow: hidden; }
 
@@ -638,6 +651,9 @@ i, .it { font-style: italic; }
 }
 /* both arrive once the band has finished opening and knows its own height */
 .band.is-scrollable > .mark, .band.is-scrollable > .track { opacity: 1; }
+/* a mouse has a wheel, and the box closes on the rail the track stood on.
+   the fade at the foot (below) still says a band runs deeper. */
+@media (hover: hover) and (pointer: fine) { .mark, .track { display: none; } }
 
 /* and the same thing said where it is felt. the mark in the margin is a
    position, and it reads as one; what it does not say is that the line the
@@ -1060,7 +1076,7 @@ i, .it { font-style: italic; }
    edge. the mark scales instead. this one stays on the window because the
    length it answers to does. */
 @media (max-width: 1080px) {
-  .band::before { --bw: 12px; }
+  .band { --bw: 12px; }
 }
 
 /* ── the sheet's own widths ──────────────────────────────────
@@ -1111,7 +1127,7 @@ i, .it { font-style: italic; }
      back, and the gap is then the gap you can see. */
   .head { flex-direction: column; align-items: flex-start; gap: 10px; }
   .head h1 { margin-bottom: .13em; }
-  .band::before { --bw: 11px; }   /* the rail is at its 14px floor from here down */
+  .band { --bw: 11px; }   /* the rail is at its 14px floor from here down */
   .about__top { padding-bottom: 0; row-gap: clamp(10px, 2.4svh, 28px); }
   /* only here do the two blocks stack; the notes keep their own rhythm */
   .lede, .about__two { grid-column: 1 / -1; }
@@ -1388,18 +1404,18 @@ i, .it { font-style: italic; }
 
    there is no accent bar here on purpose. the active-item bar is the
    most generated-looking component on the web, and the open register is
-   already marked three times over: the brace in the rail, the leader
-   filling red, the word going to ink. */
+   already marked twice over: the box closed out of the brace, and the word
+   going to the box's orange. */
 .strip { gap: 0; }
 
 .word {
   font-family: var(--mono);
   text-transform: uppercase;
   font-size: calc(var(--t-word) * .8);
-  font-weight: 400;
+  font-weight: 600;
   letter-spacing: .085em;
 }
-.band.is-open .word { font-weight: 600; letter-spacing: .085em; }
+.band.is-open .word { font-weight: 400; letter-spacing: .085em; }
 
 .leader { margin: 0 0 0 .9em; }
 
@@ -1444,7 +1460,7 @@ i, .it { font-style: italic; }
 }
 
 /* Space Mono runs wide and tall; the label gives back what the face takes */
-.word { font-size: calc(var(--t-word) * .72); letter-spacing: .07em; }
+.word { font-size: calc(var(--t-word) * .828); letter-spacing: .07em; }
 .band.is-open .word { letter-spacing: .07em; }
 
 /* lit, not printed: the accent picks up a halo of its own ink. */
@@ -1599,7 +1615,7 @@ addEventListener('resize', setSheetZoom);
 
 const about = [
   "I sit between business operations and the tools that run them. Close enough to the process to see what's breaking, and technical enough to implement the fix. Experience includes internal tooling, CRM integrations, and data management.",
-  "I've automated workflows, fixed recurring failures, and cleaned up processes that were costing time and money. I like working the whole arc of a problem, from figuring out why something's broken to fixing it.",
+  "I've automated workflows, fixed recurring failures, and cleaned up processes that were costing time and money. I like working the whole arc of a problem, from figuring out why something's broken to permanently fixing it.",
   "AWS certified and working toward Solutions Architect to have a technical footing on the infrastructure side of the business. It's also why the projects here skew toward cloud infra, data pipelines, and agent orchestration."
 ];
 
@@ -1832,6 +1848,7 @@ REGISTERS.forEach((r) => {
       '</div>' +
       '<pre class="track" aria-hidden="true"></pre>' +
       '<i class="mark" aria-hidden="true"></i>' +
+      '<i class="spur" aria-hidden="true"></i>' +
     '</section>'
   );
   band.querySelector('.strip').addEventListener('click', () => open(r.id));
@@ -2322,6 +2339,57 @@ document.addEventListener('keydown', (e) => {
   if (current === 'projects') selectProject(projIdx + step);
   if (current === 'work') selectRole(roleIdx + step);
 });
+
+/* the wheel walks the stack the way the down arrow does: an open band deep
+   enough to scroll is read to its end first, then the next band opens. no
+   wrap at either end — about is the top of the page and stack is its foot.
+
+   a trackpad sends a gesture as a stream of small events and keeps sending
+   them for a second or more of momentum after the fingers lift. so a gesture
+   — events with less than a pause between them — does one thing only: scroll
+   the band, or step to the next one. a flick that runs a band to its floor
+   stops there and the next band waits for a fresh one; a flick that steps
+   does not carry on through three registers on its momentum.
+
+   performance.now() and not e.timeStamp: a synthesized event carries a clock
+   of its own, and a gesture measured across two clocks never ends. */
+const WHEEL_PAUSE = 220;   /* ms of quiet that ends a gesture */
+const WHEEL_NUDGE = 30;    /* px a gesture has to travel before it steps */
+let wheelLast = 0, wheelSpent = false, wheelStepped = false, wheelTravel = 0;
+
+addEventListener('wheel', (e) => {
+  if (e.ctrlKey || plate.open) return;              /* pinch-zoom, or a shot is up */
+  const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1);
+  if (Math.abs(dy) < Math.abs(e.deltaX)) return;    /* a sideways swipe is not ours */
+
+  const now = performance.now();
+  if (now - wheelLast > WHEEL_PAUSE) { wheelSpent = wheelStepped = false; wheelTravel = 0; }
+  wheelLast = now;
+  /* a gesture that has stepped is momentum now: it moves nothing, not even
+     the band it just opened */
+  if (wheelStepped) { e.preventDefault(); return; }
+
+  const dir = Math.sign(dy);
+  if (!dir) return;
+  const body = bandsEl.querySelector('.band.is-open .body');
+  const end = body ? body.scrollHeight - body.clientHeight : 0;
+  /* the same pixel of tolerance the arrows keep at each end (see scrolled) */
+  const room = end >= 2 && (dir > 0 ? body.scrollTop < end - 1 : body.scrollTop > 1);
+  if (room) {
+    /* under the pointer the browser scrolls the band; anywhere else on the
+       page it is scrolled here */
+    wheelSpent = true;
+    if (!body.contains(e.target)) { e.preventDefault(); body.scrollBy(0, dy); }
+    return;
+  }
+  e.preventDefault();
+  if (wheelSpent) return;
+  wheelTravel += dy;
+  if (Math.abs(wheelTravel) < WHEEL_NUDGE) return;
+  wheelSpent = wheelStepped = true;
+  const j = REGISTERS.findIndex((r) => r.id === current) + dir;
+  if (j >= 0 && j < REGISTERS.length) open(REGISTERS[j].id);
+}, { passive: false });
 
 /* ── the address ─────────────────────────────────────────────── */
 
